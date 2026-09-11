@@ -197,6 +197,70 @@ export interface CopilotAnalysisResult {
   }[];
 }
 
+// AI Career Copilot 3.0 Models
+export interface WeeklyMission {
+  id: string;
+  title: string;
+  description: string;
+  category: 'Assessment' | 'Project' | 'Profile' | 'DSA' | 'Skill';
+  estimatedMinutes: number;
+  completed: boolean;
+  xpReward: number;
+  dueDate?: string;
+}
+
+export interface CareerGPS {
+  currentPosition: string; // e.g. "Year 3 CSE (Semester 6)"
+  targetPosition: string; // e.g. "AI Engineer"
+  distanceSkillsCount: number; // e.g. 5 skills needed
+  estimatedMonths: number; // e.g. 6 Months
+  successProbability: number; // e.g. 84%
+  criticalMilestones: string[];
+}
+
+export interface OpportunityMatch {
+  id: string;
+  title: string;
+  company: string;
+  type: 'Job' | 'Internship' | 'Hackathon' | 'Competition';
+  matchScore: number; // %
+  matchReasons: string[];
+  requiredSkills: string[];
+  missingSkills: string[];
+  url?: string;
+  deadline?: string;
+}
+
+export interface LearningVelocity {
+  velocityScore: number; // 0 - 100
+  percentileRank: string; // e.g. "Top 10% Growth Rate"
+  skillsGainedLast30Days: number;
+  projectsCompletedCount: number;
+  assessmentsPassedCount: number;
+  githubGrowthRate: string; // e.g. "+34% Commits MoM"
+}
+
+export interface CopilotChatMessage {
+  id: string;
+  sender: 'user' | 'copilot';
+  text: string;
+  timestamp: string;
+  structuredType?: 'roadmap' | 'gps' | 'missions' | 'projects' | 'gaps' | 'opportunities' | 'readiness';
+  structuredPayload?: any;
+}
+
+export interface CopilotSession {
+  id: string;
+  title: string;
+  targetRole: string;
+  createdAt: string;
+  lastActive: string;
+  messages: CopilotChatMessage[];
+  readinessScore: number;
+  industryAvg: number;
+  topStudentsScore: number;
+}
+
 export interface InternshipOpportunity {
   id: string;
   role: string;
