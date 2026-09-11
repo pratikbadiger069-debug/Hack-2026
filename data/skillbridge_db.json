@@ -106,7 +106,7 @@
       "isEmailVerified": false,
       "emailVerificationToken": "vt_1789124286176_8js9t1b",
       "createdAt": "2026-09-11T10:58:06.176Z",
-      "updatedAt": "2026-09-11T10:58:06.176Z"
+      "updatedAt": "2026-09-11T19:27:12.353Z"
     },
     "manutejreddy@gmail.com": {
       "id": "usr_1789148645714_20tlt0r",
@@ -132,7 +132,7 @@
       "isEmailVerified": false,
       "emailVerificationToken": "vt_1789148818117_n5snm7u",
       "createdAt": "2026-09-11T17:46:58.117Z",
-      "updatedAt": "2026-09-11T19:20:43.012Z",
+      "updatedAt": "2026-09-11T19:25:10.289Z",
       "googleName": "Aarav Sharma"
     },
     "aarav-builder@github.user": {
@@ -649,7 +649,7 @@
         "studentId": "ST-2026-88"
       },
       "professional": {
-        "githubUrl": "https://github.com/builder-dev",
+        "githubUrl": "https://github.com/manutej-128",
         "linkedinUrl": "https://linkedin.com/in/aarav-sharma",
         "portfolioUrl": "",
         "bio": "Software engineer focused on scalable web systems and ML infrastructure.",
@@ -1256,6 +1256,14 @@
     ]
   },
   "auditLogs": [
+    {
+      "id": "log-1789154800948",
+      "timestamp": "2026-09-11T19:26:40.948Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789124286176",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: manu18reddy@gmail.com"
+    },
     {
       "id": "log-1789154461902",
       "timestamp": "2026-09-11T19:21:01.902Z",

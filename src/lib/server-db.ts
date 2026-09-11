@@ -42,107 +42,121 @@ export interface DBData {
   auditLogs: { id: string; timestamp: string; action: string; userId: string; role: string; details: string; ip?: string }[];
 }
 
-const DB_FILE_PATH = path.join(process.cwd(), 'data', 'skillbridge_db.json');
+const isVercel = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const SEED_DB_PATH = path.join(process.cwd(), 'data', 'skillbridge_db.json');
+const DB_FILE_PATH = isVercel ? path.join('/tmp', 'skillbridge_db.json') : SEED_DB_PATH;
+
+let memoryDbCache: DBData | null = null;
 
 function ensureDbFile(): DBData {
-  const dir = path.dirname(DB_FILE_PATH);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-
-  if (!fs.existsSync(DB_FILE_PATH)) {
-    const initialData: DBData = {
-      users: {
-        'admin@skillbridge.io': {
-          id: 'usr-admin-master',
-          email: 'admin@skillbridge.io',
-          name: 'Platform Administrator',
-          role: 'admin',
-          passwordHash: bcrypt.hashSync('Admin2026!', 10),
-          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-          isDemoUser: false,
-          isEmailVerified: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        'demo.student@stanford.edu': {
-          id: 'usr-demo-student',
-          email: 'demo.student@stanford.edu',
-          name: 'Alex Chen',
-          role: 'student',
-          passwordHash: bcrypt.hashSync('Demo1234!', 10),
-          avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
-          isDemoUser: true,
-          isEmailVerified: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        'demo.institute@stanford.edu': {
-          id: 'usr-demo-institute',
-          email: 'demo.institute@stanford.edu',
-          name: 'Dean Eleanor Vance',
-          role: 'institute',
-          passwordHash: bcrypt.hashSync('Demo1234!', 10),
-          avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
-          isDemoUser: true,
-          isEmailVerified: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        'demo.industry@anthropic.com': {
-          id: 'usr-demo-industry',
-          email: 'demo.industry@anthropic.com',
-          name: 'Marcus Vance',
-          role: 'industry',
-          passwordHash: bcrypt.hashSync('Demo1234!', 10),
-          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-          isDemoUser: true,
-          isEmailVerified: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      },
-      studentProfiles: {
-        'demo.student@stanford.edu': mockStudentProfile,
-      },
-      instituteData: {
-        curriculum: [mockCurriculumAnalysis],
-      },
-      industryData: {
-        jobs: mockJobRequirements,
-        candidates: mockCandidatesPipeline,
-      },
-      auditLogs: [
-        {
-          id: 'log-1',
-          timestamp: new Date().toISOString(),
-          action: 'SECURITY_SUBSYSTEM_ONLINE',
-          userId: 'system',
-          role: 'ADMIN',
-          details: 'Production Bcrypt/JWT security engine online with RBAC isolation.',
-        },
-      ],
-    };
-    fs.writeFileSync(DB_FILE_PATH, JSON.stringify(initialData, null, 2), 'utf-8');
-    return initialData;
+  if (memoryDbCache) {
+    return memoryDbCache;
   }
 
   try {
-    const raw = fs.readFileSync(DB_FILE_PATH, 'utf-8');
-    return JSON.parse(raw);
-  } catch {
-    const fallback: DBData = {
-      users: {},
-      studentProfiles: {},
-      instituteData: {},
-      industryData: {},
-      auditLogs: [],
-    };
-    return fallback;
+    const dir = path.dirname(DB_FILE_PATH);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    if (isVercel && !fs.existsSync(DB_FILE_PATH) && fs.existsSync(SEED_DB_PATH)) {
+      const seedRaw = fs.readFileSync(SEED_DB_PATH, 'utf-8');
+      fs.writeFileSync(DB_FILE_PATH, seedRaw, 'utf-8');
+      memoryDbCache = JSON.parse(seedRaw);
+      return memoryDbCache!;
+    }
+
+    if (fs.existsSync(DB_FILE_PATH)) {
+      const raw = fs.readFileSync(DB_FILE_PATH, 'utf-8');
+      memoryDbCache = JSON.parse(raw);
+      return memoryDbCache!;
+    }
+  } catch (fsErr) {
+    console.warn('Filesystem access fallback to memory:', fsErr);
   }
+
+  const initialData: DBData = {
+    users: {
+      'admin@skillbridge.io': {
+        id: 'usr-admin-master',
+        email: 'admin@skillbridge.io',
+        name: 'Platform Administrator',
+        role: 'admin',
+        passwordHash: bcrypt.hashSync('Admin2026!', 10),
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+        isDemoUser: false,
+        isEmailVerified: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      'demo.student@stanford.edu': {
+        id: 'usr-demo-student',
+        email: 'demo.student@stanford.edu',
+        name: 'Alex Chen',
+        role: 'student',
+        passwordHash: bcrypt.hashSync('Demo1234!', 10),
+        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+        isDemoUser: true,
+        isEmailVerified: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      'demo.institute@stanford.edu': {
+        id: 'usr-demo-institute',
+        email: 'demo.institute@stanford.edu',
+        name: 'Dean Eleanor Vance',
+        role: 'institute',
+        passwordHash: bcrypt.hashSync('Demo1234!', 10),
+        avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+        isDemoUser: true,
+        isEmailVerified: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      'demo.industry@anthropic.com': {
+        id: 'usr-demo-industry',
+        email: 'demo.industry@anthropic.com',
+        name: 'Marcus Vance',
+        role: 'industry',
+        passwordHash: bcrypt.hashSync('Demo1234!', 10),
+        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+        isDemoUser: true,
+        isEmailVerified: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    },
+    studentProfiles: {
+      'demo.student@stanford.edu': mockStudentProfile,
+    },
+    instituteData: {
+      curriculum: [mockCurriculumAnalysis],
+    },
+    industryData: {
+      jobs: mockJobRequirements,
+      candidates: mockCandidatesPipeline,
+    },
+    auditLogs: [
+      {
+        id: 'log-1',
+        timestamp: new Date().toISOString(),
+        action: 'SECURITY_SUBSYSTEM_ONLINE',
+        userId: 'system',
+        role: 'ADMIN',
+        details: 'Production Bcrypt/JWT security engine online with RBAC isolation.',
+      },
+    ],
+  };
+
+  memoryDbCache = initialData;
+  try {
+    fs.writeFileSync(DB_FILE_PATH, JSON.stringify(initialData, null, 2), 'utf-8');
+  } catch {}
+  return memoryDbCache;
 }
 
 function saveDb(data: DBData) {
+  memoryDbCache = data;
   try {
     const dir = path.dirname(DB_FILE_PATH);
     if (!fs.existsSync(dir)) {
@@ -150,7 +164,7 @@ function saveDb(data: DBData) {
     }
     fs.writeFileSync(DB_FILE_PATH, JSON.stringify(data, null, 2), 'utf-8');
   } catch (err) {
-    console.error('Failed to save to database file:', err);
+    console.warn('Warning: Serverless persistent write skipped, updated in-memory state.');
   }
 }
 
