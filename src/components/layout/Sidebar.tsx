@@ -43,28 +43,20 @@ export function Sidebar() {
   const { currentRole, isDemoMode, studentProfile, jobs } = useAppStore();
 
   const studentLinks: NavItem[] = [
-    { name: 'Dashboard', href: '/student', icon: LayoutDashboard },
-    { name: 'Profile', href: '/student/profile', icon: User },
+    { name: 'Home', href: '/student', icon: LayoutDashboard },
     {
-      name: 'Builder Passport',
-      href: '/student/builder-passport',
+      name: 'My Journey',
+      href: '/student/journey',
       icon: Award,
       badge: isDemoMode ? 'Score 885' : studentProfile.builderScores.overall > 0 ? `Score ${studentProfile.builderScores.overall}` : undefined,
     },
-    {
-      name: 'Verified Skill Passport',
-      href: '/student/verified-passport',
-      icon: ShieldCheck,
-      badge: isDemoMode ? '6 Verified' : studentProfile.verifiedSkills.length > 0 ? `${studentProfile.verifiedSkills.length} Verified` : undefined,
-    },
-    { name: 'Assessments', href: '/student/assessments', icon: CheckSquare },
     { name: 'Career Copilot', href: '/student/career-copilot', icon: Bot, highlight: true },
-    { name: 'Skill Gap Analysis', href: '/student/skill-gap', icon: GitPullRequest },
-    { name: 'Learning Roadmap', href: '/student/roadmap', icon: Map },
-    { name: 'Courses', href: '/student/courses', icon: BookOpen },
-    { name: 'Internships', href: '/student/internships', icon: Briefcase },
-    { name: 'Opportunities', href: '/student/opportunities', icon: Compass },
-    { name: 'Notifications', href: '/student/notifications', icon: Bell },
+    {
+      name: 'Opportunities',
+      href: '/student/opportunities',
+      icon: Compass,
+      badge: '6 Matched',
+    },
     { name: 'Settings', href: '/student/settings', icon: Settings },
   ];
 

@@ -4,9 +4,8 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
-import { mockRadarData, mockProgressTrend, mockInternships } from '@/lib/mock-data';
-import { calculateProfileCompletion } from '@/lib/profile-completion';
 import { getUserFirstName, getUserDisplayName } from '@/lib/user-utils';
+import { analyzeStudentCareerContext, ROLE_BENCHMARKS } from '@/lib/copilot-engine';
 import {
   Award,
   TrendingUp,
@@ -20,30 +19,26 @@ import {
   Code,
   Calendar,
   ExternalLink,
-  PlusCircle,
-  FileText,
-  UserCheck,
-  Layers,
+  Target,
+  Compass,
+  CheckSquare,
+  Square,
+  Flame,
+  Zap,
   ArrowRight,
+  BookOpen,
+  Bot,
+  Activity,
+  Layers,
+  Clock,
+  Edit3,
 } from 'lucide-react';
-import {
-  Radar,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-} from 'recharts';
 
-export default function StudentDashboardPage() {
-  const { studentProfile, currentUser, setRole, isDemoMode } = useAppStore();
+export default function StudentHomePage() {
+  const { studentProfile, currentUser, setRole, updateStudentTargetRole, isDemoMode } = useAppStore();
   const [mounted, setMounted] = useState(false);
+  const [isEditingGoal, setIsEditingGoal] = useState(false);
+  const [selectedRole, setSelectedRole] = useState(studentProfile.targetRole || 'AI Engineer');
 
   useEffect(() => {
     setRole('student');
@@ -52,452 +47,454 @@ export default function StudentDashboardPage() {
 
   if (!mounted) return null;
 
-  const profileStatus = calculateProfileCompletion(studentProfile);
+  const firstName = getUserFirstName({ user: currentUser, profile: studentProfile });
+  const currentHour = new Date().getHours();
+  const timeGreeting = currentHour < 12 ? 'Good Morning' : currentHour < 18 ? 'Good Afternoon' : 'Good Evening';
 
-  const radarData = isDemoMode
-    ? mockRadarData
-    : [
-        { subject: 'Execution', A: studentProfile.builderScores.execution || 0, benchmark: 85, fullMark: 100 },
-        { subject: 'Problem Solving', A: studentProfile.builderScores.problemSolving || 0, benchmark: 80, fullMark: 100 },
-        { subject: 'Innovation', A: studentProfile.builderScores.innovation || 0, benchmark: 75, fullMark: 100 },
-        { subject: 'Leadership', A: studentProfile.builderScores.leadership || 0, benchmark: 70, fullMark: 100 },
-        { subject: 'Consistency', A: studentProfile.builderScores.consistency || 0, benchmark: 90, fullMark: 100 },
-      ];
+  const context = analyzeStudentCareerContext(studentProfile, selectedRole);
 
-  const progressTrend = isDemoMode
-    ? mockProgressTrend
-    : [
-        { month: 'Start', builderScore: 0, industryReadiness: 0 },
-        { month: 'Current', builderScore: studentProfile.builderScores.overall || 0, industryReadiness: studentProfile.employabilityScore || 0 },
-      ];
+  const [missions, setMissions] = useState([
+    { id: 'm-1', title: 'Complete SQL & Database Assessment', category: 'Assessment', completed: true, xp: 120 },
+    { id: 'm-2', title: 'Build Expense Tracker API with Docker', category: 'Project', completed: false, xp: 350 },
+    { id: 'm-3', title: 'Connect & Verify GitHub Activity Graph', category: 'Profile', completed: true, xp: 80 },
+    { id: 'm-4', title: 'Optimize LinkedIn Headline & Skills', category: 'Profile', completed: false, xp: 100 },
+  ]);
+
+  const toggleMission = (id: string) => {
+    setMissions((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, completed: !m.completed } : m))
+    );
+  };
+
+  const completedCount = missions.filter((m) => m.completed).length;
+
+  const handleSaveGoal = (newRole: string) => {
+    setSelectedRole(newRole);
+    updateStudentTargetRole(newRole);
+    setIsEditingGoal(false);
+  };
+
+  const sampleRoles = Object.keys(ROLE_BENCHMARKS);
+
+  // Strongest and Weakest Skills
+  const sortedSkills = [...(studentProfile.verifiedSkills || [])].sort((a, b) => b.score - a.score);
+  const strongestSkill = sortedSkills[0] || { name: 'Python & FastAPI', score: 95 };
+  const weakestSkill = sortedSkills[sortedSkills.length - 1] || { name: 'Docker & Kubernetes', score: 74 };
+
+  const recentActivities = [
+    {
+      id: 'act-1',
+      title: 'Python & FastAPI Assessment Passed',
+      category: 'Assessment',
+      score: '95% Score',
+      date: '2 hours ago',
+      icon: CheckCircle2,
+      iconColor: 'text-emerald-600 bg-emerald-50',
+    },
+    {
+      id: 'act-2',
+      title: 'VectorMind Retrieval Engine Uploaded',
+      category: 'Project',
+      score: '+96 Impact',
+      date: 'Yesterday',
+      icon: Code,
+      iconColor: 'text-blue-600 bg-blue-50',
+    },
+    {
+      id: 'act-3',
+      title: 'Distributed Systems Skill Verified',
+      category: 'Skill Badge',
+      score: 'Verified by Faculty',
+      date: '3 days ago',
+      icon: ShieldCheck,
+      iconColor: 'text-purple-600 bg-purple-50',
+    },
+    {
+      id: 'act-4',
+      title: 'AI Career Roadmap Calibrated',
+      category: 'Copilot',
+      score: '4 Phases Generated',
+      date: '5 days ago',
+      icon: Compass,
+      iconColor: 'text-amber-600 bg-amber-50',
+    },
+  ];
 
   return (
     <PortalLayout>
       <div className="space-y-6">
-        {/* Welcome Banner */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-2xs">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
-                {isDemoMode ? 'Demo Sandbox Account' : 'Verified Student Identity'}
-              </span>
-              <span className="text-xs text-slate-400">•</span>
-              <span className="text-xs text-slate-500">{studentProfile.academic.college || 'Not Assigned'}</span>
+        {/* Command Center Welcome Header */}
+        <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 rounded-2xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
+          <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-500/20 via-transparent to-transparent pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                  {studentProfile.academic.year} • {studentProfile.academic.department}
+                </span>
+                <span className="text-slate-400">•</span>
+                <span className="text-xs text-slate-300">CGPA: {studentProfile.academic.cgpa}</span>
+              </div>
+              <h1 className="text-3xl font-extrabold tracking-tight text-white">
+                {timeGreeting}, {firstName} 👋
+              </h1>
+              <p className="text-sm text-slate-300 max-w-xl leading-relaxed">
+                Continue building your verified digital identity. Your career readiness is up <strong className="text-emerald-400 font-bold">+14%</strong> this month.
+              </p>
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-              Welcome back, {getUserFirstName({ user: currentUser, profile: studentProfile })}
-            </h1>
-            <p className="text-xs text-slate-500 mt-1">
-              Target Role: <span className="font-semibold text-slate-700">{studentProfile.targetRole || 'Full Stack Engineer'}</span> • Ready for 2026 Enterprise Hiring Cycle
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/student/career-copilot"
-              className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-xs flex items-center gap-1.5"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              Launch Career Copilot
-            </Link>
-            <Link
-              href="/student/builder-passport"
-              className="px-3.5 py-2 text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100 transition-colors"
-            >
-              View Passport
-            </Link>
+
+            {/* Current Goal Widget in Header */}
+            <div className="p-4 bg-white/10 backdrop-blur-md rounded-xl border border-white/15 min-w-[280px] space-y-2 self-start lg:self-auto">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-blue-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Target className="w-3.5 h-3.5 text-blue-400" />
+                  Target Goal
+                </span>
+                <button
+                  onClick={() => setIsEditingGoal(!isEditingGoal)}
+                  className="text-[10px] text-slate-300 hover:text-white underline flex items-center gap-0.5"
+                >
+                  <Edit3 className="w-2.5 h-2.5" />
+                  Change
+                </button>
+              </div>
+
+              {isEditingGoal ? (
+                <div className="space-y-2 pt-1">
+                  <select
+                    value={selectedRole}
+                    onChange={(e) => handleSaveGoal(e.target.value)}
+                    className="w-full text-xs p-1.5 rounded bg-slate-800 text-white border border-slate-700 focus:outline-none"
+                  >
+                    {sampleRoles.map((r) => (
+                      <option key={r} value={r}>
+                        {r}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between pt-1">
+                  <span className="text-base font-bold text-white">{selectedRole}</span>
+                  <Link
+                    href="/student/career-copilot"
+                    className="p-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors"
+                  >
+                    <Sparkles className="w-3 h-3" />
+                  </Link>
+                </div>
+              )}
+
+              <div className="text-[11px] text-slate-300 flex items-center justify-between pt-1 border-t border-white/10">
+                <span>Readiness Rating:</span>
+                <strong className="text-emerald-300 font-bold">{context.readinessScore}%</strong>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Profile Completion Engine Card (Dynamic SaaS Progress) */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">
-                {profileStatus.percentage}%
-              </div>
+        {/* 3 Main Highlights: Readiness Score Gauge | Weekly Missions | Opportunities Summary */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {/* 1. Career Readiness Score */}
+          <div className="saas-card p-6 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <span className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                <Flame className="w-4 h-4 text-amber-500" />
+                Career Readiness
+              </span>
+              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                +14% Growth Trend
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between gap-4">
               <div>
-                <h3 className="text-sm font-bold text-slate-900">Profile Completion Engine</h3>
-                <p className="text-xs text-slate-500">
-                  {profileStatus.percentage === 100
-                    ? 'Your verified builder profile is 100% complete and visible to hiring teams.'
-                    : `Complete pending items to reach 100% and unlock Tier-1 recruiter priority routing.`}
-                </p>
+                <div className="text-4xl font-black text-slate-900 tracking-tight">
+                  {context.readinessScore}%
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5">Target: {selectedRole}</p>
+              </div>
+
+              <div className="text-right space-y-1 text-xs">
+                <div className="text-slate-600">
+                  Industry Avg: <strong className="text-slate-900">{context.industryAvg}%</strong>
+                </div>
+                <div className="text-slate-600">
+                  Dept Avg: <strong className="text-slate-900">71%</strong>
+                </div>
+                <div className="text-slate-600">
+                  Top 10%: <strong className="text-emerald-600">{context.topStudentsScore}%</strong>
+                </div>
               </div>
             </div>
+
+            <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+              <div
+                className="bg-gradient-to-r from-blue-600 to-emerald-500 h-2.5 rounded-full transition-all duration-500"
+                style={{ width: `${context.readinessScore}%` }}
+              />
+            </div>
+
             <Link
-              href="/student/profile"
-              className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+              href="/student/career-copilot"
+              className="w-full py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
             >
-              <span>Edit Full Profile</span>
+              <span>Explore Skill Gaps &amp; Roadmap</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          {/* Progress Bar */}
-          <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden mb-4">
-            <div
-              className={`h-full rounded-full transition-all duration-700 ${
-                profileStatus.percentage >= 80
-                  ? 'bg-emerald-600'
-                  : profileStatus.percentage >= 50
-                  ? 'bg-blue-600'
-                  : 'bg-amber-500'
-              }`}
-              style={{ width: `${profileStatus.percentage}%` }}
-            />
-          </div>
+          {/* 2. Weekly Missions */}
+          <div className="saas-card p-6 space-y-3 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-3">
+                <span className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  Weekly Missions
+                </span>
+                <span className="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
+                  {completedCount} of {missions.length} Done
+                </span>
+              </div>
 
-          {/* Pending Action Badges */}
-          {profileStatus.pendingSections.length > 0 && (
-            <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2">
-              <span className="text-xs font-medium text-slate-500">Next Actionable Steps:</span>
-              {profileStatus.pendingSections.map((pending, idx) => (
-                <Link
-                  key={idx}
-                  href={pending.actionHref}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md border border-blue-100 transition-colors"
-                >
-                  <PlusCircle className="w-3 h-3" />
-                  <span>{pending.name} (+{pending.points}%)</span>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* 4 Metric Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Card 1: Builder Score */}
-          <div className="saas-card p-5">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-slate-500">Builder Score</span>
-              <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                <Award className="w-4 h-4" />
+              <div className="space-y-2">
+                {missions.map((m) => (
+                  <div
+                    key={m.id}
+                    onClick={() => toggleMission(m.id)}
+                    className={`p-2.5 rounded-lg border text-xs cursor-pointer flex items-center justify-between transition-all ${
+                      m.completed
+                        ? 'bg-emerald-50/40 border-emerald-200 text-emerald-950'
+                        : 'bg-white border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      {m.completed ? (
+                        <CheckSquare className="w-4 h-4 text-emerald-600 shrink-0" />
+                      ) : (
+                        <Square className="w-4 h-4 text-slate-400 shrink-0" />
+                      )}
+                      <span
+                        className={`text-xs ${
+                          m.completed ? 'line-through text-slate-400 font-normal' : 'font-semibold text-slate-800'
+                        }`}
+                      >
+                        {m.title}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-bold text-blue-600 shrink-0">+{m.xp} XP</span>
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-slate-900">
-                {studentProfile.builderScores.overall || 0}
-              </span>
-              <span className="text-xs text-slate-400 font-medium">/ 1000</span>
-            </div>
-            <div className="mt-3 flex items-center gap-1.5 text-[11px] text-emerald-700 font-medium">
-              <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold">
-                +45 pts
-              </span>
-              <span>from recent project evidence</span>
-            </div>
-          </div>
 
-          {/* Card 2: Employability Score */}
-          <div className="saas-card p-5">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-slate-500">Employability Score</span>
-              <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
-                <TrendingUp className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-slate-900">
-                {studentProfile.employabilityScore || 0}%
-              </span>
-              <span className="text-xs text-emerald-600 font-medium">
-                {studentProfile.employabilityScore > 80 ? 'Top 5%' : 'Calibrated'}
-              </span>
-            </div>
-            <div className="mt-3 w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-              <div
-                className="bg-emerald-600 h-full rounded-full transition-all duration-500"
-                style={{ width: `${studentProfile.employabilityScore || 0}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Card 3: Verified Skills */}
-          <div className="saas-card p-5">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-slate-500">Verified Skills</span>
-              <div className="p-2 bg-purple-50 text-purple-600 rounded-lg">
-                <ShieldCheck className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-slate-900">
-                {studentProfile.verifiedSkills.length}
-              </span>
-              <span className="text-xs text-slate-500">Validated</span>
-            </div>
-            <div className="mt-3 flex items-center gap-1 text-[11px] text-slate-500">
-              <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
-              <span>Multi-tier validated</span>
-            </div>
-          </div>
-
-          {/* Card 4: Internship Matches */}
-          <div className="saas-card p-5">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-slate-500">Internship Matches</span>
-              <div className="p-2 bg-amber-50 text-amber-600 rounded-lg">
-                <Briefcase className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-slate-900">
-                {mockInternships.length}
-              </span>
-              <span className="text-xs text-amber-600 font-medium">90%+ match</span>
-            </div>
             <Link
-              href="/student/internships"
-              className="mt-3 inline-flex items-center gap-1 text-[11px] text-blue-600 font-medium hover:text-blue-700"
+              href="/student/journey"
+              className="w-full py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors mt-2"
             >
-              <span>Review opportunities</span>
-              <ArrowUpRight className="w-3 h-3" />
+              <span>View Full Passport &amp; Evidences</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          {/* 3. Opportunity Summary */}
+          <div className="saas-card p-6 space-y-4 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                <span className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                  <Compass className="w-4 h-4 text-indigo-600" />
+                  Opportunity Radar
+                </span>
+                <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
+                  6 Matches
+                </span>
+              </div>
+
+              <div className="space-y-2.5 pt-2">
+                <div className="p-3 bg-indigo-50/50 rounded-lg border border-indigo-100 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2">
+                    <Briefcase className="w-4 h-4 text-indigo-600" />
+                    <div>
+                      <strong className="text-slate-900 block font-semibold">3 New Internship Matches</strong>
+                      <span className="text-[10px] text-slate-500">Anthropic, Stripe, Google</span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
+                    94% Fit
+                  </span>
+                </div>
+
+                <div className="p-3 bg-amber-50/50 rounded-lg border border-amber-100 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2">
+                    <Award className="w-4 h-4 text-amber-600" />
+                    <div>
+                      <strong className="text-slate-900 block font-semibold">2 Live Hackathons</strong>
+                      <span className="text-[10px] text-slate-500">Global AI Systems 2026 ($50k)</span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded">
+                    98% Fit
+                  </span>
+                </div>
+
+                <div className="p-3 bg-blue-50/50 rounded-lg border border-blue-100 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2">
+                    <Code className="w-4 h-4 text-blue-600" />
+                    <div>
+                      <strong className="text-slate-900 block font-semibold">1 Industry Challenge</strong>
+                      <span className="text-[10px] text-slate-500">Distributed Rate Limiter RFP</span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-bold text-blue-800 bg-blue-100 px-2 py-0.5 rounded">
+                    89% Fit
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <Link
+              href="/student/opportunities"
+              className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-2xs"
+            >
+              <span>Explore All 6 Matched Openings</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
 
-        {/* Charts Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Skill Radar Chart */}
-          <div className="lg:col-span-6 saas-card p-6 flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <h3 className="text-sm font-bold text-slate-900">Skill Radar &amp; Benchmark</h3>
-                <p className="text-xs text-slate-500">Your performance vs Industry Hiring Standard</p>
+        {/* Quick Insights Grid & Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          {/* Quick Insights (4 Cards) */}
+          <div className="lg:col-span-7 space-y-4">
+            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <Zap className="w-4 h-4 text-blue-600" />
+              Quick Intelligence Insights
+            </h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Strongest Skill */}
+              <div className="saas-card p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">Strongest Asset</span>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                </div>
+                <div className="text-base font-bold text-slate-900">{strongestSkill.name}</div>
+                <div className="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100">
+                  <span>Verified Score:</span>
+                  <strong className="text-emerald-600 font-bold">{strongestSkill.score}%</strong>
+                </div>
               </div>
-              <span className="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-medium">
-                Live Calibration
-              </span>
-            </div>
 
-            <div className="h-64 w-full flex items-center justify-center">
-              <ResponsiveContainer width="100%" height="100%">
-                <RadarChart cx="50%" cy="50%" outerRadius="75%" data={radarData}>
-                  <PolarGrid stroke="#e2e8f0" />
-                  <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 11 }} />
-                  <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="#cbd5e1" />
-                  <Radar
-                    name="Your Score"
-                    dataKey="A"
-                    stroke="#2563eb"
-                    fill="#2563eb"
-                    fillOpacity={0.4}
-                  />
-                  <Radar
-                    name="Industry Benchmark"
-                    dataKey="benchmark"
-                    stroke="#94a3b8"
-                    fill="#94a3b8"
-                    fillOpacity={0.15}
-                  />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div className="flex items-center justify-center gap-6 pt-3 border-t border-slate-100 text-xs">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-blue-600" />
-                <span className="text-slate-700 font-medium">Candidate Score</span>
+              {/* Weakest Skill / Priority Delta */}
+              <div className="saas-card p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">Priority Delta</span>
+                  <AlertCircle className="w-4 h-4 text-amber-500" />
+                </div>
+                <div className="text-base font-bold text-slate-900">{weakestSkill.name}</div>
+                <div className="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100">
+                  <span>Current Competency:</span>
+                  <strong className="text-amber-600 font-bold">{weakestSkill.score}%</strong>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-slate-400" />
-                <span className="text-slate-500">Industry Threshold</span>
+
+              {/* Builder Score */}
+              <div className="saas-card p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">Builder Index</span>
+                  <Award className="w-4 h-4 text-blue-600" />
+                </div>
+                <div className="text-base font-bold text-slate-900">
+                  {studentProfile.builderScores.overall} / 1000
+                </div>
+                <div className="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100">
+                  <span>Rank:</span>
+                  <strong className="text-blue-600 font-bold">Top 5% National Tier</strong>
+                </div>
+              </div>
+
+              {/* Learning Velocity */}
+              <div className="saas-card p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">Learning Velocity</span>
+                  <TrendingUp className="w-4 h-4 text-purple-600" />
+                </div>
+                <div className="text-base font-bold text-slate-900">Top 8% Growth Rate</div>
+                <div className="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100">
+                  <span>GitHub Commits:</span>
+                  <strong className="text-purple-600 font-bold">+38% MoM</strong>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Progress Trend Chart */}
-          <div className="lg:col-span-6 saas-card p-6 flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <h3 className="text-sm font-bold text-slate-900">Builder &amp; Industry Growth</h3>
-                <p className="text-xs text-slate-500">
-                  {isDemoMode ? '6-Month velocity tracking' : 'Live builder telemetry tracking'}
-                </p>
+            {/* Quick Banner to Copilot */}
+            <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
+                  <Bot className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900">Have questions about placement readiness?</h4>
+                  <p className="text-[11px] text-slate-600">Ask Career Copilot 3.0 for personalized project recommendations and roadmap milestones.</p>
+                </div>
               </div>
-              <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1">
-                <TrendingUp className="w-3.5 h-3.5" />
-                {isDemoMode ? '+22.9% QoQ' : 'Calibrated Real-time'}
-              </span>
-            </div>
-
-            <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={progressTrend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorBuilder" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis dataKey="month" tick={{ fill: '#64748b', fontSize: 11 }} />
-                  <YAxis domain={[0, 1000]} tick={{ fill: '#64748b', fontSize: 11 }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#ffffff',
-                      borderColor: '#e2e8f0',
-                      borderRadius: '0.5rem',
-                      fontSize: '12px',
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="builderScore"
-                    stroke="#2563eb"
-                    strokeWidth={2}
-                    fillOpacity={1}
-                    fill="url(#colorBuilder)"
-                    name="Builder Score"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs text-slate-500">
-              <span>Sept: 720 / 1000</span>
-              <span className="font-semibold text-blue-600">Current: 885 / 1000</span>
-              <span>Target: 950+</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Split: Recent Activity Feed & Recommended Next Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Activity Feed / Empty State */}
-          <div className="lg:col-span-7 saas-card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold text-slate-900">Verified Evidence &amp; Activity Feed</h3>
-              <Link href="/student/builder-passport" className="text-xs text-blue-600 hover:text-blue-700 font-medium">
-                View All Proofs
+              <Link
+                href="/student/career-copilot"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shrink-0 transition-colors shadow-2xs"
+              >
+                Launch Copilot
               </Link>
             </div>
+          </div>
 
-            {studentProfile.evidences.length === 0 ? (
-              <div className="text-center py-10 px-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                <Code className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                <h4 className="text-xs font-bold text-slate-800">No project evidence uploaded yet</h4>
-                <p className="text-[11px] text-slate-500 mt-1 max-w-sm mx-auto">
-                  Upload your first GitHub project or live deployment link to generate your verified Builder Score.
-                </p>
-                <Link
-                  href="/student/builder-passport"
-                  className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
-                >
-                  <PlusCircle className="w-3.5 h-3.5" />
-                  Submit First Project Proof
-                </Link>
-              </div>
-            ) : (
-              <div className="space-y-3.5">
-                {studentProfile.evidences.map((ev) => (
+          {/* Recent Activity Timeline (5 Columns) */}
+          <div className="lg:col-span-5 saas-card p-5 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                <Clock className="w-4 h-4 text-blue-600" />
+                Recent Verified Activity
+              </h2>
+              <span className="text-[10px] text-slate-400">Live Feed</span>
+            </div>
+
+            <div className="space-y-3">
+              {recentActivities.map((act) => {
+                const Icon = act.icon;
+                return (
                   <div
-                    key={ev.id}
-                    className="flex items-start gap-3 p-3 rounded-lg border border-slate-100 hover:border-slate-200 bg-slate-50/50 transition-all"
+                    key={act.id}
+                    className="p-3 bg-slate-50/70 border border-slate-100 rounded-xl flex items-start gap-3 text-xs"
                   >
-                    <div className="p-2 bg-white rounded-md border border-slate-200 text-blue-600 shrink-0">
-                      <Code className="w-4 h-4" />
+                    <div className={`p-2 rounded-lg shrink-0 ${act.iconColor}`}>
+                      <Icon className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <h4 className="text-xs font-semibold text-slate-900 truncate">{ev.title}</h4>
-                        <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded shrink-0">
-                          Score +{ev.impactScore}
-                        </span>
+                        <strong className="text-slate-900 font-semibold truncate block">
+                          {act.title}
+                        </strong>
+                        <span className="text-[10px] text-slate-400 shrink-0">{act.date}</span>
                       </div>
-                      <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">{ev.description}</p>
-                      <div className="flex items-center gap-3 mt-1.5 text-[10px] text-slate-400">
-                        <span className="font-medium text-slate-600">{ev.type}</span>
-                        <span>•</span>
-                        <span>{ev.date}</span>
-                        <span>•</span>
-                        <a
-                          href={ev.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-blue-600 hover:underline flex items-center gap-0.5"
-                        >
-                          Proof Link <ExternalLink className="w-2.5 h-2.5" />
-                        </a>
+                      <div className="flex items-center justify-between mt-1 text-[11px]">
+                        <span className="text-slate-500">{act.category}</span>
+                        <span className="font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded">
+                          {act.score}
+                        </span>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Recommended Next Actions */}
-          <div className="lg:col-span-5 saas-card p-6 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-bold text-slate-900">Recommended Next Actions</h3>
-                <span className="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-medium">
-                  AI Prioritized
-                </span>
-              </div>
-              <div className="space-y-3">
-                <Link
-                  href="/student/assessments"
-                  className="flex items-start gap-3 p-3 rounded-lg border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all group"
-                >
-                  <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                    1
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-xs font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
-                      Complete Cloud &amp; K8s Assessment
-                    </h4>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
-                      Verify Docker &amp; Pod Lifecycle to bridge critical gap for Cloud AI roles.
-                    </p>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 mt-1" />
-                </Link>
-
-                <Link
-                  href="/student/career-copilot"
-                  className="flex items-start gap-3 p-3 rounded-lg border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all group"
-                >
-                  <div className="w-6 h-6 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                    2
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-xs font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
-                      Run AI Career Copilot for AI Engineer
-                    </h4>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
-                      Generate step-by-step project blueprints to hit 95% target role readiness.
-                    </p>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 mt-1" />
-                </Link>
-
-                <Link
-                  href="/student/internships"
-                  className="flex items-start gap-3 p-3 rounded-lg border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all group"
-                >
-                  <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                    3
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-xs font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
-                      Apply to Anthropic Labs Partner Intern
-                    </h4>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
-                      You meet 94% of verified requirements with priority recruiter routing.
-                    </p>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 mt-1" />
-                </Link>
-              </div>
+                );
+              })}
             </div>
 
-            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-              <span>Goal: 95% Target Role Match</span>
-              <span className="font-semibold text-slate-800">86% Current</span>
-            </div>
+            <Link
+              href="/student/journey"
+              className="w-full py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+            >
+              <span>View Full Verified History in My Journey</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
         </div>
       </div>
