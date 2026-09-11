@@ -17,8 +17,11 @@ import {
   AchievementBadge,
   LearningQuest,
   LearningPath,
+  CopilotMemory,
+  CopilotMemoryItem,
 } from '@/types';
 import { AuthUser, DEMO_USERS } from './auth-service';
+import { getInitialCopilotMemory } from './copilot-engine';
 import {
   mockStudentProfile,
   mockCandidatesPipeline,
@@ -287,9 +290,13 @@ interface AppState {
   applyForInternship: (internshipId: string) => void;
   completeAssessment: (assessmentId: string, score: number) => void;
 
-  // AI Copilot Results History
+  // AI Copilot Results & Persistent Memory
   copilotResults: Record<string, CopilotAnalysisResult>;
   saveCopilotResult: (targetRole: string, result: CopilotAnalysisResult) => void;
+  copilotMemory: CopilotMemory;
+  updateCopilotMemory: (updates: Partial<CopilotMemory>) => void;
+  addCopilotMemoryItem: (item: Omit<CopilotMemoryItem, 'id' | 'timestamp'>) => void;
+  clearCopilotMemory: () => void;
 
   // Industry Portal State
   candidates: CandidateApplication[];
@@ -1226,6 +1233,33 @@ export const useAppStore = create<AppState>()(
           },
         })),
 
+      copilotMemory: getInitialCopilotMemory(mockStudentProfile),
+      updateCopilotMemory: (updates) =>
+        set((state) => ({
+          copilotMemory: {
+            ...state.copilotMemory,
+            ...updates,
+          },
+        })),
+      addCopilotMemoryItem: (item) =>
+        set((state) => {
+          const newItem: CopilotMemoryItem = {
+            id: `mem-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+            timestamp: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            ...item,
+          };
+          return {
+            copilotMemory: {
+              ...state.copilotMemory,
+              items: [newItem, ...(state.copilotMemory?.items || [])],
+            },
+          };
+        }),
+      clearCopilotMemory: () =>
+        set((state) => ({
+          copilotMemory: getInitialCopilotMemory(state.studentProfile),
+        })),
+
       moveCandidateStage: (candidateId, newStage) =>
         set((state) => ({
           candidates: state.candidates.map((cand) =>
@@ -1265,6 +1299,7 @@ export const useAppStore = create<AppState>()(
         candidates: state.candidates,
         jobs: state.jobs,
         copilotResults: state.copilotResults,
+        copilotMemory: state.copilotMemory,
         curriculumAnalyses: state.curriculumAnalyses,
         xp: state.xp,
         level: state.level,

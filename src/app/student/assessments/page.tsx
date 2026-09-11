@@ -4,19 +4,16 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
-import { LearningQuest } from '@/types';
-import { mockQuests, mockLearningPaths } from '@/lib/mock-data';
 import {
   getLevelInfo,
-  DIFFICULTY_RULES,
   generateStrictAssessmentReport,
   StrictAssessmentReport,
-  shuffleArray,
 } from '@/lib/xp-engine';
 import {
   DEPARTMENT_TRACKS,
-  generateAdaptive10QuestionAssessment,
+  generatePersonalizedAssessment,
   ComprehensiveAssessmentQuestion,
+  GeneratedAssessment,
 } from '@/lib/assessment-bank';
 import {
   CheckCircle2,
@@ -28,34 +25,33 @@ import {
   Clock,
   AlertTriangle,
   RotateCcw,
-  Search,
-  Code2,
-  Cpu,
-  Layers,
   Sparkles,
   Check,
   ShieldCheck,
-  BookOpen,
+  Target,
+  Flame,
+  Brain,
+  Zap,
 } from 'lucide-react';
 
 export default function StudentAssessmentsPage() {
-  const { quests, learningPaths, completeQuest, xp, studentProfile, addVerifiedSkill } = useAppStore();
-  const [selectedDepartment, setSelectedDepartment] = useState<string>('Computer Science');
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('All');
-  const [activeTab, setActiveTab] = useState<'departments' | 'tracks' | 'all-challenges'>('departments');
+  const {
+    quests,
+    xp,
+    streakDays,
+    studentProfile,
+    addVerifiedSkill,
+    githubData,
+  } = useAppStore();
 
-  // Test Runner State for 10-Question Session
-  const [activeSession, setActiveSession] = useState<{
-    id: string;
-    title: string;
-    department: string;
-    topic: string;
-    questions: ComprehensiveAssessmentQuestion[];
-    estimatedMinutes: number;
-    xpReward: number;
-    passThreshold: number;
-  } | null>(null);
+  const userDept = studentProfile.academic?.department || studentProfile.branch || 'Computer Science';
+  const targetRole = studentProfile.targetRole || studentProfile.careerPath || 'Software Development';
+  const [selectedDepartment, setSelectedDepartment] = useState<string>(
+    userDept.includes('AI') ? 'AI & Machine Learning' : userDept.includes('Cyber') ? 'Cybersecurity' : 'Computer Science'
+  );
 
+  // Test Runner State for Personalized 10-Question Session
+  const [activeSession, setActiveSession] = useState<GeneratedAssessment | null>(null);
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [answersLog, setAnswersLog] = useState<{ isCorrect: boolean; timeTakenMs: number; topic?: string }[]>([]);
@@ -81,12 +77,18 @@ export default function StudentAssessmentsPage() {
     return () => clearInterval(interval);
   }, [activeSession, assessmentReport]);
 
-  const handleStartDepartmentTopic = (topic: string, dept: string) => {
-    const session = generateAdaptive10QuestionAssessment(
-      topic,
-      dept,
-      studentProfile?.careerGoal || 'Internship'
-    );
+  const handleStartTopic = (topic: string, deptName: string) => {
+    const session = generatePersonalizedAssessment(topic, {
+      department: deptName,
+      branch: studentProfile.branch || userDept,
+      targetRole,
+      careerGoal: studentProfile.careerGoal,
+      builderLevel: levelInfo.level,
+      xp,
+      streakDays,
+      verifiedSkills: (studentProfile.verifiedSkills || []).map((s) => ({ name: s.name, score: s.score })),
+      githubConnected: githubData.connected,
+    });
 
     setActiveSession(session);
     setCurrentQIndex(0);
@@ -94,7 +96,7 @@ export default function StudentAssessmentsPage() {
     setAnswersLog([]);
     setQuestionStartTime(Date.now());
     setAssessmentReport(null);
-    setTimeLeftSec(1200);
+    setTimeLeftSec(session.estimatedMinutes * 60);
   };
 
   const handleSelectOption = (idx: number) => {
@@ -131,7 +133,7 @@ export default function StudentAssessmentsPage() {
         id: activeSession.id,
         title: activeSession.title,
         category: activeSession.topic,
-        difficulty: 'Advanced',
+        difficulty: activeSession.difficultyTier === 'Industry Expert' ? 'Expert' : 'Advanced',
         xpReward: activeSession.xpReward,
       },
       finalLog,
@@ -140,524 +142,328 @@ export default function StudentAssessmentsPage() {
 
     setAssessmentReport(report);
 
-    if (report.passed && !report.antiCheatFlagged) {
-      completeQuest(activeSession.id);
+    // If passed, auto-record verified skill
+    if (report.passed) {
       addVerifiedSkill(
         activeSession.topic,
-        report.scorePercentage >= 90 ? 'Expert' : report.scorePercentage >= 80 ? 'Advanced' : 'Intermediate',
-        activeSession.department.includes('AI') ? 'AI & ML' : activeSession.department.includes('Cyber') ? 'Cloud' : 'Programming'
+        activeSession.difficultyTier === 'Industry Expert' ? 'Expert' : 'Advanced',
+        (activeSession.department.includes('AI') ? 'AI & ML' : 'Programming') as any
       );
     }
   };
 
-  const formatTimer = (sec: number) => {
-    const mins = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${mins}:${s < 10 ? '0' : ''}${s}`;
-  };
-
-  const selectedTrackObj = DEPARTMENT_TRACKS.find((d) => d.department === selectedDepartment) || DEPARTMENT_TRACKS[0];
+  const activeTrack = DEPARTMENT_TRACKS.find((t) => t.name === selectedDepartment) || DEPARTMENT_TRACKS[0];
 
   return (
     <PortalLayout>
-      <div className="space-y-8 max-w-[1240px] mx-auto pb-16">
-        {/* Top Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-          className="pb-5 border-b border-[#E8E5DD] flex flex-col md:flex-row md:items-center justify-between gap-4"
-        >
-          <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#C76A2A] mb-1 block">
-              10-Question Adaptive Assessment Engine
-            </span>
-            <h1 className="text-3xl font-bold text-[#1B1B1B] tracking-tight">
-              Department Skill Evaluations &amp; Benchmarks
-            </h1>
-            <p className="text-xs text-[#6F6A60] mt-0.5">
-              Strict 10-question evaluations structured across Easy (Q1-2), Medium (Q3-5), Hard (Q6-8), and Expert (Q9-10).
-            </p>
-          </div>
+      <div className="space-y-8 max-w-[1200px] mx-auto pb-16">
+        
+        {/* Header with True Personalization Metadata */}
+        <div className="p-8 rounded-3xl bg-white border border-[#E8E5DD] shadow-xs space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-[#C76A2A]/10 text-[#C76A2A] text-xs font-bold font-mono uppercase">
+                  Assessment Engine 3.0
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-[#2F7A45]/10 text-[#2F7A45] text-xs font-bold flex items-center gap-1">
+                  <Brain className="w-3.5 h-3.5" />
+                  Dynamic Personalization Active
+                </span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#1B1B1B] tracking-tight mt-1">
+                Personalized Skill Assessments
+              </h1>
+              <p className="text-xs text-[#6F6A60] mt-0.5">
+                Questions dynamically calibrated on your Department ({userDept}), Target Role ({targetRole}), Level ({levelInfo.level}), and GitHub proof.
+              </p>
+            </div>
 
-          <div className="flex items-center gap-3">
-            <div className="px-4 py-2 bg-white rounded-2xl border border-[#E8E5DD] shadow-none text-xs">
-              <span className="text-[#6F6A60]">Level {levelInfo.level} • </span>
-              <span className="font-semibold text-[#1B1B1B]">{levelInfo.title}</span>
-              <span className="font-mono text-[#C76A2A] font-semibold ml-2">{xp} XP</span>
+            {/* Profile Context Pill */}
+            <div className="flex items-center gap-3 bg-[#F6F4EE] p-3 rounded-2xl border border-[#E8E5DD] text-xs self-start md:self-auto">
+              <div>
+                <span className="text-[10px] text-[#6F6A60] block font-medium">Target Career Path</span>
+                <strong className="text-[#1B1B1B] font-bold">{targetRole}</strong>
+              </div>
+              <div className="w-px h-8 bg-[#E8E5DD]" />
+              <div>
+                <span className="text-[10px] text-[#6F6A60] block font-medium">Level &amp; Streak</span>
+                <strong className="text-[#C76A2A] font-mono font-bold">Lvl {levelInfo.level} • {streakDays}d Streak</strong>
+              </div>
             </div>
           </div>
-        </motion.div>
-
-        {/* View Switcher Tabs */}
-        <div className="flex items-center gap-2 border-b border-[#E8E5DD] pb-3">
-          <button
-            onClick={() => setActiveTab('departments')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-              activeTab === 'departments'
-                ? 'bg-[#1B1B1B] text-white shadow-none'
-                : 'bg-white text-[#6F6A60] hover:text-[#1B1B1B] border border-[#E8E5DD]'
-            }`}
-          >
-            Department Tracks (7 Domains)
-          </button>
-          <button
-            onClick={() => setActiveTab('tracks')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-              activeTab === 'tracks'
-                ? 'bg-[#1B1B1B] text-white shadow-none'
-                : 'bg-white text-[#6F6A60] hover:text-[#1B1B1B] border border-[#E8E5DD]'
-            }`}
-          >
-            Progression Roadmaps ({mockLearningPaths.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('all-challenges')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-              activeTab === 'all-challenges'
-                ? 'bg-[#1B1B1B] text-white shadow-none'
-                : 'bg-white text-[#6F6A60] hover:text-[#1B1B1B] border border-[#E8E5DD]'
-            }`}
-          >
-            Quick Quests &amp; Boss Capstones
-          </button>
         </div>
 
-        {/* TAB 1: DEPARTMENT-BASED 10-QUESTION ASSESSMENTS */}
-        {activeTab === 'departments' && (
-          <div className="space-y-6">
-            {/* Department Selection Bar */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
-              {DEPARTMENT_TRACKS.map((track) => {
-                const isSelected = selectedDepartment === track.department;
-                return (
-                  <button
-                    key={track.id}
-                    onClick={() => setSelectedDepartment(track.department)}
-                    className={`px-4 py-2.5 rounded-xl text-xs font-semibold border flex items-center gap-2 transition-all shrink-0 cursor-pointer ${
-                      isSelected
-                        ? 'bg-[#1B1B1B] text-white border-[#1B1B1B]'
-                        : 'bg-white text-[#6E6E6A] border-[#E8E5DD] hover:border-[#1B1B1B] hover:text-[#1B1B1B]'
-                    }`}
-                  >
-                    <span>{track.icon}</span>
-                    <span>{track.name}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Selected Track Overview Banner */}
-            <div className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-none flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xl">{selectedTrackObj.icon}</span>
-                  <h2 className="text-lg font-bold text-[#1B1B1B]">{selectedTrackObj.name}</h2>
-                </div>
-                <p className="text-xs text-[#6E6E6A] max-w-xl">{selectedTrackObj.description}</p>
-              </div>
-              <div className="flex items-center gap-3 shrink-0">
-                <div className="p-3 rounded-xl bg-[#FAF9F5] border border-[#E8E5DD] text-center">
-                  <span className="text-[10px] text-[#6E6E6A] uppercase font-mono block">Format</span>
-                  <span className="text-xs font-bold text-[#1B1B1B]">10 Questions</span>
-                </div>
-                <div className="p-3 rounded-xl bg-[#FAF9F5] border border-[#E8E5DD] text-center">
-                  <span className="text-[10px] text-[#6E6E6A] uppercase font-mono block">Reward</span>
-                  <span className="text-xs font-bold text-[#C76A2A] font-mono">+100 XP</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Topic Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {selectedTrackObj.topics.map((topic, idx) => (
-                <div
-                  key={topic}
-                  className="p-5 rounded-2xl bg-white border border-[#E8E5DD] shadow-none hover:border-[#C76A2A] transition-all flex flex-col justify-between space-y-4"
-                >
-                  <div className="space-y-2.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#C76A2A] bg-[#C76A2A]/10 px-2 py-0.5 rounded font-mono">
-                        Benchmark #{idx + 1}
-                      </span>
-                      <span className="text-xs font-mono text-[#6E6E6A]">20 Mins • 10 Qs</span>
-                    </div>
-                    <h3 className="text-base font-bold text-[#1B1B1B]">{topic} Evaluation</h3>
-                    <p className="text-xs text-[#6E6E6A]">
-                      Full adaptive verification spanning MCQs, debugging code snippets, and scenario-based architecture.
-                    </p>
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-[#FAF9F5] border border-[#E8E5DD] text-[#1B1B1B]">
-                        Q1-2: Easy
-                      </span>
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-[#FAF9F5] border border-[#E8E5DD] text-[#1B1B1B]">
-                        Q3-5: Med
-                      </span>
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-[#FAF9F5] border border-[#E8E5DD] text-[#1B1B1B]">
-                        Q6-8: Hard
-                      </span>
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-[#FAF9F5] border border-[#E8E5DD] text-[#1B1B1B]">
-                        Q9-10: Expert
-                      </span>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => handleStartDepartmentTopic(topic, selectedTrackObj.department)}
-                    className="w-full py-2.5 bg-[#1B1B1B] hover:bg-[#C76A2A] text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <Play className="w-3.5 h-3.5 fill-current" />
-                    <span>Launch 10-Question Assessment</span>
-                  </button>
-                </div>
-              ))}
-            </div>
+        {/* 6 Department Tracks Selector */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#6F6A60]">
+              Select Engineering &amp; Professional Domain
+            </span>
+            <span className="text-xs text-[#C76A2A] font-medium font-mono">
+              6 Core Domains Available
+            </span>
           </div>
-        )}
 
-        {/* TAB 2: PROGRESSION PATHS */}
-        {activeTab === 'tracks' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {mockLearningPaths.map((path: any) => {
-              const stepsList = path.milestones || path.steps || [];
-              const totalInPath = Math.max(1, stepsList.length);
-              const completedInPath = stepsList.filter((m: any) => m.status === 'completed').length;
-              const progressPct = Math.round((completedInPath / totalInPath) * 100);
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {DEPARTMENT_TRACKS.map((track) => {
+              const isSelected = selectedDepartment === track.name;
+              return (
+                <button
+                  key={track.id}
+                  onClick={() => setSelectedDepartment(track.name)}
+                  className={`p-3.5 rounded-2xl border text-left transition-all flex flex-col justify-between gap-3 ${
+                    isSelected
+                      ? 'bg-[#1B1B1B] text-white border-[#1B1B1B] shadow-sm'
+                      : 'bg-white border-[#E8E5DD] hover:border-[#C76A2A] text-[#1B1B1B]'
+                  }`}
+                >
+                  <div className="text-2xl">{track.icon}</div>
+                  <div>
+                    <h3 className="text-xs font-bold leading-snug">{track.name}</h3>
+                    <p className={`text-[10px] mt-0.5 ${isSelected ? 'text-gray-300' : 'text-[#6F6A60]'}`}>
+                      {track.topics.length} evaluation paths
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Domain Topics Grid with Smart Adaptive Level Badges */}
+        <div className="p-6 rounded-3xl bg-white border border-[#E8E5DD] shadow-xs space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#E8E5DD]">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xl">{activeTrack.icon}</span>
+                <h2 className="text-lg font-bold text-[#1B1B1B]">{activeTrack.name} Benchmark Paths</h2>
+              </div>
+              <p className="text-xs text-[#6F6A60] mt-0.5">{activeTrack.description}</p>
+            </div>
+
+            <span className="text-xs font-mono font-bold text-[#2F7A45] bg-[#2F7A45]/10 px-2.5 py-1 rounded-full self-start sm:self-auto">
+              10 Questions • Proctored
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {activeTrack.topics.map((topic) => {
+              const isVerified = (studentProfile.verifiedSkills || []).some(
+                (s) => s.name.toLowerCase().includes(topic.toLowerCase())
+              );
+              const verifiedSkillObj = (studentProfile.verifiedSkills || []).find(
+                (s) => s.name.toLowerCase().includes(topic.toLowerCase())
+              );
 
               return (
                 <div
-                  key={path.id}
-                  className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-none flex flex-col justify-between space-y-4 hover:border-[#C76A2A] transition-all"
+                  key={topic}
+                  className="p-5 rounded-2xl bg-white border border-[#E8E5DD] hover:border-[#1B1B1B] transition-all space-y-3 flex flex-col justify-between"
                 >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-mono font-semibold text-[#C76A2A] bg-[#C76A2A]/10 px-2.5 py-0.5 rounded-full">
-                        {path.targetRole || 'Engineering Track'}
-                      </span>
-                      <span className="text-xs font-mono font-semibold text-[#1B1B1B]">
-                        {progressPct}% Complete
-                      </span>
+                  <div className="space-y-1.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <h4 className="text-sm font-bold text-[#1B1B1B]">{topic}</h4>
+                      {isVerified ? (
+                        <span className="px-2 py-0.5 rounded-full bg-[#2F7A45]/10 text-[#2F7A45] text-[10px] font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          {verifiedSkillObj?.score}% Verified
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-full bg-[#C76A2A]/10 text-[#C76A2A] text-[10px] font-bold">
+                          Adaptive Tier
+                        </span>
+                      )}
                     </div>
-
-                    <div>
-                      <h3 className="text-base font-bold text-[#1B1B1B]">{path.title}</h3>
-                      <p className="text-xs text-[#6E6E6A] mt-1">{path.description}</p>
-                    </div>
-
-                    <div className="space-y-1.5 pt-2">
-                      {stepsList.slice(0, 3).map((step: any, sIdx: number) => (
-                        <div
-                          key={sIdx}
-                          className="flex items-center justify-between text-xs text-[#6E6E6A] p-2 bg-[#FAF9F5] rounded-xl border border-[#E8E5DD]"
-                        >
-                          <span className="truncate">{step.title}</span>
-                          {step.status === 'completed' ? (
-                            <CheckCircle2 className="w-4 h-4 text-[#2F7A45] shrink-0" />
-                          ) : (
-                            <span className="text-[10px] font-mono text-[#C76A2A]">Ready</span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+                    <p className="text-xs text-[#6F6A60] line-clamp-2">
+                      10 questions evaluating algorithms, architecture, edge cases, and industry real-world scenarios.
+                    </p>
                   </div>
 
-                  <button
-                    onClick={() => handleStartDepartmentTopic(path.targetRole || 'Java', 'Computer Science')}
-                    className="w-full py-2.5 bg-[#1B1B1B] hover:bg-[#C76A2A] text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <span>Take Next Verification Milestone</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="pt-2 flex items-center justify-between border-t border-[#E8E5DD] text-xs">
+                    <div className="flex items-center gap-1.5 text-[11px] font-mono text-[#6F6A60]">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>20 Mins</span>
+                      <span>•</span>
+                      <span className="text-[#C76A2A] font-bold">+100 XP</span>
+                    </div>
+
+                    <button
+                      onClick={() => handleStartTopic(topic, activeTrack.name)}
+                      className="px-3 py-1.5 bg-[#1B1B1B] hover:bg-[#C76A2A] text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                    >
+                      <Play className="w-3 h-3 fill-current" />
+                      <span>{isVerified ? 'Retake Path' : 'Start Path'}</span>
+                    </button>
+                  </div>
                 </div>
               );
             })}
           </div>
-        )}
+        </div>
 
-        {/* TAB 3: ALL QUESTS & BOSS CAPSTONES */}
-        {activeTab === 'all-challenges' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {mockQuests.map((quest) => (
-              <div
-                key={quest.id}
-                className="p-5 rounded-2xl bg-white border border-[#E8E5DD] shadow-none flex flex-col justify-between space-y-4 hover:border-[#C76A2A] transition-all"
-              >
-                <div className="space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-semibold text-[#C76A2A] bg-[#C76A2A]/10 px-2 py-0.5 rounded">
-                      {quest.category}
-                    </span>
-                    <span className="text-xs font-bold text-[#1B1B1B]">+{quest.xpReward} XP</span>
-                  </div>
-                  <h3 className="text-base font-bold text-[#1B1B1B]">{quest.title}</h3>
-                  <p className="text-xs text-[#6E6E6A] line-clamp-2">{quest.description}</p>
-                </div>
+      </div>
 
-                <button
-                  onClick={() => handleStartDepartmentTopic(quest.title.split(' ')[0] || 'Java', quest.category)}
-                  className="w-full py-2 bg-[#1B1B1B] hover:bg-[#C76A2A] text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>Start 10-Q Session</span>
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* ==================== ACTIVE 10-QUESTION TEST RUNNER MODAL ==================== */}
-        <AnimatePresence>
-          {activeSession && !assessmentReport && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
-            >
-              <motion.div
-                initial={{ scale: 0.96, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.96, opacity: 0 }}
-                className="bg-white rounded-2xl border border-[#E8E5DD] max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl relative max-h-[90vh] overflow-y-auto"
-              >
-                {/* Modal Header */}
-                <div className="flex items-start justify-between border-b border-[#E8E5DD] pb-4">
+      {/* Dynamic 10-Question Assessment Runner Modal */}
+      {activeSession && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-[#E8E5DD] max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            
+            {!assessmentReport ? (
+              <>
+                {/* Modal Top Bar */}
+                <div className="flex items-center justify-between pb-3 border-b border-[#E8E5DD]">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-[#C76A2A]/10 text-[#C76A2A]">
-                        {activeSession.topic} • 10-Question Evaluation
+                      <span className="px-2 py-0.5 rounded-md bg-[#C76A2A]/10 text-[#C76A2A] text-[10px] font-mono font-bold uppercase">
+                        {activeSession.difficultyTier}
                       </span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#1B1B1B] text-white font-mono">
-                        {activeSession.questions[currentQIndex]?.difficulty} Tier
-                      </span>
+                      <span className="text-xs text-[#6F6A60]">Question {currentQIndex + 1} of {activeSession.questions.length}</span>
                     </div>
-                    <h2 className="text-lg font-bold text-[#1B1B1B] mt-1">
-                      Question {currentQIndex + 1} of {activeSession.questions.length}
-                    </h2>
+                    <h3 className="text-base font-bold text-[#1B1B1B] mt-0.5">{activeSession.title}</h3>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0">
-                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#FAF9F5] border border-[#E8E5DD] text-xs font-mono font-bold text-[#1B1B1B]">
-                      <Clock className="w-3.5 h-3.5 text-[#C76A2A]" />
-                      <span>{formatTimer(timeLeftSec)}</span>
-                    </div>
-                    <button
-                      onClick={() => {
-                        if (confirm('Exit assessment? Unfinished progress will be abandoned.')) {
-                          setActiveSession(null);
-                        }
-                      }}
-                      className="p-1 rounded-lg text-[#6E6E6A] hover:text-[#1B1B1B] transition-colors cursor-pointer"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
+                  {/* Timer Pill */}
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD] text-xs font-mono font-bold text-[#1B1B1B]">
+                    <Clock className="w-3.5 h-3.5 text-[#C76A2A]" />
+                    <span>{Math.floor(timeLeftSec / 60)}:{String(timeLeftSec % 60).padStart(2, '0')}</span>
                   </div>
                 </div>
 
-                {/* Question Stepper Indicator (1 to 10) */}
-                <div className="grid grid-cols-10 gap-1.5">
-                  {activeSession.questions.map((q, idx) => {
-                    const isAnswered = idx < currentQIndex;
-                    const isCurrent = idx === currentQIndex;
+                {/* Question Progress Bar */}
+                <div className="w-full h-1.5 bg-[#F6F4EE] rounded-full overflow-hidden border border-[#E8E5DD]">
+                  <div
+                    className="h-full bg-[#C76A2A] rounded-full transition-all duration-300"
+                    style={{ width: `${((currentQIndex + 1) / activeSession.questions.length) * 100}%` }}
+                  />
+                </div>
+
+                {/* Question Text */}
+                <div className="space-y-3">
+                  <span className="text-[11px] font-bold text-[#6F6A60] uppercase tracking-wider block">
+                    {activeSession.questions[currentQIndex]?.type || 'Scenario Based'} • Difficulty: {activeSession.questions[currentQIndex]?.difficulty}
+                  </span>
+                  <p className="text-sm font-bold text-[#1B1B1B] leading-relaxed">
+                    {activeSession.questions[currentQIndex]?.question}
+                  </p>
+                </div>
+
+                {/* Multiple Choice Options */}
+                <div className="space-y-2.5 pt-1">
+                  {activeSession.questions[currentQIndex]?.options.map((opt, idx) => {
+                    const isSelected = selectedAnswer === idx;
                     return (
-                      <div
-                        key={idx}
-                        className={`h-2 rounded-full transition-all ${
-                          isCurrent
-                            ? 'bg-[#C76A2A] ring-2 ring-[#C76A2A]/30'
-                            : isAnswered
-                            ? 'bg-[#1B1B1B]'
-                            : 'bg-[#E8E5DD]'
+                      <button
+                        key={opt.id}
+                        onClick={() => handleSelectOption(idx)}
+                        className={`w-full p-3.5 rounded-2xl border text-left text-xs transition-all flex items-center justify-between gap-3 ${
+                          isSelected
+                            ? 'bg-[#1B1B1B] text-white border-[#1B1B1B] shadow-xs'
+                            : 'bg-white border-[#E8E5DD] hover:border-[#C76A2A] text-[#1B1B1B]'
                         }`}
-                      />
+                      >
+                        <div className="flex items-center gap-3">
+                          <span
+                            className={`w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs ${
+                              isSelected ? 'bg-white text-[#1B1B1B]' : 'bg-[#F6F4EE] text-[#6F6A60]'
+                            }`}
+                          >
+                            {String.fromCharCode(65 + idx)}
+                          </span>
+                          <span className="leading-snug">{opt.text}</span>
+                        </div>
+                        {isSelected && <Check className="w-4 h-4 text-[#C76A2A] shrink-0" />}
+                      </button>
                     );
                   })}
                 </div>
 
-                {/* Active Question Body */}
-                {activeSession.questions[currentQIndex] && (
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-semibold text-[#6E6E6A] uppercase font-mono">
-                        Type: {activeSession.questions[currentQIndex].type}
-                      </span>
-                    </div>
-
-                    <h3 className="text-sm sm:text-base font-semibold text-[#1B1B1B] leading-relaxed">
-                      {activeSession.questions[currentQIndex].question}
-                    </h3>
-
-                    {/* Code Snippet Box */}
-                    {activeSession.questions[currentQIndex].codeSnippet && (
-                      <div className="p-4 bg-[#1B1B1B] text-[#F6F4EE] rounded-xl font-mono text-xs overflow-x-auto leading-relaxed border border-[#E8E5DD]/20">
-                        <pre>{activeSession.questions[currentQIndex].codeSnippet}</pre>
-                      </div>
-                    )}
-
-                    {/* Options List */}
-                    <div className="space-y-2.5 pt-2">
-                      {activeSession.questions[currentQIndex].options.map((opt, optIdx) => {
-                        const isSelected = selectedAnswer === optIdx;
-                        return (
-                          <button
-                            key={opt.id || optIdx}
-                            type="button"
-                            onClick={() => handleSelectOption(optIdx)}
-                            className={`w-full p-3.5 rounded-xl border text-left text-xs sm:text-sm font-medium transition-all flex items-start gap-3 cursor-pointer ${
-                              isSelected
-                                ? 'border-[#C76A2A] bg-[#C76A2A]/5 text-[#1B1B1B] ring-1 ring-[#C76A2A]'
-                                : 'border-[#E8E5DD] hover:border-[#1B1B1B] bg-white text-[#1B1B1B]'
-                            }`}
-                          >
-                            <span
-                              className={`w-5 h-5 rounded-full border flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${
-                                isSelected
-                                  ? 'border-[#C76A2A] bg-[#C76A2A] text-white'
-                                  : 'border-[#E8E5DD] text-[#6E6E6A]'
-                              }`}
-                            >
-                              {String.fromCharCode(65 + optIdx)}
-                            </span>
-                            <span className="flex-1 leading-relaxed">{opt.text}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* Modal Footer Controls */}
-                <div className="flex items-center justify-between pt-4 border-t border-[#E8E5DD]">
-                  <span className="text-[11px] text-[#6E6E6A]">
-                    Adaptive Assessment • Anti-Cheat Verification Active
-                  </span>
+                {/* Footer Controls */}
+                <div className="flex items-center justify-between pt-3 border-t border-[#E8E5DD]">
+                  <button
+                    onClick={() => setActiveSession(null)}
+                    className="px-3 py-1.5 text-xs text-[#6F6A60] hover:text-[#1B1B1B] transition-colors"
+                  >
+                    Quit Assessment
+                  </button>
 
                   <button
-                    type="button"
-                    disabled={selectedAnswer === null}
                     onClick={handleNextQuestion}
-                    className="px-5 py-2.5 bg-[#C76A2A] hover:bg-[#B55D22] text-white rounded-xl text-xs font-semibold flex items-center gap-2 transition-all disabled:opacity-40 cursor-pointer shadow-none"
+                    disabled={selectedAnswer === null}
+                    className="px-5 py-2.5 bg-[#1B1B1B] hover:bg-[#C76A2A] text-white text-xs font-bold rounded-xl transition-all disabled:opacity-40 flex items-center gap-2 cursor-pointer shadow-xs"
                   >
-                    <span>
-                      {currentQIndex < activeSession.questions.length - 1
-                        ? 'Next Question'
-                        : 'Submit Evaluation'}
-                    </span>
+                    <span>{currentQIndex === activeSession.questions.length - 1 ? 'Finish & Generate Report' : 'Next Question'}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ==================== ASSESSMENT RESULT & AUTO-EVALUATION REPORT ==================== */}
-        <AnimatePresence>
-          {assessmentReport && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
-            >
-              <motion.div
-                initial={{ scale: 0.96, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.96, opacity: 0 }}
-                className="bg-white rounded-2xl border border-[#E8E5DD] max-w-xl w-full p-6 sm:p-8 space-y-6 shadow-2xl relative max-h-[90vh] overflow-y-auto"
-              >
-                {/* Result Header */}
+              </>
+            ) : (
+              /* Report View */
+              <div className="space-y-6">
                 <div className="text-center space-y-2">
                   <div
-                    className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto border ${
+                    className={`w-16 h-16 rounded-3xl mx-auto flex items-center justify-center text-2xl ${
                       assessmentReport.passed
-                        ? 'bg-[#2F7A45]/10 text-[#2F7A45] border-[#2F7A45]/30'
-                        : 'bg-red-50 text-red-600 border-red-200'
+                        ? 'bg-[#2F7A45]/10 text-[#2F7A45] border border-[#2F7A45]/30'
+                        : 'bg-red-50 text-red-600 border border-red-200'
                     }`}
                   >
-                    {assessmentReport.passed ? (
-                      <CheckCircle2 className="w-8 h-8" />
-                    ) : (
-                      <AlertTriangle className="w-8 h-8" />
-                    )}
+                    {assessmentReport.passed ? '🏆' : '📚'}
                   </div>
-                  <h2 className="text-2xl font-bold text-[#1B1B1B]">
-                    {assessmentReport.passed ? 'Assessment Passed & Verified!' : 'Assessment Incomplete'}
-                  </h2>
-                  <p className="text-xs text-[#6E6E6A]">
+                  <h3 className="text-xl font-bold text-[#1B1B1B]">
+                    {assessmentReport.passed ? 'Skill Verification Passed!' : 'Assessment Completed'}
+                  </h3>
+                  <p className="text-xs text-[#6F6A60]">
                     {assessmentReport.passed
-                      ? `Congratulations! You scored ${assessmentReport.scorePercentage}% on ${activeSession?.topic}. Your Builder Score & XP have been updated.`
-                      : `You scored ${assessmentReport.scorePercentage}% (Passing threshold: ${assessmentReport.passThreshold}%). Review the topics below to prepare for your retake.`}
+                      ? `Congratulations! You scored ${assessmentReport.finalScore}% and earned verified proof for ${activeSession.topic}.`
+                      : `You scored ${assessmentReport.finalScore}%. Review the diagnostic breakdown below to strengthen your weak areas.`}
                   </p>
                 </div>
 
                 {/* Score Summary Grid */}
-                <div className="grid grid-cols-3 gap-3 p-4 bg-[#FAF9F5] rounded-xl border border-[#E8E5DD] text-center">
+                <div className="grid grid-cols-3 gap-3 p-4 bg-[#F6F4EE] rounded-2xl border border-[#E8E5DD] text-center text-xs">
                   <div>
-                    <span className="text-[10px] text-[#6E6E6A] uppercase font-mono block">Score</span>
-                    <span className="text-lg font-black text-[#1B1B1B]">{assessmentReport.scorePercentage}%</span>
+                    <span className="text-[10px] text-[#6F6A60] uppercase block">Final Score</span>
+                    <strong className="text-2xl font-bold font-mono text-[#1B1B1B]">{assessmentReport.finalScore}%</strong>
                   </div>
                   <div>
-                    <span className="text-[10px] text-[#6E6E6A] uppercase font-mono block">Accuracy</span>
-                    <span className="text-lg font-black text-[#1B1B1B]">
-                      {assessmentReport.correctAnswers} / {assessmentReport.totalQuestions} Qs
-                    </span>
+                    <span className="text-[10px] text-[#6F6A60] uppercase block">XP Earned</span>
+                    <strong className="text-2xl font-bold font-mono text-[#C76A2A]">+{assessmentReport.xpEarned} XP</strong>
                   </div>
                   <div>
-                    <span className="text-[10px] text-[#6E6E6A] uppercase font-mono block">XP Earned</span>
-                    <span className="text-lg font-black text-[#C76A2A] font-mono">
-                      +{assessmentReport.xpEarned} XP
-                    </span>
+                    <span className="text-[10px] text-[#6F6A60] uppercase block">Accuracy</span>
+                    <strong className="text-2xl font-bold font-mono text-[#2F7A45]">
+                      {assessmentReport.passed ? 'Verified' : 'In Review'}
+                    </strong>
                   </div>
                 </div>
 
-                {/* Diagnostic Insights */}
-                <div className="space-y-3 text-xs">
-                  {assessmentReport.strengths.length > 0 && (
-                    <div className="p-3.5 bg-emerald-50/50 border border-emerald-200 rounded-xl space-y-1">
-                      <span className="font-bold text-emerald-900 block flex items-center gap-1.5">
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
-                        Demonstrated Strengths
-                      </span>
-                      {assessmentReport.strengths.map((s, idx) => (
-                        <p key={idx} className="text-emerald-800 text-[11px]">
-                          • {s}
-                        </p>
-                      ))}
-                    </div>
-                  )}
-
-                  {assessmentReport.weakAreas.length > 0 && (
-                    <div className="p-3.5 bg-amber-50/50 border border-amber-200 rounded-xl space-y-1">
-                      <span className="font-bold text-amber-900 block flex items-center gap-1.5">
-                        <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-                        Recommended Areas to Reinforce
-                      </span>
-                      {assessmentReport.weakAreas.map((w, idx) => (
-                        <p key={idx} className="text-amber-800 text-[11px]">
-                          • {w}
-                        </p>
-                      ))}
-                    </div>
-                  )}
+                {/* Recommendations */}
+                <div className="p-4 bg-white rounded-2xl border border-[#E8E5DD] space-y-2 text-xs">
+                  <span className="font-bold text-[#1B1B1B] block">Personalized Growth Recommendations</span>
+                  <p className="text-[#6F6A60] leading-relaxed">
+                    {assessmentReport.suggestedNextChallenge}
+                  </p>
                 </div>
 
-                {/* Next Step Action */}
-                <button
-                  onClick={() => {
-                    setActiveSession(null);
-                    setAssessmentReport(null);
-                  }}
-                  className="w-full py-3 bg-[#1B1B1B] hover:bg-[#C76A2A] text-white rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <span>Return to Assessments Hub</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+                {/* Close Button */}
+                <div className="pt-2 text-center">
+                  <button
+                    onClick={() => {
+                      setActiveSession(null);
+                      setAssessmentReport(null);
+                    }}
+                    className="px-6 py-2.5 bg-[#1B1B1B] hover:bg-[#C76A2A] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
+                  >
+                    Return to Assessments
+                  </button>
+                </div>
+              </div>
+            )}
+
+          </div>
+        </div>
+      )}
     </PortalLayout>
   );
 }

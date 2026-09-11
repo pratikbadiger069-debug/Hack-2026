@@ -306,25 +306,27 @@ export interface RoleSkillGapAnalysis {
 
 export interface RoadmapPhase {
   id: string;
-  phaseNumber: 1 | 2 | 3 | 4;
-  title: 'Foundation' | 'Core' | 'Advanced' | 'Industry Ready';
+  phaseNumber: number;
+  title: string;
   description: string;
-  status: 'completed' | 'in_progress' | 'locked';
-  progressPercentage: number;
-  courses: {
+  status: 'completed' | 'in_progress' | 'locked' | 'active' | 'upcoming' | string;
+  progressPercentage?: number;
+  duration?: string;
+  courses?: {
     title: string;
     provider: string;
     duration: string;
     completed: boolean;
     url?: string;
   }[];
-  projects: {
+  milestones?: { id: string; title: string; completed: boolean; xpReward?: number }[];
+  projects?: {
     title: string;
     description: string;
     techStack: string[];
     completed: boolean;
   }[];
-  assessments: {
+  assessments?: {
     title: string;
     category: string;
     completed: boolean;
@@ -404,8 +406,40 @@ export interface CopilotChatMessage {
   sender: 'user' | 'copilot';
   text: string;
   timestamp: string;
-  structuredType?: 'roadmap' | 'gps' | 'missions' | 'projects' | 'gaps' | 'opportunities' | 'readiness';
+  mode?: 'career' | 'learning' | 'projects' | 'interview' | 'productivity';
+  structuredType?: 'roadmap' | 'gps' | 'missions' | 'projects' | 'gaps' | 'opportunities' | 'readiness' | 'memory' | 'profile_analysis';
   structuredPayload?: any;
+}
+
+export type CopilotAssistantMode = 'career' | 'learning' | 'projects' | 'interview' | 'productivity';
+
+export interface CopilotMemoryItem {
+  id: string;
+  category: 'goal' | 'tech_stack' | 'learning_plan' | 'project_idea' | 'weakness' | 'strength' | 'custom';
+  content: string;
+  timestamp: string;
+  relevance: number;
+}
+
+export interface CopilotMemory {
+  rememberedGoals: string[];
+  preferredTechnologies: string[];
+  activeLearningPlans: string[];
+  savedProjectIdeas: string[];
+  identifiedWeaknesses: string[];
+  identifiedStrengths: string[];
+  lastSummary: string;
+  items: CopilotMemoryItem[];
+}
+
+export interface GitHubProfileAnalysis {
+  analyzedAt: string;
+  username: string;
+  skillMap: { skill: string; confidence: number; evidence: string }[];
+  strengthMap: { area: string; description: string }[];
+  weaknessMap: { gap: string; recommendation: string }[];
+  careerRecommendations: string[];
+  complexityScore: number; // 0 - 100
 }
 
 export interface CopilotSession {
@@ -419,6 +453,7 @@ export interface CopilotSession {
   industryAvg: number;
   topStudentsScore: number;
 }
+
 
 export interface InternshipOpportunity {
   id: string;
