@@ -91,7 +91,7 @@
       "isEmailVerified": false,
       "emailVerificationToken": "vt_1789123646558_c2c0v4b",
       "createdAt": "2026-09-11T10:47:26.558Z",
-      "updatedAt": "2026-09-11T18:52:25.353Z"
+      "updatedAt": "2026-09-11T19:08:18.244Z"
     },
     "manu18reddy@gmail.com": {
       "id": "usr-1789124286176",
@@ -122,7 +122,7 @@
     "pranitha12@gmail.com": {
       "id": "usr_1789148818117_r151md3",
       "email": "pranitha12@gmail.com",
-      "name": "Pranitha",
+      "name": "Aarav Sharma",
       "role": "industry",
       "passwordHash": "$2b$12$vA604yb9TE3cPjYaM.q0auz3Zr5YVxjmrUk8/xB.TNhQDYsqoF2Su",
       "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
@@ -130,7 +130,21 @@
       "isEmailVerified": false,
       "emailVerificationToken": "vt_1789148818117_n5snm7u",
       "createdAt": "2026-09-11T17:46:58.117Z",
-      "updatedAt": "2026-09-11T17:46:58.117Z"
+      "updatedAt": "2026-09-11T19:19:11.867Z",
+      "googleName": "Aarav Sharma"
+    },
+    "aarav-builder@github.user": {
+      "id": "usr_1789154371055_yzgl0gf",
+      "email": "aarav-builder@github.user",
+      "name": "aarav-builder",
+      "role": "student",
+      "passwordHash": "$2b$12$UYBpym3tnhg2ah6/pGEahOfGM2Pe9IGUQkJ9YadG8HKOTn4UoU89e",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      "isDemoUser": false,
+      "isEmailVerified": false,
+      "emailVerificationToken": "vt_1789154371055_dbbhqa4",
+      "createdAt": "2026-09-11T19:19:31.055Z",
+      "updatedAt": "2026-09-11T19:19:31.055Z"
     }
   },
   "studentProfiles": {
@@ -575,7 +589,7 @@
         "studentId": ""
       },
       "professional": {
-        "githubUrl": "https://github.com/builder-dev",
+        "githubUrl": "https://github.com/pratikbadiger069-debug",
         "linkedinUrl": "",
         "portfolioUrl": "",
         "bio": "",
@@ -677,8 +691,252 @@
     },
     "pranitha12@gmail.com": {
       "id": "std-1789150084793-zyo8g",
-      "name": "Pranitha",
+      "name": "Aarav Sharma",
       "email": "pranitha12@gmail.com",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      "headline": "",
+      "targetRole": "Software Engineer",
+      "academic": {
+        "college": "",
+        "department": "CSE",
+        "year": "1st Year",
+        "semester": "1st Semester",
+        "cgpa": 0,
+        "studentId": ""
+      },
+      "professional": {
+        "githubUrl": "",
+        "linkedinUrl": "",
+        "portfolioUrl": "",
+        "bio": "",
+        "totalProjects": 0,
+        "hackathonWins": 0,
+        "researchPapers": 0,
+        "openSourceContributions": 0
+      },
+      "builderScores": {
+        "overall": 540,
+        "execution": 60,
+        "leadership": 0,
+        "innovation": 0,
+        "problemSolving": 0,
+        "consistency": 0
+      },
+      "employabilityScore": 66,
+      "verifiedSkills": [
+        {
+          "id": "vs-1789154324246",
+          "name": "Modern Frontend Architecture",
+          "category": "Programming",
+          "level": "Expert",
+          "score": 94,
+          "verificationSources": [
+            "Assessment",
+            "Code Validation"
+          ],
+          "verifiedDate": "Sep 12, 2026",
+          "verificationCode": "SB-MO-75962",
+          "evidenceCount": 1
+        },
+        {
+          "id": "vs-1789154324103",
+          "name": "Modern Frontend Architecture",
+          "category": "Programming",
+          "level": "Expert",
+          "score": 94,
+          "verificationSources": [
+            "Assessment",
+            "Code Validation"
+          ],
+          "verifiedDate": "Sep 12, 2026",
+          "verificationCode": "SB-MO-77243",
+          "evidenceCount": 1
+        },
+        {
+          "id": "vs-1789154323481",
+          "name": "Modern Frontend Architecture",
+          "category": "Programming",
+          "level": "Expert",
+          "score": 94,
+          "verificationSources": [
+            "Assessment",
+            "Code Validation"
+          ],
+          "verifiedDate": "Sep 12, 2026",
+          "verificationCode": "SB-MO-30232",
+          "evidenceCount": 1
+        },
+        {
+          "id": "vs-1789154321918",
+          "name": "Modern Frontend Architecture",
+          "category": "Programming",
+          "level": "Expert",
+          "score": 94,
+          "verificationSources": [
+            "Assessment",
+            "Code Validation"
+          ],
+          "verifiedDate": "Sep 12, 2026",
+          "verificationCode": "SB-MO-67838",
+          "evidenceCount": 1
+        },
+        {
+          "id": "vs-1789154320178",
+          "name": "Modern Frontend Architecture",
+          "category": "Programming",
+          "level": "Expert",
+          "score": 94,
+          "verificationSources": [
+            "Assessment",
+            "Code Validation"
+          ],
+          "verifiedDate": "Sep 12, 2026",
+          "verificationCode": "SB-MO-70543",
+          "evidenceCount": 1
+        },
+        {
+          "id": "vs-1789154317757",
+          "name": "Modern Frontend Architecture",
+          "category": "Programming",
+          "level": "Expert",
+          "score": 94,
+          "verificationSources": [
+            "Assessment",
+            "Code Validation"
+          ],
+          "verifiedDate": "Sep 12, 2026",
+          "verificationCode": "SB-MO-25910",
+          "evidenceCount": 1
+        }
+      ],
+      "evidences": [
+        {
+          "id": "ev-1789154324196",
+          "title": "ngx-intl-tel-input-update",
+          "type": "GitHub Repo",
+          "url": "https://github.com/Builder-Dev/ngx-intl-tel-input-update",
+          "description": "High-performance production repository built by @builder-dev. (Code, ★ 0)",
+          "impactScore": 75,
+          "verified": true,
+          "date": "Sep 12, 2026"
+        },
+        {
+          "id": "ev-1789154324164",
+          "title": "ngx-intl-tel-input",
+          "type": "GitHub Repo",
+          "url": "https://github.com/Builder-Dev/ngx-intl-tel-input",
+          "description": "Phone number input field to support international numbers, Angular (TypeScript, ★ 0)",
+          "impactScore": 75,
+          "verified": true,
+          "date": "Sep 12, 2026"
+        },
+        {
+          "id": "ev-1789154323960",
+          "title": "ngx-intl-tel-input-update",
+          "type": "GitHub Repo",
+          "url": "https://github.com/Builder-Dev/ngx-intl-tel-input-update",
+          "description": "High-performance production repository built by @builder-dev. (Code, ★ 0)",
+          "impactScore": 75,
+          "verified": true,
+          "date": "Sep 12, 2026"
+        },
+        {
+          "id": "ev-1789154323797",
+          "title": "ngx-intl-tel-input",
+          "type": "GitHub Repo",
+          "url": "https://github.com/Builder-Dev/ngx-intl-tel-input",
+          "description": "Phone number input field to support international numbers, Angular (TypeScript, ★ 0)",
+          "impactScore": 75,
+          "verified": true,
+          "date": "Sep 12, 2026"
+        },
+        {
+          "id": "ev-1789154323277",
+          "title": "ngx-intl-tel-input-update",
+          "type": "GitHub Repo",
+          "url": "https://github.com/Builder-Dev/ngx-intl-tel-input-update",
+          "description": "High-performance production repository built by @builder-dev. (Code, ★ 0)",
+          "impactScore": 75,
+          "verified": true,
+          "date": "Sep 12, 2026"
+        },
+        {
+          "id": "ev-1789154323201",
+          "title": "ngx-intl-tel-input",
+          "type": "GitHub Repo",
+          "url": "https://github.com/Builder-Dev/ngx-intl-tel-input",
+          "description": "Phone number input field to support international numbers, Angular (TypeScript, ★ 0)",
+          "impactScore": 75,
+          "verified": true,
+          "date": "Sep 12, 2026"
+        },
+        {
+          "id": "ev-1789154321752",
+          "title": "ngx-intl-tel-input-update",
+          "type": "GitHub Repo",
+          "url": "https://github.com/Builder-Dev/ngx-intl-tel-input-update",
+          "description": "High-performance production repository built by @builder-dev. (Code, ★ 0)",
+          "impactScore": 75,
+          "verified": true,
+          "date": "Sep 12, 2026"
+        },
+        {
+          "id": "ev-1789154321734",
+          "title": "ngx-intl-tel-input",
+          "type": "GitHub Repo",
+          "url": "https://github.com/Builder-Dev/ngx-intl-tel-input",
+          "description": "Phone number input field to support international numbers, Angular (TypeScript, ★ 0)",
+          "impactScore": 75,
+          "verified": true,
+          "date": "Sep 12, 2026"
+        },
+        {
+          "id": "ev-1789154320166",
+          "title": "ngx-intl-tel-input-update",
+          "type": "GitHub Repo",
+          "url": "https://github.com/Builder-Dev/ngx-intl-tel-input-update",
+          "description": "High-performance production repository built by @builder-dev. (Code, ★ 0)",
+          "impactScore": 75,
+          "verified": true,
+          "date": "Sep 12, 2026"
+        },
+        {
+          "id": "ev-1789154320155",
+          "title": "ngx-intl-tel-input",
+          "type": "GitHub Repo",
+          "url": "https://github.com/Builder-Dev/ngx-intl-tel-input",
+          "description": "Phone number input field to support international numbers, Angular (TypeScript, ★ 0)",
+          "impactScore": 75,
+          "verified": true,
+          "date": "Sep 12, 2026"
+        },
+        {
+          "id": "ev-1789154317746",
+          "title": "ngx-intl-tel-input-update",
+          "type": "GitHub Repo",
+          "url": "https://github.com/Builder-Dev/ngx-intl-tel-input-update",
+          "description": "High-performance production repository built by @builder-dev. (Code, ★ 0)",
+          "impactScore": 75,
+          "verified": true,
+          "date": "Sep 12, 2026"
+        },
+        {
+          "id": "ev-1789154317735",
+          "title": "ngx-intl-tel-input",
+          "type": "GitHub Repo",
+          "url": "https://github.com/Builder-Dev/ngx-intl-tel-input",
+          "description": "Phone number input field to support international numbers, Angular (TypeScript, ★ 0)",
+          "impactScore": 75,
+          "verified": true,
+          "date": "Sep 12, 2026"
+        }
+      ],
+      "googleName": "Aarav Sharma"
+    },
+    "manutejreddy@gmail.com": {
+      "id": "std-1789152783595-4ngdu",
+      "name": "manu",
+      "email": "manutejreddy@gmail.com",
       "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
       "headline": "",
       "targetRole": "Software Engineer",
@@ -712,10 +970,10 @@
       "verifiedSkills": [],
       "evidences": []
     },
-    "manutejreddy@gmail.com": {
-      "id": "std-1789152783595-4ngdu",
-      "name": "manu",
-      "email": "manutejreddy@gmail.com",
+    "aarav-builder@github.user": {
+      "id": "std-1789154371055-vdu6f",
+      "name": "aarav-builder",
+      "email": "aarav-builder@github.user",
       "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
       "headline": "",
       "targetRole": "Software Engineer",
@@ -996,6 +1254,38 @@
     ]
   },
   "auditLogs": [
+    {
+      "id": "log-1789154371055",
+      "timestamp": "2026-09-11T19:19:31.055Z",
+      "action": "USER_REGISTERED_BCRYPT",
+      "userId": "usr_1789154371055_yzgl0gf",
+      "role": "STUDENT",
+      "details": "Registered new verified student identity: aarav-builder@github.user"
+    },
+    {
+      "id": "log-1789153856581",
+      "timestamp": "2026-09-11T19:10:56.581Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148818117_r151md3",
+      "role": "INDUSTRY",
+      "details": "Successful authenticated login for: pranitha12@gmail.com"
+    },
+    {
+      "id": "log-1789153809046",
+      "timestamp": "2026-09-11T19:10:09.046Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148645714_20tlt0r",
+      "role": "INSTITUTE",
+      "details": "Successful authenticated login for: manutejreddy@gmail.com"
+    },
+    {
+      "id": "log-1789153653230",
+      "timestamp": "2026-09-11T19:07:33.230Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
     {
       "id": "log-1789152868463",
       "timestamp": "2026-09-11T18:54:28.463Z",

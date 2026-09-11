@@ -266,9 +266,9 @@ interface AppState {
 
   // Gamification Actions
   addXP: (amount: number, reason?: string) => void;
-  connectGitHub: (username?: string) => void;
+  connectGitHub: (username?: string) => Promise<void> | void;
   disconnectGitHub: () => void;
-  syncGitHub: () => void;
+  syncGitHub: () => Promise<void> | void;
   completeQuest: (questId: string) => void;
   unlockAchievement: (id: string) => void;
   completeChecklistItem: (itemId: string) => void;
@@ -427,62 +427,69 @@ export const useAppStore = create<AppState>()(
           };
         }),
 
-      connectGitHub: (username = 'aarav-builder') =>
-        set((state) => {
-          const newDetectedSkills: any[] = [
-            {
-              id: `vs-gh-${Date.now()}-1`,
-              name: 'Docker Containerization',
-              category: 'DevOps',
-              level: 'Advanced',
-              score: 88,
-              verificationSources: ['GitHub Repository Analysis'],
-              verifiedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
-              verificationCode: `GH-DOC-${Math.floor(10000 + Math.random() * 90000)}`,
-              evidenceCount: 3,
-            },
-            {
-              id: `vs-gh-${Date.now()}-2`,
-              name: 'Java 21 & Spring Boot',
-              category: 'Programming',
-              level: 'Intermediate',
-              score: 82,
-              verificationSources: ['GitHub Repository Analysis'],
-              verifiedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
-              verificationCode: `GH-JAV-${Math.floor(10000 + Math.random() * 90000)}`,
-              evidenceCount: 2,
-            },
-          ];
+      connectGitHub: async (username = 'aarav-builder') => {
+        const cleanUser = username.trim();
+        const currentEmail = get().studentProfile.email || get().currentUser?.email || '';
 
-          const updatedSkills = [...newDetectedSkills, ...state.studentProfile.verifiedSkills];
-          const newOverall = Math.min(1000, state.studentProfile.builderScores.overall + 50);
-          const newXP = state.xp + 25;
-          const levelInfo = getLevelInfo(newXP);
+        try {
+          const res = await fetch('/api/auth/github/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: cleanUser, email: currentEmail }),
+          });
+          const data = await res.json();
+          if (data.success && data.githubData) {
+            const newSkills = data.analysis?.verifiedSkills || [];
+            const existingSkills = get().studentProfile.verifiedSkills || [];
+            const mergedSkills = [...newSkills, ...existingSkills.filter((s) => !newSkills.some((ns: any) => ns.name === s.name))];
+            
+            const newXP = get().xp + 50;
+            const levelInfo = getLevelInfo(newXP);
+            const updatedAchievements = get().achievements.map((ach) =>
+              ach.title.includes('GitHub') ? { ...ach, unlocked: true, unlockedAt: 'Today' } : ach
+            );
 
-          // Unlock GitHub Pro achievement
-          const updatedAchievements = state.achievements.map((ach) =>
-            ach.title.includes('GitHub') ? { ...ach, unlocked: true, unlockedAt: 'Today' } : ach
-          );
-
-          return {
-            xp: newXP,
-            level: levelInfo.level,
-            achievements: updatedAchievements,
-            githubData: {
-              ...state.githubData,
-              connected: true,
-              username,
-            },
-            studentProfile: {
-              ...state.studentProfile,
-              verifiedSkills: updatedSkills,
-              builderScores: {
-                ...state.studentProfile.builderScores,
-                overall: newOverall,
+            set((state) => ({
+              xp: newXP,
+              level: levelInfo.level,
+              achievements: updatedAchievements,
+              githubData: data.githubData,
+              studentProfile: {
+                ...state.studentProfile,
+                professional: {
+                  ...state.studentProfile.professional,
+                  githubUrl: `https://github.com/${cleanUser}`,
+                },
+                verifiedSkills: mergedSkills,
+                builderScores: {
+                  ...state.studentProfile.builderScores,
+                  overall: Math.min(1000, state.studentProfile.builderScores.overall + 60),
+                },
               },
+            }));
+            return;
+          }
+        } catch (err) {
+          console.warn('API sync error, applying optimistic connection', err);
+        }
+
+        // Fallback optimistic update
+        set((state) => ({
+          githubData: {
+            ...state.githubData,
+            connected: true,
+            username: cleanUser,
+            avatarUrl: `https://github.com/${cleanUser}.png`,
+          },
+          studentProfile: {
+            ...state.studentProfile,
+            professional: {
+              ...state.studentProfile.professional,
+              githubUrl: `https://github.com/${cleanUser}`,
             },
-          };
-        }),
+          },
+        }));
+      },
 
       disconnectGitHub: () =>
         set((state) => ({
@@ -490,9 +497,50 @@ export const useAppStore = create<AppState>()(
             ...state.githubData,
             connected: false,
           },
+          studentProfile: {
+            ...state.studentProfile,
+            professional: {
+              ...state.studentProfile.professional,
+              githubUrl: '',
+            },
+          },
         })),
 
-      syncGitHub: () =>
+      syncGitHub: async () => {
+        const username = get().githubData?.username || 'aarav-builder';
+        const currentEmail = get().studentProfile.email || get().currentUser?.email || '';
+
+        try {
+          const res = await fetch('/api/auth/github/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email: currentEmail }),
+          });
+          const data = await res.json();
+          if (data.success && data.githubData) {
+            const newSkills = data.analysis?.verifiedSkills || [];
+            const existingSkills = get().studentProfile.verifiedSkills || [];
+            const mergedSkills = [...newSkills, ...existingSkills.filter((s) => !newSkills.some((ns: any) => ns.name === s.name))];
+            
+            const syncedXP = get().xp + 25;
+            const levelInfo = getLevelInfo(syncedXP);
+
+            set((state) => ({
+              xp: syncedXP,
+              level: levelInfo.level,
+              githubData: data.githubData,
+              studentProfile: {
+                ...state.studentProfile,
+                verifiedSkills: mergedSkills,
+              },
+            }));
+            return;
+          }
+        } catch (err) {
+          console.warn('GitHub live sync error', err);
+        }
+
+        // Fallback optimistic increment
         set((state) => {
           const syncedXP = state.xp + 10;
           const levelInfo = getLevelInfo(syncedXP);
@@ -506,7 +554,8 @@ export const useAppStore = create<AppState>()(
               streakDays: Math.max(state.streakDays, 7),
             },
           };
-        }),
+        });
+      },
 
       completeQuest: (questId) =>
         set((state) => {

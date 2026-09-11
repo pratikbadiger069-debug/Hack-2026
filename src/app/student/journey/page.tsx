@@ -468,18 +468,29 @@ export default function MyJourneyPage() {
               {/* Languages Breakdown */}
               <div className="p-4 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD] space-y-2">
                 <span className="text-xs font-bold text-[#1B1B1B] block">Language Distribution</span>
-                <div className="w-full h-2.5 bg-white rounded-full overflow-hidden flex border border-[#E8E5DD]">
-                  <div style={{ width: '48%' }} className="bg-[#3B82F6]" title="Python 48%" />
-                  <div style={{ width: '32%' }} className="bg-[#60A5FA]" title="TypeScript 32%" />
-                  <div style={{ width: '12%' }} className="bg-[#F97316]" title="C++ 12%" />
-                  <div style={{ width: '8%' }} className="bg-[#22C55E]" title="SQL & Others 8%" />
-                </div>
-                <div className="flex items-center gap-4 text-[11px] text-[#6F6A60] flex-wrap pt-1 font-mono">
-                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#3B82F6]" /> Python (48%)</span>
-                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#60A5FA]" /> TypeScript (32%)</span>
-                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#F97316]" /> C++ (12%)</span>
-                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#22C55E]" /> SQL & Others (8%)</span>
-                </div>
+                {githubData.languages && githubData.languages.length > 0 ? (
+                  <>
+                    <div className="w-full h-2.5 bg-white rounded-full overflow-hidden flex border border-[#E8E5DD]">
+                      {githubData.languages.map((l: any) => (
+                        <div
+                          key={l.name}
+                          style={{ width: `${l.percentage}%`, backgroundColor: l.color || '#3178C6' }}
+                          title={`${l.name} ${l.percentage}%`}
+                        />
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-4 text-[11px] text-[#6F6A60] flex-wrap pt-1 font-mono">
+                      {githubData.languages.map((l: any) => (
+                        <span key={l.name} className="flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: l.color || '#3178C6' }} />
+                          {l.name} ({l.percentage}%)
+                        </span>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-xs text-[#6F6A60]">No language distribution detected yet. Sync your GitHub repos to calculate.</div>
+                )}
               </div>
 
               {/* Automatic Skill Extraction Matrix */}
@@ -495,53 +506,47 @@ export default function MyJourneyPage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="p-3 bg-[#F6F4EE] rounded-xl border border-[#E8E5DD] space-y-1">
-                    <span className="text-[11px] font-semibold text-[#6F6A60] block">Spring Boot / Java Repo</span>
-                    <span className="text-xs font-bold text-[#1B1B1B] block">→ Backend Development</span>
-                    <span className="text-[10px] text-[#2F7A45] font-semibold">96% Confidence (REST APIs, JPA)</span>
-                  </div>
-                  <div className="p-3 bg-[#F6F4EE] rounded-xl border border-[#E8E5DD] space-y-1">
-                    <span className="text-[11px] font-semibold text-[#6F6A60] block">React / Next.js Repo</span>
-                    <span className="text-xs font-bold text-[#1B1B1B] block">→ Frontend Engineering</span>
-                    <span className="text-[10px] text-[#2F7A45] font-semibold">94% Confidence (TS, Tailwind)</span>
-                  </div>
-                  <div className="p-3 bg-[#F6F4EE] rounded-xl border border-[#E8E5DD] space-y-1">
-                    <span className="text-[11px] font-semibold text-[#6F6A60] block">Docker / Compose Repo</span>
-                    <span className="text-xs font-bold text-[#1B1B1B] block">→ DevOps &amp; Containers</span>
-                    <span className="text-[10px] text-[#2F7A45] font-semibold">91% Confidence (Multi-stage CI)</span>
-                  </div>
+                  {(githubData.detectedSkills || ['Backend Engineering', 'Modern Frontend Architecture', 'DevOps & Containers']).map((skill: string, idx: number) => (
+                    <div key={skill} className="p-3 bg-[#F6F4EE] rounded-xl border border-[#E8E5DD] space-y-1">
+                      <span className="text-[11px] font-semibold text-[#6F6A60] block">Inferred Skill #{idx + 1}</span>
+                      <span className="text-xs font-bold text-[#1B1B1B] block">→ {skill}</span>
+                      <span className="text-[10px] text-[#2F7A45] font-semibold">Verified via Codebase Analysis</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
               {/* Repositories Grid */}
               <div className="space-y-3">
                 <span className="text-xs font-bold text-[#1B1B1B] block uppercase tracking-wider">
-                  Pinned Repositories
+                  Analyzed Repositories
                 </span>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {(githubData.pinnedRepos || []).map((repo) => (
+                  {(githubData.pinnedRepos || []).map((repo: any) => (
                     <div
-                      key={repo.name}
+                      key={repo.title || repo.name}
                       className="p-4 rounded-xl bg-white border border-[#E8E5DD] hover:border-[#C76A2A] transition-all space-y-2"
                     >
                       <div className="flex items-center justify-between">
                         <a
-                          href={repo.url}
+                          href={repo.githubUrl || repo.url || `https://github.com/${githubData.username}/${repo.title || repo.name}`}
                           target="_blank"
                           rel="noreferrer"
                           className="font-bold text-sm text-[#1B1B1B] hover:text-[#C76A2A] flex items-center gap-1.5"
                         >
-                          <span>{repo.name}</span>
+                          <span>{repo.title || repo.name}</span>
                           <ExternalLink className="w-3 h-3 text-[#6F6A60]" />
                         </a>
                         <span className="text-xs font-mono text-[#6F6A60] flex items-center gap-1">
-                          <Star className="w-3 h-3 text-[#C76A2A]" /> {repo.stars}
+                          <Star className="w-3 h-3 text-[#C76A2A]" /> {repo.stars || 0}
                         </span>
                       </div>
                       <p className="text-xs text-[#6F6A60] line-clamp-2">{repo.description}</p>
                       <div className="flex items-center justify-between pt-1 text-[11px]">
-                        <span className="font-mono text-[#C76A2A] font-medium">{repo.language}</span>
-                        <span className="text-[#6F6A60]">{repo.forks} forks</span>
+                        <span className="font-mono text-[#C76A2A] font-medium">{repo.language || 'Code'}</span>
+                        <span className="text-[#6F6A60]">
+                          {repo.technologies?.length > 0 ? repo.technologies.join(' • ') : 'Verified'}
+                        </span>
                       </div>
                     </div>
                   ))}
