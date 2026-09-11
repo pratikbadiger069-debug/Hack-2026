@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import {
-  LayoutDashboard,
-  Compass,
+  Home,
+  MapPin,
   Bot,
   Settings,
   Users,
@@ -20,11 +20,9 @@ import {
   Code,
   Layers,
   Sparkles,
-  Award,
-  Swords,
-  Trophy,
-  Flame,
-  Zap,
+  CheckCircle2,
+  Compass,
+  FileText,
 } from 'lucide-react';
 
 interface NavItem {
@@ -32,57 +30,35 @@ interface NavItem {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   badge?: string;
-  highlight?: boolean;
 }
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { currentRole, studentProfile, level, streakDays } = useAppStore();
+  const { currentRole, level, xp } = useAppStore();
 
   const studentLinks: NavItem[] = [
-    { name: 'Home', href: '/student', icon: LayoutDashboard },
-    {
-      name: 'My Journey',
-      href: '/student/journey',
-      icon: Award,
-      badge: `Lv.${level}`,
-    },
-    {
-      name: 'Assessments',
-      href: '/student/assessments',
-      icon: Swords,
-      badge: 'Quests',
-      highlight: true,
-    },
+    { name: 'Home', href: '/student', icon: Home },
+    { name: 'My Journey', href: '/student/journey', icon: MapPin },
+    { name: 'Assessments', href: '/student/assessments', icon: CheckCircle2 },
     { name: 'Career Copilot', href: '/student/career-copilot', icon: Bot },
-    {
-      name: 'Opportunities',
-      href: '/student/opportunities',
-      icon: Compass,
-      badge: '6',
-    },
-    {
-      name: 'Leaderboard',
-      href: '/student/leaderboard',
-      icon: Trophy,
-    },
+    { name: 'Opportunities', href: '/student/opportunities', icon: Compass },
     { name: 'Settings', href: '/student/settings', icon: Settings },
   ];
 
   const instituteLinks: NavItem[] = [
-    { name: 'Dashboard', href: '/institute', icon: LayoutDashboard },
+    { name: 'Dashboard', href: '/institute', icon: Home },
     { name: 'Students Roster', href: '/institute/students', icon: Users },
     { name: 'Departments', href: '/institute/departments', icon: Building },
-    { name: 'Curriculum Analysis', href: '/institute/curriculum', icon: FileSpreadsheet, highlight: true },
+    { name: 'Curriculum Analysis', href: '/institute/curriculum', icon: FileSpreadsheet },
     { name: 'Placement Cell', href: '/institute/placement', icon: UserCheck },
     { name: 'Reports', href: '/institute/reports', icon: LineChart },
     { name: 'Settings', href: '/institute/settings', icon: Settings },
   ];
 
   const industryLinks: NavItem[] = [
-    { name: 'Dashboard', href: '/industry', icon: LayoutDashboard },
+    { name: 'Dashboard', href: '/industry', icon: Home },
     { name: 'Job Requirements', href: '/industry/jobs', icon: Briefcase },
-    { name: 'Talent Discovery', href: '/industry/talent', icon: Sparkles, highlight: true },
+    { name: 'Talent Discovery', href: '/industry/talent', icon: Sparkles },
     { name: 'Assignments', href: '/industry/assignments', icon: Code },
     { name: 'Pipeline', href: '/industry/pipeline', icon: Layers },
     { name: 'Reports', href: '/industry/reports', icon: LineChart },
@@ -90,8 +66,8 @@ export function Sidebar() {
   ];
 
   const adminLinks: NavItem[] = [
-    { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-    { name: 'Skill Demand Intel', href: '/admin/demand', icon: TrendingUp, highlight: true },
+    { name: 'Dashboard', href: '/admin', icon: Home },
+    { name: 'Skill Demand Intel', href: '/admin/demand', icon: TrendingUp },
     { name: 'User Management', href: '/admin/users', icon: Users },
     { name: 'Content Management', href: '/admin/content', icon: FileCheck },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
@@ -107,30 +83,28 @@ export function Sidebar() {
       : adminLinks;
 
   return (
-    <aside className="w-60 bg-transparent border-r border-zinc-200 dark:border-zinc-800 flex flex-col shrink-0 min-h-[calc(100vh-4rem)] p-3">
+    <aside className="w-56 bg-transparent border-r border-[#E6E4DD] dark:border-[#2D333B] flex flex-col shrink-0 min-h-[calc(100vh-3.5rem)] p-3">
       {/* Navigation Links */}
-      <nav className="flex-1 space-y-1">
+      <nav className="flex-1 space-y-0.5">
         {links.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href || (item.href !== '/student' && pathname.startsWith(item.href));
+          const isActive = pathname === item.href;
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center justify-between px-3.5 py-2.5 text-xs rounded-xl font-medium transition-all group lift-hover ${
+              className={`flex items-center justify-between px-3 py-2 text-xs rounded-lg font-medium transition-colors ${
                 isActive
-                  ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-semibold shadow-sm'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
+                  ? 'bg-[#1F2328] dark:bg-[#F0F6FC] text-white dark:text-[#0F1115] font-semibold'
+                  : 'text-[#656D76] dark:text-[#8B949E] hover:text-[#1F2328] dark:hover:text-[#F0F6FC] hover:bg-black/5 dark:hover:bg-white/5'
               }`}
             >
               <div className="flex items-center gap-2.5">
                 <Icon
-                  className={`w-4 h-4 transition-colors ${
+                  className={`w-4 h-4 ${
                     isActive
-                      ? 'text-blue-400 dark:text-blue-600'
-                      : item.highlight
-                      ? 'text-orange-500'
-                      : 'text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white'
+                      ? 'text-white dark:text-[#0F1115]'
+                      : 'text-[#8C959F] dark:text-[#6E7681]'
                   }`}
                 />
                 <span>{item.name}</span>
@@ -138,10 +112,10 @@ export function Sidebar() {
 
               {item.badge && (
                 <span
-                  className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-semibold ${
+                  className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
                     isActive
-                      ? 'bg-zinc-800 dark:bg-zinc-100 text-zinc-300 dark:text-zinc-700'
-                      : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-700'
+                      ? 'bg-white/20 dark:bg-black/20 text-white dark:text-[#0F1115]'
+                      : 'bg-[#E6E4DD] dark:bg-[#2D333B] text-[#656D76] dark:text-[#8B949E]'
                   }`}
                 >
                   {item.badge}
@@ -152,21 +126,25 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Builder Quick Card at Bottom */}
-      <div className="p-3.5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-xs space-y-2 mt-auto shadow-2xs">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 font-bold text-zinc-900 dark:text-white text-xs">
-            <Flame className="w-4 h-4 text-orange-500" />
-            <span>Builder Tier</span>
+      {/* Subtle Student Profile Pill */}
+      {currentRole === 'student' && (
+        <div className="p-3 bg-white dark:bg-[#161B22] rounded-lg border border-[#E6E4DD] dark:border-[#2D333B] text-xs space-y-1.5 mt-auto">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-medium text-[#1F2328] dark:text-[#F0F6FC]">
+              Level {level} Builder
+            </span>
+            <span className="text-[10px] font-mono text-[#656D76] dark:text-[#8B949E]">
+              {xp} XP
+            </span>
           </div>
-          <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-bold">
-            Lv. {level}
-          </span>
+          <div className="w-full h-1 bg-[#E6E4DD] dark:bg-[#2D333B] rounded-full overflow-hidden">
+            <div
+              className="h-full bg-blue-600 dark:bg-blue-400 progress-fill"
+              style={{ width: `${Math.min(100, (xp % 1000) / 10)}%` }}
+            />
+          </div>
         </div>
-        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug">
-          Complete quests to unlock tier badges and placement fast-tracks.
-        </p>
-      </div>
+      )}
     </aside>
   );
 }

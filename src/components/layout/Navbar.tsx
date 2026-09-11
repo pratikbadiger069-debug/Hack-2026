@@ -2,23 +2,22 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { AIProviderModal } from '@/components/ai/AIProviderModal';
 import { getUserDisplayName } from '@/lib/user-utils';
 import {
   Sparkles,
-  Flame,
-  Zap,
   Search,
   Moon,
   Sun,
+  Laptop,
   LogOut,
   Compass,
   CheckCircle2,
 } from 'lucide-react';
 
-function GithubIcon({ className = 'w-4 h-4' }: { className?: string }) {
+function GithubIcon({ className = 'w-3.5 h-3.5' }: { className?: string }) {
   return (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24">
       <path
@@ -31,10 +30,8 @@ function GithubIcon({ className = 'w-4 h-4' }: { className?: string }) {
 }
 
 export function Navbar() {
-  const pathname = usePathname();
   const router = useRouter();
   const {
-    currentRole,
     currentUser,
     logoutUser,
     aiKeys,
@@ -71,28 +68,31 @@ export function Navbar() {
   };
 
   const displayName = getUserDisplayName({ user: currentUser, profile: studentProfile });
-  const nextLevelXP = level * 150;
-  const currentLevelProgress = Math.min(100, Math.round(((xp % 150) / 150) * 100));
+  const xpInCurrentLevel = xp % 1000;
+  const levelTarget = 1000;
+
+  const cycleColorMode = () => {
+    if (colorMode === 'light') setColorMode('dark');
+    else if (colorMode === 'dark') setColorMode('system');
+    else setColorMode('light');
+  };
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full bg-white/90 dark:bg-[#09090B]/90 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 transition-colors">
-        <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 max-w-[1440px] mx-auto">
+      <header className="sticky top-0 z-40 w-full bg-[#FFFFFF]/95 dark:bg-[#161B22]/95 backdrop-blur-md border-b border-[#E6E4DD] dark:border-[#2D333B] transition-colors">
+        <div className="flex items-center justify-between h-14 px-4 sm:px-6 max-w-[1440px] mx-auto">
           {/* Brand Identity */}
           <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-8 h-8 rounded-xl bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white font-bold text-sm shadow-sm group-hover:scale-105 transition-transform">
-                <Compass className="w-4 h-4 text-white" />
+            <Link href="/" className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-[#1F2328] dark:bg-[#F0F6FC] flex items-center justify-center text-white dark:text-[#0F1115] font-semibold text-xs shadow-xs">
+                <Compass className="w-3.5 h-3.5 text-white dark:text-[#0F1115]" />
               </div>
-              <div className="flex flex-col">
-                <span className="font-heading font-extrabold text-zinc-900 dark:text-white tracking-tight text-sm flex items-center gap-1.5">
+              <div className="flex items-baseline gap-2">
+                <span className="font-semibold text-[#1F2328] dark:text-[#F0F6FC] tracking-tight text-sm">
                   SKILLBRIDGE
-                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 font-bold">
-                    V4
-                  </span>
                 </span>
-                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium tracking-wide hidden sm:inline">
-                  Proof-of-Work Platform
+                <span className="text-[11px] text-[#656D76] dark:text-[#8B949E] hidden sm:inline">
+                  Workforce Intelligence
                 </span>
               </div>
             </Link>
@@ -101,88 +101,74 @@ export function Navbar() {
           {/* Center Search Input */}
           <div className="hidden md:flex items-center flex-1 max-w-sm mx-6">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8C959F] dark:text-[#6E7681]" />
               <input
                 type="text"
-                placeholder="Search quests, skills, peers, projects..."
-                className="w-full pl-9 pr-3 py-1.5 text-xs bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-full focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 transition-all shadow-2xs"
+                placeholder="Search skills, challenges, peer builders..."
+                className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg focus:outline-none focus:border-blue-500 text-[#1F2328] dark:text-[#F0F6FC] placeholder:text-[#8C959F] dark:placeholder:text-[#6E7681] transition-colors"
               />
             </div>
           </div>
 
-          {/* Right Gamification & Profile Controls */}
+          {/* Right Controls */}
           <div className="flex items-center gap-2.5 sm:gap-3">
-            {/* Streak Counter */}
-            <div
-              title={`${streakDays} Day Builder Streak`}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full streak-pill text-xs font-semibold text-orange-600 dark:text-orange-400 cursor-default"
-            >
-              <Flame className="w-3.5 h-3.5 text-orange-500 animate-pulse" />
-              <span>{streakDays}d Streak</span>
-            </div>
-
-            {/* Level & XP Capsule */}
+            {/* Level & XP Minimal Capsule */}
             <Link
               href="/student/journey"
-              className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full xp-pill text-xs font-semibold text-blue-700 dark:text-blue-300 hover:opacity-90 transition-opacity"
+              className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] text-xs font-medium text-[#1F2328] dark:text-[#F0F6FC] hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
             >
-              <Zap className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-              <span>Lv. {level} Builder</span>
-              <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
-                {xp} XP
+              <span>Level {level} Builder</span>
+              <span className="text-[#8C959F] dark:text-[#6E7681] font-mono text-[11px]">
+                {xpInCurrentLevel} / {levelTarget} XP
               </span>
-              <div className="w-10 bg-zinc-200 dark:bg-zinc-700 rounded-full h-1.5 overflow-hidden ml-0.5">
-                <div
-                  className="bg-blue-600 dark:bg-blue-400 h-1.5 rounded-full"
-                  style={{ width: `${currentLevelProgress}%` }}
-                />
-              </div>
             </Link>
 
-            {/* GitHub Connected Pill */}
+            {/* GitHub Connected Indicator */}
             {githubData.connected && (
-              <div className="hidden lg:flex items-center gap-1 px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[11px] font-mono text-zinc-700 dark:text-zinc-300">
-                <GithubIcon className="w-3 h-3 text-zinc-800 dark:text-zinc-200" />
-                <span>@{githubData.username}</span>
-                <CheckCircle2 className="w-3 h-3 text-emerald-500 ml-0.5" />
+              <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] text-xs text-[#1F2328] dark:text-[#F0F6FC]">
+                <GithubIcon className="w-3.5 h-3.5 text-[#1F2328] dark:text-[#F0F6FC]" />
+                <span className="font-mono text-[11px]">@{githubData.username}</span>
+                <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
               </div>
             )}
 
-            {/* Theme / Dark Mode Toggle */}
+            {/* Light / Dark / System Mode Toggle */}
             <button
-              onClick={() => setColorMode(colorMode === 'dark' ? 'light' : 'dark')}
-              className="p-2 rounded-xl text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-              title="Toggle Light / Dark Mode"
+              onClick={cycleColorMode}
+              className="p-1.5 rounded-lg text-[#656D76] dark:text-[#8B949E] hover:text-[#1F2328] dark:hover:text-[#F0F6FC] hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+              title={`Current: ${colorMode} mode (Click to switch)`}
             >
               {mounted && colorMode === 'dark' ? (
-                <Sun className="w-4 h-4 text-amber-400" />
+                <Moon className="w-4 h-4 text-blue-400" />
+              ) : mounted && colorMode === 'system' ? (
+                <Laptop className="w-4 h-4 text-[#8C959F]" />
               ) : (
-                <Moon className="w-4 h-4 text-zinc-600" />
+                <Sun className="w-4 h-4 text-amber-600" />
               )}
             </button>
 
-            {/* AI Engine BYOK */}
+            {/* AI Engine Status */}
             <button
               onClick={() => setIsAiModalOpen(true)}
-              className="hidden md:flex px-2.5 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-semibold items-center gap-1.5 transition-colors"
+              className="hidden md:flex px-2.5 py-1 bg-[#FAF9F5] dark:bg-[#0F1115] hover:bg-[#F0EEE6] dark:hover:bg-[#1C2128] text-[#1F2328] dark:text-[#F0F6FC] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg text-xs font-medium items-center gap-1.5 transition-colors"
             >
-              <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+              <Sparkles className="w-3 h-3 text-blue-600 dark:text-blue-400" />
               <span className="capitalize">{activeProvider}</span>
               {hasKey && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />}
             </button>
 
             {/* User Profile Avatar */}
-            <div className="flex items-center gap-2 pl-2 border-l border-zinc-200 dark:border-zinc-800">
+            <div className="flex items-center gap-2 pl-2 border-l border-[#E6E4DD] dark:border-[#2D333B]">
               <img
                 src={currentUser?.avatar || studentProfile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
                 alt={displayName}
-                className="w-7 h-7 rounded-full object-cover border border-zinc-300 dark:border-zinc-700"
+                className="w-6 h-6 rounded-full object-cover border border-[#E6E4DD] dark:border-[#2D333B]"
               />
               <button
                 onClick={handleLogout}
                 disabled={isLoggingOut}
                 title="Sign Out"
-                className="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                className="p-1 text-[#8C959F] dark:text-[#6E7681] hover:text-[#1F2328] dark:hover:text-[#F0F6FC] rounded transition-colors"
               >
                 <LogOut className="w-3.5 h-3.5" />
               </button>

@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
-import confetti from 'canvas-confetti';
 import {
   Award,
   ShieldCheck,
@@ -12,24 +11,16 @@ import {
   Calendar,
   ExternalLink,
   PlusCircle,
-  TrendingUp,
-  Sparkles,
   Trophy,
   X,
-  Flame,
-  Zap,
-  Star,
-  GitBranch,
-  GitCommit,
-  GitPullRequest,
   CheckCircle2,
   Lock,
-  Layers,
-  Cpu,
-  Server,
+  GitBranch,
+  Star,
+  BookOpen,
 } from 'lucide-react';
 
-function GithubIcon({ className = 'w-5 h-5' }: { className?: string }) {
+function GithubIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24">
       <path
@@ -54,7 +45,7 @@ export default function MyJourneyPage() {
     unlockAchievement,
   } = useAppStore();
 
-  const [activeFilter, setActiveFilter] = useState<'all' | 'github' | 'skills' | 'projects' | 'achievements' | 'timeline'>('all');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'github' | 'skills' | 'projects' | 'badges' | 'timeline'>('all');
   const [isConnectingGitHub, setIsConnectingGitHub] = useState(false);
   const [isAddEvidenceOpen, setIsAddEvidenceOpen] = useState(false);
   const [isAddSkillOpen, setIsAddSkillOpen] = useState(false);
@@ -74,22 +65,12 @@ export default function MyJourneyPage() {
     setTimeout(() => {
       connectGitHub('aarav-builder');
       setIsConnectingGitHub(false);
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
-      });
-    }, 800);
+    }, 600);
   };
 
   const handleBadgeClick = (badgeId: string, unlocked: boolean) => {
     if (!unlocked) {
       unlockAchievement(badgeId);
-      confetti({
-        particleCount: 90,
-        spread: 60,
-        origin: { y: 0.6 },
-      });
     }
   };
 
@@ -105,12 +86,6 @@ export default function MyJourneyPage() {
       impactScore: Math.floor(85 + Math.random() * 12),
     });
 
-    confetti({
-      particleCount: 70,
-      spread: 50,
-      origin: { y: 0.7 },
-    });
-
     setNewTitle('');
     setNewUrl('');
     setNewDesc('');
@@ -122,10 +97,6 @@ export default function MyJourneyPage() {
     if (!newSkillName) return;
 
     addVerifiedSkill(newSkillName, newSkillLevel, newSkillCategory);
-    confetti({
-      particleCount: 50,
-      spread: 40,
-    });
     setNewSkillName('');
     setIsAddSkillOpen(false);
   };
@@ -136,7 +107,7 @@ export default function MyJourneyPage() {
     {
       month: 'Jan 2026',
       title: 'Real-time Multimodal Vector Retrieval Engine Deployed',
-      type: 'Project Upload (+100 XP)',
+      type: 'Project Verified (+100 XP)',
       description: 'Built HNSW vector search serving 40k QPS with sub-15ms p99 latency in C++ and Python.',
     },
     {
@@ -161,128 +132,116 @@ export default function MyJourneyPage() {
 
   return (
     <PortalLayout>
-      <div className="space-y-8 max-w-[1300px] mx-auto pb-20">
-        {/* 1. TOP HERO: GAMING PROFILE + GITHUB CONNECT HUD */}
-        <motion.section
-          initial={{ opacity: 0, y: 12 }}
+      <div className="space-y-6 max-w-[1200px] mx-auto pb-16">
+        {/* Top Hero & Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-zinc-200 dark:border-zinc-800"
+          transition={{ duration: 0.25 }}
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-[#E6E4DD] dark:border-[#2D333B]"
         >
           <div>
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse" />
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                Level {level} Builder Identity
-              </span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-heading font-black tracking-tight text-zinc-900 dark:text-white mt-1">
-              My Journey &amp; Proof Index
+            <h1 className="text-2xl font-semibold text-[#1F2328] dark:text-[#F0F6FC] tracking-tight">
+              My Journey
             </h1>
-            <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 font-sans">
-              Your verified repositories, skill badges, hackathons, and on-chain proof of craft.
+            <p className="text-xs text-[#656D76] dark:text-[#8B949E] mt-0.5">
+              Verified proof-of-work, GitHub activity, skill passport, and builder milestones.
             </p>
           </div>
 
-          {/* Action CTAs */}
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap">
             <button
               onClick={handleOAuthConnect}
               disabled={isConnectingGitHub || githubData.connected}
-              className={`px-4 py-2 text-xs font-heading font-bold rounded-xl transition-all shadow-xs flex items-center gap-2 lift-hover ${
+              className={`px-3.5 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center gap-2 ${
                 githubData.connected
-                  ? 'bg-zinc-900 dark:bg-zinc-800 text-white cursor-default'
-                  : 'bg-black text-white hover:bg-zinc-800'
+                  ? 'bg-[#FAF9F5] dark:bg-[#161B22] border border-[#E6E4DD] dark:border-[#2D333B] text-[#1F2328] dark:text-[#F0F6FC]'
+                  : 'bg-[#1F2328] dark:bg-[#F0F6FC] text-white dark:text-[#0F1115] hover:bg-black dark:hover:bg-white'
               }`}
             >
-              <GithubIcon className="w-4 h-4" />
-              <span>{isConnectingGitHub ? 'Scanning Repos...' : githubData.connected ? 'GitHub Synced ✓' : 'Connect GitHub (+25 XP)'}</span>
+              <GithubIcon className="w-3.5 h-3.5" />
+              <span>
+                {isConnectingGitHub ? 'Connecting...' : githubData.connected ? 'GitHub Connected' : 'Connect GitHub (+25 XP)'}
+              </span>
             </button>
 
             <button
               onClick={() => setIsAddEvidenceOpen(true)}
-              className="px-4 py-2 text-xs font-heading font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all shadow-xs flex items-center gap-1.5 lift-hover"
+              className="px-3.5 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-1.5"
             >
               <PlusCircle className="w-3.5 h-3.5" />
-              <span>+ Upload Project (+100 XP)</span>
+              <span>+ Add Project (+100 XP)</span>
             </button>
           </div>
-        </motion.section>
+        </motion.div>
 
-        {/* 2. BUILDER SCORE & XP VELOCITY CARD */}
-        <motion.section
-          whileHover={{ scale: 1.005 }}
-          transition={{ duration: 0.15 }}
-          className="builder-card p-7 sm:p-8 space-y-6"
-        >
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-            <div className="flex items-center gap-6">
-              <div className="w-24 h-24 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex flex-col items-center justify-center text-center shrink-0 shadow-md">
-                <span className="text-3xl font-heading font-black">{bScores.overall || 885}</span>
-                <span className="text-[10px] font-mono text-blue-100 font-semibold uppercase">/ 1000</span>
+        {/* Builder Score Overview Card */}
+        <div className="p-6 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] space-y-5">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="flex items-center gap-5">
+              <div className="w-18 h-18 rounded-xl bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] flex flex-col items-center justify-center text-center shrink-0 p-3">
+                <span className="text-2xl font-bold text-[#1F2328] dark:text-[#F0F6FC] font-mono">{bScores.overall || 885}</span>
+                <span className="text-[10px] text-[#8C959F] dark:text-[#6E7681] font-mono">/ 1000</span>
               </div>
 
               <div className="space-y-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/80 px-2.5 py-0.5 rounded-full">
-                    Top 5% National Tier
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
+                    Builder Score &amp; Track Record
                   </span>
-                  <span className="text-xs font-mono font-bold text-blue-600 dark:text-blue-400">
-                    {xp} Total XP Accumulated
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-medium">
+                    Top 5%
                   </span>
                 </div>
-                <h2 className="text-2xl font-heading font-extrabold text-zinc-900 dark:text-white">
-                  Verified Builder Score
-                </h2>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-md leading-relaxed">
-                  Real-time algorithmic index computed from code complexity, commit velocity, live deployments, and peer validations.
+                <p className="text-xs text-[#656D76] dark:text-[#8B949E] max-w-lg">
+                  Algorithmic index calculated from repository complexity, commit frequency, verified challenges, and peer validations.
                 </p>
               </div>
             </div>
 
-            {/* Sub-Scores Matrix */}
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 pt-4 lg:pt-0 border-t lg:border-t-0 lg:border-l border-zinc-200 dark:border-zinc-800 lg:pl-8">
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-900/70 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center">
-                <span className="text-[10px] font-mono text-zinc-500 block uppercase">Execution</span>
-                <strong className="text-base font-heading font-extrabold text-zinc-900 dark:text-white">{bScores.execution || 92}%</strong>
+            {/* Sub-Score Dimensions */}
+            <div className="grid grid-cols-5 gap-2 pt-4 lg:pt-0 border-t lg:border-t-0 lg:border-l border-[#E6E4DD] dark:border-[#2D333B] lg:pl-6">
+              <div className="p-2.5 bg-[#FAF9F5] dark:bg-[#0F1115] rounded-lg border border-[#E6E4DD] dark:border-[#2D333B] text-center">
+                <span className="text-[10px] font-mono text-[#8C959F] dark:text-[#6E7681] block">EXEC</span>
+                <strong className="text-xs font-mono font-bold text-[#1F2328] dark:text-[#F0F6FC]">{bScores.execution || 92}%</strong>
               </div>
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-900/70 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center">
-                <span className="text-[10px] font-mono text-zinc-500 block uppercase">Leadership</span>
-                <strong className="text-base font-heading font-extrabold text-zinc-900 dark:text-white">{bScores.leadership || 85}%</strong>
+              <div className="p-2.5 bg-[#FAF9F5] dark:bg-[#0F1115] rounded-lg border border-[#E6E4DD] dark:border-[#2D333B] text-center">
+                <span className="text-[10px] font-mono text-[#8C959F] dark:text-[#6E7681] block">LEAD</span>
+                <strong className="text-xs font-mono font-bold text-[#1F2328] dark:text-[#F0F6FC]">{bScores.leadership || 85}%</strong>
               </div>
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-900/70 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center">
-                <span className="text-[10px] font-mono text-zinc-500 block uppercase">Innovation</span>
-                <strong className="text-base font-heading font-extrabold text-zinc-900 dark:text-white">{bScores.innovation || 90}%</strong>
+              <div className="p-2.5 bg-[#FAF9F5] dark:bg-[#0F1115] rounded-lg border border-[#E6E4DD] dark:border-[#2D333B] text-center">
+                <span className="text-[10px] font-mono text-[#8C959F] dark:text-[#6E7681] block">INNOV</span>
+                <strong className="text-xs font-mono font-bold text-[#1F2328] dark:text-[#F0F6FC]">{bScores.innovation || 90}%</strong>
               </div>
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-900/70 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center">
-                <span className="text-[10px] font-mono text-zinc-500 block uppercase">Solving</span>
-                <strong className="text-base font-heading font-extrabold text-zinc-900 dark:text-white">{bScores.problemSolving || 94}%</strong>
+              <div className="p-2.5 bg-[#FAF9F5] dark:bg-[#0F1115] rounded-lg border border-[#E6E4DD] dark:border-[#2D333B] text-center">
+                <span className="text-[10px] font-mono text-[#8C959F] dark:text-[#6E7681] block">SOLVE</span>
+                <strong className="text-xs font-mono font-bold text-[#1F2328] dark:text-[#F0F6FC]">{bScores.problemSolving || 94}%</strong>
               </div>
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-900/70 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center">
-                <span className="text-[10px] font-mono text-zinc-500 block uppercase">Consistency</span>
-                <strong className="text-base font-heading font-extrabold text-zinc-900 dark:text-white">{bScores.consistency || 88}%</strong>
+              <div className="p-2.5 bg-[#FAF9F5] dark:bg-[#0F1115] rounded-lg border border-[#E6E4DD] dark:border-[#2D333B] text-center">
+                <span className="text-[10px] font-mono text-[#8C959F] dark:text-[#6E7681] block">CONSIST</span>
+                <strong className="text-xs font-mono font-bold text-[#1F2328] dark:text-[#F0F6FC]">{bScores.consistency || 88}%</strong>
               </div>
             </div>
           </div>
-        </motion.section>
+        </div>
 
-        {/* 3. NARRATIVE FILTER TABS */}
-        <div className="flex items-center gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-3 overflow-x-auto no-scrollbar">
+        {/* Filter Tabs */}
+        <div className="flex items-center gap-1.5 border-b border-[#E6E4DD] dark:border-[#2D333B] pb-2 overflow-x-auto no-scrollbar">
           {[
-            { id: 'all', label: 'All Identity' },
+            { id: 'all', label: 'All Items' },
             { id: 'github', label: `GitHub Repos (${githubData.publicRepos})` },
             { id: 'skills', label: `Verified Skills (${studentProfile.verifiedSkills.length})` },
             { id: 'projects', label: `Projects (${studentProfile.evidences.length})` },
-            { id: 'achievements', label: `Badges (${achievements.length})` },
+            { id: 'badges', label: `Badges (${achievements.length})` },
             { id: 'timeline', label: 'Growth Timeline' },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveFilter(tab.id as any)}
-              className={`px-4 py-1.5 rounded-full text-xs font-heading font-bold whitespace-nowrap transition-all lift-hover ${
+              className={`px-3 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors ${
                 activeFilter === tab.id
-                  ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 shadow-xs'
-                  : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-800'
+                  ? 'bg-[#1F2328] dark:bg-[#F0F6FC] text-white dark:text-[#0F1115]'
+                  : 'text-[#656D76] dark:text-[#8B949E] hover:text-[#1F2328] dark:hover:text-[#F0F6FC] hover:bg-black/5 dark:hover:bg-white/5'
               }`}
             >
               {tab.label}
@@ -290,329 +249,290 @@ export default function MyJourneyPage() {
           ))}
         </div>
 
-        {/* 4. GITHUB REPOSITORIES & REAL AUTO-DETECTED SKILLS */}
+        {/* GitHub Intelligence Section */}
         {(activeFilter === 'all' || activeFilter === 'github') && (
-          <section className="space-y-4">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <GithubIcon className="w-5 h-5 text-zinc-900 dark:text-white" />
-                <h3 className="text-xl font-heading font-extrabold text-zinc-900 dark:text-white">
-                  Connected GitHub Intelligence
-                </h3>
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
+                <GithubIcon className="w-4 h-4" />
+                <span>GitHub Repositories &amp; Analysis</span>
               </div>
-              <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-bold">
-                ● Live Repo Analysis Active
+              <span className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400">
+                Connected: @{githubData.username}
               </span>
             </div>
 
-            {/* GitHub Stats Row */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="builder-card p-4 text-center">
-                <span className="text-xs text-zinc-500 block font-mono">Public Repos</span>
-                <strong className="text-xl font-heading font-extrabold text-zinc-900 dark:text-white">
-                  {githubData.publicRepos}
-                </strong>
+            {/* Metrics */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="p-3.5 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] text-center">
+                <span className="text-[11px] text-[#656D76] dark:text-[#8B949E] block">Public Repos</span>
+                <strong className="text-base font-mono font-semibold text-[#1F2328] dark:text-[#F0F6FC]">{githubData.publicRepos}</strong>
               </div>
-              <div className="builder-card p-4 text-center">
-                <span className="text-xs text-zinc-500 block font-mono">Total Stars Earned</span>
-                <strong className="text-xl font-heading font-extrabold text-amber-500">
-                  ★ {githubData.totalStars}
-                </strong>
+              <div className="p-3.5 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] text-center">
+                <span className="text-[11px] text-[#656D76] dark:text-[#8B949E] block">Stars Earned</span>
+                <strong className="text-base font-mono font-semibold text-[#1F2328] dark:text-[#F0F6FC]">★ {githubData.totalStars}</strong>
               </div>
-              <div className="builder-card p-4 text-center">
-                <span className="text-xs text-zinc-500 block font-mono">Yearly Commits</span>
-                <strong className="text-xl font-heading font-extrabold text-blue-600 dark:text-blue-400">
-                  {githubData.recentCommitsCount}
-                </strong>
+              <div className="p-3.5 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] text-center">
+                <span className="text-[11px] text-[#656D76] dark:text-[#8B949E] block">Commits (12m)</span>
+                <strong className="text-base font-mono font-semibold text-[#1F2328] dark:text-[#F0F6FC]">{githubData.recentCommitsCount}</strong>
               </div>
-              <div className="builder-card p-4 text-center">
-                <span className="text-xs text-zinc-500 block font-mono">Followers</span>
-                <strong className="text-xl font-heading font-extrabold text-zinc-900 dark:text-white">
-                  {githubData.followers}
-                </strong>
+              <div className="p-3.5 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] text-center">
+                <span className="text-[11px] text-[#656D76] dark:text-[#8B949E] block">Followers</span>
+                <strong className="text-base font-mono font-semibold text-[#1F2328] dark:text-[#F0F6FC]">{githubData.followers}</strong>
               </div>
             </div>
 
-            {/* Pinned Repositories Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Pinned Repos */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {githubData.pinnedRepos.map((repo, idx) => (
-                <motion.div
+                <div
                   key={idx}
-                  whileHover={{ scale: 1.01 }}
-                  className="builder-card p-5 space-y-3 flex flex-col justify-between"
+                  className="p-4 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] space-y-2.5 flex flex-col justify-between"
                 >
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5 text-xs font-heading font-bold text-zinc-900 dark:text-white">
-                        <Code className="w-3.5 h-3.5 text-blue-600" />
+                      <div className="flex items-center gap-1.5 text-xs font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
+                        <BookOpen className="w-3.5 h-3.5 text-[#656D76] dark:text-[#8B949E]" />
                         <span className="truncate">{repo.name}</span>
                       </div>
-                      <span className="text-xs font-mono font-bold text-amber-500 flex items-center gap-0.5">
+                      <span className="text-[11px] font-mono text-[#656D76] dark:text-[#8B949E]">
                         ★ {repo.stars}
                       </span>
                     </div>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2">
+                    <p className="text-xs text-[#656D76] dark:text-[#8B949E] line-clamp-2">
                       {repo.description}
                     </p>
                   </div>
 
-                  <div className="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                    <div className="flex flex-wrap gap-1">
-                      {repo.topics.map((t) => (
-                        <span
-                          key={t}
-                          className="text-[10px] font-mono px-2 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300"
-                        >
-                          #{t}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="flex items-center justify-between text-xs text-zinc-500 pt-1">
-                      <span className="font-mono text-[11px] font-bold text-blue-600">{repo.language}</span>
-                      <a
-                        href={repo.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:text-blue-600 inline-flex items-center gap-1"
-                      >
-                        <span>Repo</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                    </div>
+                  <div className="pt-2 border-t border-[#E6E4DD] dark:border-[#2D333B] flex items-center justify-between text-xs">
+                    <span className="font-mono text-[11px] text-blue-600 dark:text-blue-400">{repo.language}</span>
+                    <a
+                      href={repo.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs text-[#656D76] dark:text-[#8B949E] hover:text-[#1F2328] dark:hover:text-[#F0F6FC] inline-flex items-center gap-1 font-medium"
+                    >
+                      <span>View</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </section>
+          </div>
         )}
 
-        {/* 5. UNLOCKABLE GAMIFIED BADGES & ACHIEVEMENTS */}
-        {(activeFilter === 'all' || activeFilter === 'achievements') && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-amber-500" />
-                <h3 className="text-xl font-heading font-extrabold text-zinc-900 dark:text-white">
-                  Unlockable Builder Badges
-                </h3>
-              </div>
-              <span className="text-xs font-mono text-zinc-500">
-                Click unlocked badges for celebration
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {achievements.map((badge) => (
-                <motion.div
-                  key={badge.id}
-                  whileHover={{ scale: 1.02 }}
-                  onClick={() => handleBadgeClick(badge.id, badge.unlocked)}
-                  className={`builder-card p-5 text-center space-y-2 cursor-pointer transition-all ${
-                    badge.unlocked
-                      ? 'border-blue-200 dark:border-blue-900/50 bg-blue-50/20 dark:bg-blue-950/10'
-                      : 'opacity-60 grayscale'
-                  }`}
-                >
-                  <div className="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-xl bg-zinc-100 dark:bg-zinc-800 shadow-xs">
-                    {badge.unlocked ? (
-                      <Sparkles className="w-6 h-6 text-amber-500" />
-                    ) : (
-                      <Lock className="w-5 h-5 text-zinc-400" />
-                    )}
-                  </div>
-                  <div>
-                    <h4 className="font-heading font-bold text-sm text-zinc-900 dark:text-white">
-                      {badge.title}
-                    </h4>
-                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-2 mt-0.5">
-                      {badge.description}
-                    </p>
-                  </div>
-                  <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 text-xs font-mono font-bold text-blue-600 dark:text-blue-400">
-                    +{badge.xpReward} XP
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* 6. VERIFIED SKILLS PASSPORT */}
+        {/* Verified Skills Passport */}
         {(activeFilter === 'all' || activeFilter === 'skills') && (
-          <section className="space-y-4">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-emerald-500" />
-                <h3 className="text-xl font-heading font-extrabold text-zinc-900 dark:text-white">
-                  Verified Skills Passport
-                </h3>
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
+                <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <span>Verified Skills Passport</span>
               </div>
               <button
                 onClick={() => setIsAddSkillOpen(true)}
-                className="text-xs font-heading font-bold text-blue-600 dark:text-blue-400 hover:underline"
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium"
               >
-                + Verify New Skill
+                + Add Verified Skill
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {studentProfile.verifiedSkills.map((skill) => (
-                <motion.div
+                <div
                   key={skill.id}
-                  whileHover={{ scale: 1.01 }}
-                  className="builder-card p-5 space-y-2.5"
+                  className="p-4 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] space-y-2"
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <h4 className="font-heading font-bold text-sm text-zinc-900 dark:text-white">
+                      <div className="font-semibold text-xs text-[#1F2328] dark:text-[#F0F6FC]">
                         {skill.name}
-                      </h4>
-                      <span className="text-[11px] text-zinc-500">{skill.category}</span>
+                      </div>
+                      <span className="text-[11px] text-[#656D76] dark:text-[#8B949E]">{skill.category}</span>
                     </div>
-                    <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full">
+                    <span className="text-xs font-mono font-semibold text-emerald-600 dark:text-emerald-400">
                       {skill.score}%
                     </span>
                   </div>
 
-                  <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-1.5 overflow-hidden">
-                    <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: `${skill.score}%` }} />
+                  <div className="w-full bg-[#E6E4DD] dark:bg-[#2D333B] rounded-full h-1 overflow-hidden">
+                    <div className="bg-emerald-600 dark:bg-emerald-400 h-full progress-fill" style={{ width: `${skill.score}%` }} />
                   </div>
 
-                  <div className="flex items-center justify-between text-[11px] text-zinc-400 pt-1 font-mono">
+                  <div className="flex items-center justify-between text-[10px] text-[#8C959F] dark:text-[#6E7681] pt-1 font-mono">
                     <span>{skill.level}</span>
-                    <span className="text-blue-600 dark:text-blue-400 font-bold">{skill.verificationCode}</span>
+                    <span>{skill.verificationCode}</span>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </section>
+          </div>
         )}
 
-        {/* 7. PROJECTS & CAPSTONES */}
+        {/* Project Evidence */}
         {(activeFilter === 'all' || activeFilter === 'projects') && (
-          <section className="space-y-4">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Code className="w-5 h-5 text-blue-600" />
-                <h3 className="text-xl font-heading font-extrabold text-zinc-900 dark:text-white">
-                  Production Capstone Evidence
-                </h3>
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
+                <Code className="w-4 h-4 text-[#1F2328] dark:text-[#F0F6FC]" />
+                <span>Production Project Evidence</span>
               </div>
-              <span className="text-xs font-mono text-zinc-500">
-                {studentProfile.evidences.length} Verified Repositories
+              <span className="text-xs font-mono text-[#656D76] dark:text-[#8B949E]">
+                {studentProfile.evidences.length} Verified
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {studentProfile.evidences.map((ev) => (
-                <motion.div
+                <div
                   key={ev.id}
-                  whileHover={{ scale: 1.01 }}
-                  className="builder-card p-6 space-y-3 flex flex-col justify-between"
+                  className="p-5 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] space-y-2.5 flex flex-col justify-between"
                 >
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <div className="flex items-start justify-between">
                       <div>
-                        <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-bold">
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] text-[#656D76] dark:text-[#8B949E]">
                           {ev.type}
                         </span>
-                        <h4 className="text-base font-heading font-bold text-zinc-900 dark:text-white mt-1.5">
+                        <h4 className="text-sm font-semibold text-[#1F2328] dark:text-[#F0F6FC] mt-1">
                           {ev.title}
                         </h4>
                       </div>
-                      <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2.5 py-0.5 rounded-full">
+                      <span className="text-xs font-mono font-medium text-emerald-600 dark:text-emerald-400">
                         {ev.impactScore}/100 Impact
                       </span>
                     </div>
-                    <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                    <p className="text-xs text-[#656D76] dark:text-[#8B949E] leading-relaxed">
                       {ev.description}
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-zinc-800 text-xs">
-                    <span className="text-zinc-400 font-mono">{ev.date}</span>
+                  <div className="flex items-center justify-between pt-2.5 border-t border-[#E6E4DD] dark:border-[#2D333B] text-xs">
+                    <span className="text-[#8C959F] dark:text-[#6E7681] font-mono text-[11px]">{ev.date}</span>
                     {ev.url && (
                       <a
                         href={ev.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="font-heading font-bold text-zinc-900 dark:text-white hover:text-blue-600 inline-flex items-center gap-1"
+                        className="text-xs font-medium text-[#1F2328] dark:text-[#F0F6FC] hover:text-blue-600 inline-flex items-center gap-1"
                       >
                         <span>View Repository</span>
                         <ExternalLink className="w-3 h-3" />
                       </a>
                     )}
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </section>
+          </div>
         )}
 
-        {/* 8. GROWTH TIMELINE */}
-        {(activeFilter === 'all' || activeFilter === 'timeline') && (
-          <section className="builder-card p-8 space-y-6">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
-              <div className="flex items-center gap-2.5">
-                <Calendar className="w-5 h-5 text-orange-500" />
-                <h3 className="text-lg font-heading font-extrabold text-zinc-900 dark:text-white">
-                  Growth Timeline Story
-                </h3>
+        {/* Badges */}
+        {(activeFilter === 'all' || activeFilter === 'badges') && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
+                <Trophy className="w-4 h-4 text-[#1F2328] dark:text-[#F0F6FC]" />
+                <span>Builder Badges</span>
               </div>
-              <span className="text-xs font-mono text-zinc-500">Chronological XP log</span>
             </div>
 
-            <div className="space-y-6 relative before:absolute before:left-3 before:top-2 before:bottom-2 before:w-px before:bg-zinc-200 dark:before:bg-zinc-800">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {achievements.map((badge) => (
+                <div
+                  key={badge.id}
+                  onClick={() => handleBadgeClick(badge.id, badge.unlocked)}
+                  className={`p-4 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] text-center space-y-1.5 cursor-pointer transition-opacity ${
+                    badge.unlocked ? 'opacity-100' : 'opacity-40'
+                  }`}
+                >
+                  <div className="w-8 h-8 rounded-lg mx-auto flex items-center justify-center bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B]">
+                    {badge.unlocked ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    ) : (
+                      <Lock className="w-4 h-4 text-[#8C959F]" />
+                    )}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-xs text-[#1F2328] dark:text-[#F0F6FC]">
+                      {badge.title}
+                    </div>
+                    <p className="text-[11px] text-[#656D76] dark:text-[#8B949E] line-clamp-2 mt-0.5">
+                      {badge.description}
+                    </p>
+                  </div>
+                  <div className="text-[10px] font-mono text-[#8C959F] dark:text-[#6E7681]">
+                    +{badge.xpReward} XP
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Growth Timeline */}
+        {(activeFilter === 'all' || activeFilter === 'timeline') && (
+          <div className="p-6 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E6E4DD] dark:border-[#2D333B]">
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
+                <Calendar className="w-4 h-4 text-[#1F2328] dark:text-[#F0F6FC]" />
+                <span>Growth Timeline</span>
+              </div>
+              <span className="text-xs font-mono text-[#656D76] dark:text-[#8B949E]">Milestone Log</span>
+            </div>
+
+            <div className="space-y-4 relative before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-[#E6E4DD] dark:before:bg-[#2D333B]">
               {timelineEvents.map((evt, idx) => (
-                <div key={idx} className="relative pl-8 space-y-1">
-                  <div className="absolute left-2 top-1.5 w-2.5 h-2.5 rounded-full bg-blue-600 ring-4 ring-blue-100 dark:ring-blue-950" />
+                <div key={idx} className="relative pl-6 space-y-0.5">
+                  <div className="absolute left-1.25 top-1.5 w-1.5 h-1.5 rounded-full bg-blue-600" />
                   <div className="flex items-center justify-between text-xs">
-                    <strong className="text-sm font-heading font-bold text-zinc-900 dark:text-white">
+                    <strong className="font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
                       {evt.title}
                     </strong>
-                    <span className="text-xs font-mono font-bold text-blue-600 dark:text-blue-400">
+                    <span className="text-[11px] font-mono text-blue-600 dark:text-blue-400">
                       {evt.type}
                     </span>
                   </div>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                  <p className="text-xs text-[#656D76] dark:text-[#8B949E] leading-relaxed">
                     {evt.description}
                   </p>
                 </div>
               ))}
             </div>
-          </section>
+          </div>
         )}
       </div>
 
       {/* Add Project Evidence Modal */}
       {isAddEvidenceOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
-          <div className="w-full max-w-lg bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-6 space-y-4 shadow-2xl text-xs">
-            <div className="flex items-center justify-between pb-2 border-b border-zinc-200 dark:border-zinc-800">
-              <h3 className="font-heading font-bold text-base text-zinc-900 dark:text-white">Upload Project Evidence (+100 XP)</h3>
-              <button onClick={() => setIsAddEvidenceOpen(false)} className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="w-full max-w-md bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] p-5 space-y-4 shadow-lg text-xs">
+            <div className="flex items-center justify-between pb-2 border-b border-[#E6E4DD] dark:border-[#2D333B]">
+              <h3 className="font-semibold text-sm text-[#1F2328] dark:text-[#F0F6FC]">Add Project Evidence (+100 XP)</h3>
+              <button onClick={() => setIsAddEvidenceOpen(false)} className="text-[#8C959F] hover:text-[#1F2328] dark:hover:text-[#F0F6FC]">
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <form onSubmit={handleCreateEvidence} className="space-y-4">
+            <form onSubmit={handleCreateEvidence} className="space-y-3">
               <div>
-                <label className="font-mono text-zinc-500 text-[10px] uppercase block mb-1">Project Title</label>
+                <label className="font-medium text-[#656D76] dark:text-[#8B949E] block mb-1">Project Title</label>
                 <input
                   type="text"
                   required
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="e.g. Distributed Token Bucket Rate Limiter"
-                  className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:outline-none focus:border-blue-600"
+                  className="w-full p-2 bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg text-[#1F2328] dark:text-[#F0F6FC] focus:outline-none"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="font-mono text-zinc-500 text-[10px] uppercase block mb-1">Type</label>
+                  <label className="font-medium text-[#656D76] dark:text-[#8B949E] block mb-1">Type</label>
                   <select
                     value={newType}
                     onChange={(e) => setNewType(e.target.value as any)}
-                    className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
+                    className="w-full p-2 bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg text-[#1F2328] dark:text-[#F0F6FC]"
                   >
                     <option value="GitHub Repo">GitHub Repo</option>
                     <option value="Live Product">Live Product</option>
@@ -621,39 +541,39 @@ export default function MyJourneyPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="font-mono text-zinc-500 text-[10px] uppercase block mb-1">Repository URL</label>
+                  <label className="font-medium text-[#656D76] dark:text-[#8B949E] block mb-1">URL</label>
                   <input
                     type="url"
                     value={newUrl}
                     onChange={(e) => setNewUrl(e.target.value)}
                     placeholder="https://github.com/..."
-                    className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
+                    className="w-full p-2 bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg text-[#1F2328] dark:text-[#F0F6FC]"
                   />
                 </div>
               </div>
               <div>
-                <label className="font-mono text-zinc-500 text-[10px] uppercase block mb-1">Description &amp; Tech Stack</label>
+                <label className="font-medium text-[#656D76] dark:text-[#8B949E] block mb-1">Description</label>
                 <textarea
                   rows={3}
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
-                  placeholder="Describe your system architecture, benchmarks, and performance metrics..."
-                  className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
+                  placeholder="Architecture, key libraries, benchmark metrics..."
+                  className="w-full p-2 bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg text-[#1F2328] dark:text-[#F0F6FC]"
                 />
               </div>
-              <div className="flex justify-end gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-[#E6E4DD] dark:border-[#2D333B]">
                 <button
                   type="button"
                   onClick={() => setIsAddEvidenceOpen(false)}
-                  className="px-4 py-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white"
+                  className="px-3 py-1.5 text-[#656D76] dark:text-[#8B949E]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-heading font-bold shadow-xs lift-hover"
+                  className="px-4 py-1.5 bg-[#1F2328] dark:bg-[#F0F6FC] text-white dark:text-[#0F1115] rounded-lg font-medium"
                 >
-                  Save &amp; Claim 100 XP
+                  Save Project
                 </button>
               </div>
             </form>
@@ -663,33 +583,33 @@ export default function MyJourneyPage() {
 
       {/* Add Skill Modal */}
       {isAddSkillOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-6 space-y-4 shadow-2xl text-xs">
-            <div className="flex items-center justify-between pb-2 border-b border-zinc-200 dark:border-zinc-800">
-              <h3 className="font-heading font-bold text-base text-zinc-900 dark:text-white">Verify New Skill (+50 XP)</h3>
-              <button onClick={() => setIsAddSkillOpen(false)} className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="w-full max-w-sm bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] p-5 space-y-4 shadow-lg text-xs">
+            <div className="flex items-center justify-between pb-2 border-b border-[#E6E4DD] dark:border-[#2D333B]">
+              <h3 className="font-semibold text-sm text-[#1F2328] dark:text-[#F0F6FC]">Add Verified Skill (+50 XP)</h3>
+              <button onClick={() => setIsAddSkillOpen(false)} className="text-[#8C959F] hover:text-[#1F2328] dark:hover:text-[#F0F6FC]">
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <form onSubmit={handleCreateSkill} className="space-y-4">
+            <form onSubmit={handleCreateSkill} className="space-y-3">
               <div>
-                <label className="font-mono text-zinc-500 text-[10px] uppercase block mb-1">Skill Name</label>
+                <label className="font-medium text-[#656D76] dark:text-[#8B949E] block mb-1">Skill Name</label>
                 <input
                   type="text"
                   required
                   value={newSkillName}
                   onChange={(e) => setNewSkillName(e.target.value)}
                   placeholder="e.g. Docker, PyTorch, Kubernetes"
-                  className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
+                  className="w-full p-2 bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg text-[#1F2328] dark:text-[#F0F6FC]"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="font-mono text-zinc-500 text-[10px] uppercase block mb-1">Category</label>
+                  <label className="font-medium text-[#656D76] dark:text-[#8B949E] block mb-1">Category</label>
                   <select
                     value={newSkillCategory}
                     onChange={(e) => setNewSkillCategory(e.target.value as any)}
-                    className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
+                    className="w-full p-2 bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg text-[#1F2328] dark:text-[#F0F6FC]"
                   >
                     <option value="Programming">Programming</option>
                     <option value="AI & ML">AI & ML</option>
@@ -699,11 +619,11 @@ export default function MyJourneyPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="font-mono text-zinc-500 text-[10px] uppercase block mb-1">Level</label>
+                  <label className="font-medium text-[#656D76] dark:text-[#8B949E] block mb-1">Level</label>
                   <select
                     value={newSkillLevel}
                     onChange={(e) => setNewSkillLevel(e.target.value as any)}
-                    className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
+                    className="w-full p-2 bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg text-[#1F2328] dark:text-[#F0F6FC]"
                   >
                     <option value="Intermediate">Intermediate</option>
                     <option value="Advanced">Advanced</option>
@@ -711,19 +631,19 @@ export default function MyJourneyPage() {
                   </select>
                 </div>
               </div>
-              <div className="flex justify-end gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-[#E6E4DD] dark:border-[#2D333B]">
                 <button
                   type="button"
                   onClick={() => setIsAddSkillOpen(false)}
-                  className="px-4 py-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white"
+                  className="px-3 py-1.5 text-[#656D76] dark:text-[#8B949E]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-heading font-bold shadow-xs lift-hover"
+                  className="px-4 py-1.5 bg-blue-600 text-white rounded-lg font-medium"
                 >
-                  Verify &amp; Claim 50 XP
+                  Verify Skill
                 </button>
               </div>
             </form>

@@ -4,19 +4,14 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
-import confetti from 'canvas-confetti';
 import {
-  Sparkles,
   ArrowUpRight,
   Search,
   Check,
   Building2,
   MapPin,
-  Clock,
   Briefcase,
-  Zap,
-  ShieldCheck,
-  TrendingUp,
+  Sparkles,
 } from 'lucide-react';
 
 interface Opportunity {
@@ -55,8 +50,8 @@ export default function StudentOpportunitiesPage() {
       type: 'Hybrid',
       compensation: '$8,500 / mo',
       deadline: 'In 4 days',
-      whyItMatches: 'Your verified skills in Python, FastAPI, and PyTorch (95% score) match their model serving and evaluation infrastructure directly.',
-      howToImprove: 'Complete the Docker Multi-Stage quest to reach 99% match calibration.',
+      whyItMatches: 'Your verified scores in Python, FastAPI, and PyTorch (95% score) match their model serving and evaluation infrastructure directly.',
+      howToImprove: 'Complete the Docker Multi-Stage challenge to reach 99% match calibration.',
       matchedSkills: ['Python', 'FastAPI', 'PyTorch'],
       missingSkills: ['CUDA Optimization', 'Triton'],
       link: 'https://anthropic.com/careers',
@@ -72,7 +67,7 @@ export default function StudentOpportunitiesPage() {
       type: 'Remote',
       compensation: '$145k – $175k / yr',
       deadline: 'Rolling 2026',
-      whyItMatches: 'Your Builder Passport highlights extensive PostgreSQL vector indexing and distributed RPC pipelines with 92% Execution rating.',
+      whyItMatches: 'Your builder profile highlights extensive PostgreSQL vector indexing and distributed RPC pipelines with 92% Execution rating.',
       howToImprove: 'Add an event streaming repository (Kafka/RabbitMQ) to your builder profile.',
       matchedSkills: ['PostgreSQL', 'TypeScript', 'Next.js'],
       missingSkills: ['Kafka Event Streaming'],
@@ -89,8 +84,8 @@ export default function StudentOpportunitiesPage() {
       type: 'Remote',
       compensation: '$50,000 Prize Pool',
       deadline: 'Apr 18, 2026',
-      whyItMatches: 'Top 1% candidate match based on your 3 national hackathon wins and autonomous agent capstone repositories.',
-      howToImprove: 'You meet 100% eligibility! Form a team to maximize top prize chances.',
+      whyItMatches: 'Top candidate match based on your 3 national hackathon wins and autonomous agent capstone repositories.',
+      howToImprove: 'You meet 100% eligibility. Register your team to participate.',
       matchedSkills: ['FastAPI', 'Next.js', 'PyTorch'],
       missingSkills: [],
       link: 'https://devpost.com',
@@ -106,7 +101,7 @@ export default function StudentOpportunitiesPage() {
       type: 'Remote',
       compensation: '$12,000 Grant',
       deadline: 'May 01, 2026',
-      whyItMatches: 'Direct match for your published academic paper and speculative decoding benchmark models on low-power edge GPUs.',
+      whyItMatches: 'Direct match for your published academic paper and speculative decoding benchmark models on edge GPUs.',
       howToImprove: 'Upload benchmarks of your HNSW vector index latency to reach 96% fit.',
       matchedSkills: ['PyTorch', 'Research Papers'],
       missingSkills: ['ONNX Runtime'],
@@ -127,56 +122,45 @@ export default function StudentOpportunitiesPage() {
 
   const handleApply = (id: string) => {
     setAppliedIds((prev) => ({ ...prev, [id]: true }));
-    confetti({
-      particleCount: 80,
-      spread: 60,
-      origin: { y: 0.7 },
-    });
   };
 
   return (
     <PortalLayout>
-      <div className="space-y-8 max-w-[1300px] mx-auto pb-20">
-        {/* Header HUD */}
-        <motion.section
-          initial={{ opacity: 0, y: 12 }}
+      <div className="space-y-6 max-w-[1200px] mx-auto pb-16">
+        {/* Top Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-zinc-200 dark:border-zinc-800"
+          transition={{ duration: 0.25 }}
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-[#E6E4DD] dark:border-[#2D333B]"
         >
           <div>
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse" />
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                Workforce Intelligence Engine
-              </span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-heading font-black tracking-tight text-zinc-900 dark:text-white mt-1">
-              Curated Opportunities
+            <h1 className="text-2xl font-semibold text-[#1F2328] dark:text-[#F0F6FC] tracking-tight">
+              Matched Opportunities
             </h1>
-            <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 font-sans">
-              Algorithmic match scores computed from your verified GitHub repositories, Builder Score, and skill assessments.
+            <p className="text-xs text-[#656D76] dark:text-[#8B949E] mt-0.5">
+              Calibrated match scores generated from your verified skills, repositories, and assessments.
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-3 py-1.5 rounded-xl border border-emerald-200 dark:border-emerald-800">
-              Average Fit: 93% Verified Match
+            <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800/50">
+              Avg Calibration: 93% Fit
             </span>
           </div>
-        </motion.section>
+        </motion.div>
 
         {/* Filter bar & Search */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar w-full sm:w-auto">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-1.5 rounded-full text-xs font-heading font-bold transition-all lift-hover ${
+                className={`px-3 py-1 rounded-md text-xs whitespace-nowrap transition-colors ${
                   selectedCategory === cat
-                    ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 shadow-xs'
-                    : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 border border-zinc-200 dark:border-zinc-800'
+                    ? 'bg-[#1F2328] dark:bg-[#F0F6FC] text-white dark:text-[#0F1115] font-medium'
+                    : 'text-[#656D76] dark:text-[#8B949E] hover:text-[#1F2328] dark:hover:text-[#F0F6FC] hover:bg-black/5 dark:hover:bg-white/5'
                 }`}
               >
                 {cat}
@@ -184,80 +168,74 @@ export default function StudentOpportunitiesPage() {
             ))}
           </div>
 
-          <div className="relative w-full sm:w-72">
-            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3.5 top-3" />
+          <div className="relative w-full sm:w-64">
+            <Search className="w-3.5 h-3.5 text-[#8C959F] dark:text-[#6E7681] absolute left-3 top-2.5" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by role, company, or tech stack..."
-              className="w-full pl-9 pr-4 py-2 text-xs bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-full focus:outline-none focus:border-blue-600 text-zinc-900 dark:text-white placeholder:text-zinc-400 transition-all shadow-2xs"
+              placeholder="Search by role or company..."
+              className="w-full pl-8 pr-3 py-1.5 text-xs bg-white dark:bg-[#161B22] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg focus:outline-none focus:border-blue-500 text-[#1F2328] dark:text-[#F0F6FC] placeholder:text-[#8C959F] dark:placeholder:text-[#6E7681]"
             />
           </div>
         </div>
 
         {/* Opportunities List */}
-        <div className="space-y-4">
-          {filtered.map((opp, idx) => {
+        <div className="space-y-3">
+          {filtered.map((opp) => {
             const isApplied = appliedIds[opp.id];
             return (
-              <motion.div
+              <div
                 key={opp.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.25, delay: idx * 0.05 }}
-                whileHover={{ scale: 1.005 }}
-                className="builder-card p-6 sm:p-7 space-y-5"
+                className="p-5 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] space-y-4"
               >
-                {/* Main Row */}
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                  <div className="flex items-start gap-4">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                  <div className="flex items-start gap-3">
                     <img
                       src={opp.logo}
                       alt={opp.company}
-                      className="w-12 h-12 rounded-2xl object-cover border border-zinc-200 dark:border-zinc-800 shrink-0 shadow-xs"
+                      className="w-10 h-10 rounded-lg object-cover border border-[#E6E4DD] dark:border-[#2D333B] shrink-0"
                     />
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2.5 flex-wrap">
-                        <h2 className="text-base font-heading font-extrabold text-zinc-900 dark:text-white">
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h2 className="text-sm font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
                           {opp.title}
                         </h2>
-                        <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-bold">
+                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] text-[#656D76] dark:text-[#8B949E]">
                           {opp.category}
                         </span>
                       </div>
-                      <div className="flex items-center gap-3 text-xs text-zinc-500 font-sans">
-                        <span className="font-bold text-zinc-900 dark:text-white">{opp.company}</span>
+                      <div className="flex items-center gap-2.5 text-xs text-[#656D76] dark:text-[#8B949E]">
+                        <span className="font-medium text-[#1F2328] dark:text-[#F0F6FC]">{opp.company}</span>
                         <span>•</span>
                         <span>{opp.location}</span>
                         <span>•</span>
-                        <span className="text-emerald-600 dark:text-emerald-400 font-mono font-bold">
+                        <span className="font-mono text-emerald-600 dark:text-emerald-400 font-medium">
                           {opp.compensation}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Match & Apply CTA */}
-                  <div className="flex items-center sm:flex-col sm:items-end justify-between sm:justify-start gap-2.5 pt-2 sm:pt-0">
-                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 text-xs font-mono font-bold">
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>{opp.matchScore}% Match</span>
+                  <div className="flex items-center sm:flex-col sm:items-end justify-between sm:justify-start gap-2">
+                    <div className="text-xs font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+                      {opp.matchScore}% Match
                     </div>
 
                     <button
                       onClick={() => handleApply(opp.id)}
                       disabled={isApplied}
-                      className={`px-5 py-2 text-xs font-heading font-bold rounded-xl transition-all shadow-xs flex items-center gap-1.5 lift-hover ${
+                      className={`px-3.5 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5 ${
                         isApplied
-                          ? 'bg-emerald-600 text-white cursor-default'
-                          : 'bg-blue-600 hover:bg-blue-700 text-white'
+                          ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 cursor-default'
+                          : 'bg-[#1F2328] dark:bg-[#F0F6FC] text-white dark:text-[#0F1115] hover:bg-black dark:hover:bg-white'
                       }`}
                     >
                       {isApplied ? (
                         <>
                           <Check className="w-3.5 h-3.5" />
-                          <span>Applied with Passport</span>
+                          <span>Applied</span>
                         </>
                       ) : (
                         <>
@@ -269,27 +247,27 @@ export default function StudentOpportunitiesPage() {
                   </div>
                 </div>
 
-                {/* Match Narrative & How to Improve */}
-                <div className="p-4 bg-zinc-50 dark:bg-zinc-900/60 rounded-2xl border border-zinc-200 dark:border-zinc-800/80 space-y-3 text-xs">
+                {/* Match Details */}
+                <div className="p-3.5 bg-[#FAF9F5] dark:bg-[#0F1115] rounded-lg border border-[#E6E4DD] dark:border-[#2D333B] space-y-2.5 text-xs">
                   <div>
-                    <span className="text-[10px] font-mono uppercase font-bold text-zinc-400 block mb-1">
-                      Why you match this role
+                    <span className="text-[10px] font-mono uppercase text-[#8C959F] dark:text-[#6E7681] block mb-0.5">
+                      Why matched
                     </span>
-                    <p className="text-xs text-zinc-800 dark:text-zinc-200 leading-relaxed">
+                    <p className="text-xs text-[#1F2328] dark:text-[#F0F6FC] leading-relaxed">
                       {opp.whyItMatches}
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-[#E6E4DD] dark:border-[#2D333B]">
                     <div>
-                      <span className="text-[10px] font-mono uppercase font-bold text-emerald-600 dark:text-emerald-400 block mb-1">
+                      <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 block mb-1">
                         Verified Skills Matched:
                       </span>
                       <div className="flex flex-wrap gap-1">
                         {opp.matchedSkills.map((s) => (
                           <span
                             key={s}
-                            className="text-[11px] font-mono px-2 py-0.5 rounded bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white"
+                            className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-white dark:bg-[#161B22] border border-[#E6E4DD] dark:border-[#2D333B] text-[#1F2328] dark:text-[#F0F6FC]"
                           >
                             ✓ {s}
                           </span>
@@ -298,16 +276,16 @@ export default function StudentOpportunitiesPage() {
                     </div>
 
                     <div>
-                      <span className="text-[10px] font-mono uppercase font-bold text-orange-600 dark:text-orange-400 block mb-1">
-                        How to reach 99% calibration:
+                      <span className="text-[10px] font-mono text-[#656D76] dark:text-[#8B949E] block mb-0.5">
+                        How to improve:
                       </span>
-                      <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-snug">
+                      <p className="text-[11px] text-[#656D76] dark:text-[#8B949E]">
                         {opp.howToImprove}
                       </p>
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>

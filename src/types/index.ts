@@ -19,15 +19,9 @@ export interface AIKeys {
   claude: string;
 }
 
-export type ThemeColor =
-  | 'ocean-blue'
-  | 'sunset-orange'
-  | 'forest-green'
-  | 'purple-haze'
-  | 'monochrome'
-  | 'cyber-teal';
+export type ThemeColor = 'blue' | 'orange' | 'green' | 'gray' | 'ocean-blue' | 'sunset-orange' | 'forest-green' | 'purple-haze' | 'monochrome' | 'cyber-teal';
 
-export type ColorMode = 'light' | 'dark';
+export type ColorMode = 'light' | 'dark' | 'system';
 
 export type BuilderLevelTitle =
   | 'Explorer'

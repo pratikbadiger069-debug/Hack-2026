@@ -21,6 +21,7 @@ import {
   Palette,
   Sun,
   Moon,
+  Laptop,
   ShieldCheck,
 } from 'lucide-react';
 import { cleanApiKey, DiagnosticResult } from '@/lib/ai-diagnostics';
@@ -66,12 +67,10 @@ export default function StudentSettingsPage() {
   });
 
   const themes: { id: ThemeColor; name: string; hex: string; desc: string }[] = [
-    { id: 'ocean-blue', name: 'Ocean Blue', hex: '#2563EB', desc: 'Linear & Stripe inspired crisp blue' },
-    { id: 'sunset-orange', name: 'Sunset Orange', hex: '#F97316', desc: 'High momentum builder accent' },
-    { id: 'forest-green', name: 'Forest Green', hex: '#16A34A', desc: 'Calm growth & verified craft' },
-    { id: 'purple-haze', name: 'Purple Haze', hex: '#8B5CF6', desc: 'Modern web & Framer aesthetic' },
-    { id: 'cyber-teal', name: 'Cyber Teal', hex: '#0D9488', desc: 'Arc Browser dynamic teal' },
-    { id: 'monochrome', name: 'Monochrome', hex: '#18181B', desc: 'Raycast minimal dark/light' },
+    { id: 'blue', name: 'Blue', hex: '#2563EB', desc: 'Default minimal accent' },
+    { id: 'orange', name: 'Orange', hex: '#EA580C', desc: 'Subtle warm focus' },
+    { id: 'green', name: 'Green', hex: '#16A34A', desc: 'Calm growth accent' },
+    { id: 'gray', name: 'Gray', hex: '#475569', desc: 'Monochrome precision' },
   ];
 
   const runProviderTest = async (provider: AIProvider, rawKey: string) => {
@@ -300,63 +299,75 @@ export default function StudentSettingsPage() {
 
               {/* Mode Toggle */}
               <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-zinc-500 mb-2">
+                <label className="block text-xs font-mono uppercase tracking-wider text-[#656D76] dark:text-[#8B949E] mb-2">
                   Display Mode
                 </label>
-                <div className="grid grid-cols-2 gap-3 max-w-sm">
+                <div className="grid grid-cols-3 gap-2.5 max-w-md">
                   <button
                     type="button"
                     onClick={() => setColorMode('light')}
-                    className={`p-3 rounded-2xl border text-xs font-heading font-bold flex items-center justify-center gap-2 transition-all ${
+                    className={`p-3 rounded-xl border text-xs font-medium flex items-center justify-center gap-2 transition-colors ${
                       colorMode === 'light'
-                        ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/40 text-blue-900 dark:text-blue-200 ring-2 ring-blue-600'
-                        : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400'
+                        ? 'border-blue-600 bg-blue-50/50 dark:bg-blue-950/40 text-blue-900 dark:text-blue-200 ring-1 ring-blue-600'
+                        : 'border-[#E6E4DD] dark:border-[#2D333B] bg-white dark:bg-[#161B22] text-[#656D76] dark:text-[#8B949E]'
                     }`}
                   >
                     <Sun className="w-4 h-4 text-amber-500" />
-                    <span>Light Mode</span>
+                    <span>Light</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setColorMode('dark')}
-                    className={`p-3 rounded-2xl border text-xs font-heading font-bold flex items-center justify-center gap-2 transition-all ${
+                    className={`p-3 rounded-xl border text-xs font-medium flex items-center justify-center gap-2 transition-colors ${
                       colorMode === 'dark'
-                        ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/40 text-blue-900 dark:text-blue-200 ring-2 ring-blue-600'
-                        : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400'
+                        ? 'border-blue-600 bg-blue-50/50 dark:bg-blue-950/40 text-blue-900 dark:text-blue-200 ring-1 ring-blue-600'
+                        : 'border-[#E6E4DD] dark:border-[#2D333B] bg-white dark:bg-[#161B22] text-[#656D76] dark:text-[#8B949E]'
                     }`}
                   >
                     <Moon className="w-4 h-4 text-blue-400" />
-                    <span>Dark Mode</span>
+                    <span>Dark</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setColorMode('system')}
+                    className={`p-3 rounded-xl border text-xs font-medium flex items-center justify-center gap-2 transition-colors ${
+                      colorMode === 'system'
+                        ? 'border-blue-600 bg-blue-50/50 dark:bg-blue-950/40 text-blue-900 dark:text-blue-200 ring-1 ring-blue-600'
+                        : 'border-[#E6E4DD] dark:border-[#2D333B] bg-white dark:bg-[#161B22] text-[#656D76] dark:text-[#8B949E]'
+                    }`}
+                  >
+                    <Laptop className="w-4 h-4 text-[#8C959F]" />
+                    <span>System</span>
                   </button>
                 </div>
               </div>
 
               {/* Theme Swatches */}
               <div className="space-y-2">
-                <label className="block text-xs font-mono uppercase tracking-wider text-zinc-500 mb-2">
-                  Accent Preset
+                <label className="block text-xs font-mono uppercase tracking-wider text-[#656D76] dark:text-[#8B949E] mb-2">
+                  Accent Color
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                   {themes.map((th) => (
                     <button
                       key={th.id}
                       type="button"
                       onClick={() => setThemeColor(th.id)}
-                      className={`p-4 rounded-2xl border text-left transition-all flex items-start gap-3 lift-hover ${
+                      className={`p-3.5 rounded-xl border text-left transition-colors flex items-start gap-2.5 ${
                         themeColor === th.id
-                          ? 'border-blue-600 ring-2 ring-blue-600 bg-blue-50/20 dark:bg-blue-950/20'
-                          : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60'
+                          ? 'border-blue-600 ring-1 ring-blue-600 bg-blue-50/20 dark:bg-blue-950/20'
+                          : 'border-[#E6E4DD] dark:border-[#2D333B] bg-white dark:bg-[#161B22]'
                       }`}
                     >
                       <div
-                        className="w-7 h-7 rounded-xl shrink-0 shadow-xs"
+                        className="w-5 h-5 rounded-md shrink-0 shadow-2xs mt-0.5"
                         style={{ backgroundColor: th.hex }}
                       />
                       <div>
-                        <span className="font-heading font-bold text-xs text-zinc-900 dark:text-white block">
+                        <span className="font-semibold text-xs text-[#1F2328] dark:text-[#F0F6FC] block">
                           {th.name}
                         </span>
-                        <span className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-tight block">
+                        <span className="text-[11px] text-[#656D76] dark:text-[#8B949E] leading-tight block">
                           {th.desc}
                         </span>
                       </div>
