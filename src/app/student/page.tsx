@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   Bot,
   Calendar,
+  CheckCircle2,
 } from 'lucide-react';
 
 const mockOpportunities = [
@@ -35,7 +36,7 @@ const mockOpportunities = [
   },
 ];
 
-export default function StudentHomePage() {
+export default function StudentDashboardPage() {
   const {
     studentProfile,
     currentUser,
@@ -45,6 +46,9 @@ export default function StudentHomePage() {
     streakDays,
     quests,
     githubData,
+    checklist,
+    tierRankings,
+    completeChecklistItem,
   } = useAppStore();
 
   const [mounted, setMounted] = useState(false);
@@ -67,14 +71,15 @@ export default function StudentHomePage() {
   const builderScoreData = calculateTransparentBuilderScore({
     verifiedSkillsCount: (studentProfile.verifiedSkills || []).length,
     projectsCount: (studentProfile.evidences || []).length,
-    githubConnected: githubData.connected,
-    githubReposCount: (githubData.pinnedRepos || []).length,
+    githubConnected: githubData?.connected,
+    githubReposCount: (githubData?.pinnedRepos || []).length,
     consistencyStreakDays: streakDays,
     completedChallengesCount: (quests || []).filter((q) => q.completed).length,
   });
 
   const context = analyzeStudentCareerContext(studentProfile, selectedRole);
   const sampleRoles = Object.keys(ROLE_BENCHMARKS);
+  const completedChecklistCount = (checklist || []).filter((c) => c.completed).length;
 
   // Time-based greeting
   const getGreeting = () => {
@@ -196,6 +201,83 @@ export default function StudentHomePage() {
                   </Link>
                 </div>
               )}
+            </motion.div>
+
+            {/* 4-Tier Ranking Badges */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="px-3 py-1.5 bg-white rounded-xl border border-[#E8E5DD] text-xs flex items-center gap-1.5 shadow-2xs">
+                <span className="text-[#6F6A60]">Dept:</span>
+                <strong className="text-[#1B1B1B]">#{tierRankings?.deptRank || 2} in {studentProfile.academic?.department || 'CSE'}</strong>
+              </div>
+              <div className="px-3 py-1.5 bg-white rounded-xl border border-[#E8E5DD] text-xs flex items-center gap-1.5 shadow-2xs">
+                <span className="text-[#6F6A60]">Campus:</span>
+                <strong className="text-[#C76A2A]">#{tierRankings?.collegeRank || 5} in {studentProfile.academic?.college || 'HITAM'}</strong>
+              </div>
+              <div className="px-3 py-1.5 bg-white rounded-xl border border-[#E8E5DD] text-xs flex items-center gap-1.5 shadow-2xs">
+                <span className="text-[#6F6A60]">State:</span>
+                <strong className="text-[#1B1B1B]">#{tierRankings?.stateRank || 18} ({tierRankings?.stateName || 'Telangana'})</strong>
+              </div>
+              <div className="px-3 py-1.5 bg-white rounded-xl border border-[#E8E5DD] text-xs flex items-center gap-1.5 shadow-2xs">
+                <span className="text-[#6F6A60]">National:</span>
+                <strong className="text-[#2F7A45]">Top 3% (#{tierRankings?.nationalRank || 142})</strong>
+              </div>
+            </div>
+
+            {/* Event-Driven Verification Checklist Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: 0.08 }}
+              className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-4"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-base font-bold text-[#1B1B1B] flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-[#2F7A45]" />
+                    <span>Builder Verification Checklist</span>
+                  </h3>
+                  <p className="text-xs text-[#6F6A60]">Auto-completes dynamically upon taking assessments, connecting GitHub, and uploading proof.</p>
+                </div>
+                <span className="text-xs font-mono font-bold text-[#2F7A45] bg-[#2F7A45]/10 px-2.5 py-1 rounded-full">
+                  {completedChecklistCount} / {(checklist || []).length} Verified
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                {(checklist || []).map((item) => (
+                  <div
+                    key={item.id}
+                    className={`p-3.5 rounded-xl border transition-all flex items-start justify-between gap-3 ${
+                      item.completed
+                        ? 'bg-[#F6F4EE]/60 border-[#E8E5DD]'
+                        : 'bg-white border-[#E8E5DD] hover:border-[#C76A2A]'
+                    }`}
+                  >
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-1.5">
+                        <span className={`w-2 h-2 rounded-full ${item.completed ? 'bg-[#2F7A45]' : 'bg-[#C76A2A]'}`} />
+                        <h5 className="text-xs font-bold text-[#1B1B1B]">{item.title}</h5>
+                      </div>
+                      <p className="text-[11px] text-[#6F6A60] line-clamp-1">{item.description}</p>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      {item.completed ? (
+                        <span className="text-[10px] font-bold text-[#2F7A45] bg-[#2F7A45]/10 px-2 py-0.5 rounded-md flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" /> Done
+                        </span>
+                      ) : (
+                        <Link
+                          href={item.actionUrl}
+                          className="px-2.5 py-1 bg-[#1B1B1B] text-white rounded-lg text-[10px] font-bold hover:bg-[#C76A2A] transition-colors inline-block"
+                        >
+                          Complete →
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </motion.div>
 
             {/* Weekly Focus & Verification Challenge */}

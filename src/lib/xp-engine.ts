@@ -42,13 +42,14 @@ export function getLevelInfo(totalXP: number): LevelInfo {
   const xpRemaining = nextTarget - safeXP;
   const rank = Math.max(1, Math.round(150 - (level * 2.2)));
 
-  // Builder Titles
+  // Builder Titles for V7
   let title: BuilderLevelTitle = 'Explorer';
-  if (level >= 61) title = 'Elite Builder';
-  else if (level >= 41) title = 'Innovator';
-  else if (level >= 31) title = 'Architect';
-  else if (level >= 21) title = 'Creator';
-  else if (level >= 11) title = 'Builder';
+  if (level >= 30) title = 'Industry Ready';
+  else if (level >= 25) title = 'Elite Builder';
+  else if (level >= 20) title = 'Innovator';
+  else if (level >= 15) title = 'Architect';
+  else if (level >= 10) title = 'Creator';
+  else if (level >= 5) title = 'Builder';
   else title = 'Explorer';
 
   return {
@@ -390,9 +391,16 @@ export interface BuilderScoreBreakdownItem {
 }
 
 /**
- * Transparent Builder Score Calculation Formula:
- * 30% Assessments + 30% Projects + 20% GitHub + 10% Consistency + 10% Challenges
+ * Official SkillBridge V7 Deterministic 6-Pillar Builder Score Formula:
+ * 30% Assessments (300 max)
+ * 25% Projects (250 max)
+ * 15% GitHub (150 max)
+ * 10% Industry Challenges (100 max)
+ * 10% Communication (100 max)
+ * 10% Consistency (100 max)
+ * Total: 1000 pts max.
  */
+export const calculateBuilderScore = calculateTransparentBuilderScore;
 export function calculateTransparentBuilderScore(metrics: {
   verifiedSkillsCount?: number;
   projectsCount?: number;
@@ -403,8 +411,9 @@ export function calculateTransparentBuilderScore(metrics: {
   assessmentsScore?: number;
   projectsScore?: number;
   githubScore?: number;
+  industryChallengesScore?: number;
+  communicationScore?: number;
   consistencyScore?: number;
-  challengesScore?: number;
 }): {
   totalScore: number;
   overallScore: number;
@@ -413,59 +422,69 @@ export function calculateTransparentBuilderScore(metrics: {
     assessments: number;
     projects: number;
     github: number;
+    industryChallenges: number;
+    communication: number;
     consistency: number;
-    challenges: number;
   };
 } {
-  const assessScore = metrics.assessmentsScore ?? Math.min(100, (metrics.verifiedSkillsCount || 6) * 15 + 10);
-  const projScore = metrics.projectsScore ?? Math.min(100, (metrics.projectsCount || 2) * 45);
-  const gitScore = metrics.githubScore ?? (metrics.githubConnected ? Math.min(100, 50 + (metrics.githubReposCount || 4) * 12) : 20);
+  const assessScore = metrics.assessmentsScore ?? Math.min(100, (metrics.verifiedSkillsCount || 6) * 14 + 16);
+  const projScore = metrics.projectsScore ?? Math.min(100, (metrics.projectsCount || 2) * 45 + 10);
+  const gitScore = metrics.githubScore ?? (metrics.githubConnected ? Math.min(100, 60 + (metrics.githubReposCount || 4) * 10) : 25);
+  const indChalScore = metrics.industryChallengesScore ?? Math.min(100, (metrics.completedChallengesCount || 5) * 16 + 20);
+  const commScore = metrics.communicationScore ?? 85;
   const consScore = metrics.consistencyScore ?? Math.min(100, (metrics.consistencyStreakDays || 7) * 12 + 16);
-  const chalScore = metrics.challengesScore ?? Math.min(100, (metrics.completedChallengesCount || 5) * 18 + 10);
 
-  const aVal = Math.round(assessScore * 3.0); // 300 max
-  const pVal = Math.round(projScore * 3.0); // 300 max
-  const gVal = Math.round(gitScore * 2.0); // 200 max
-  const cVal = Math.round(consScore * 1.0); // 100 max
-  const chVal = Math.round(chalScore * 1.0); // 100 max
+  const aVal = Math.round(assessScore * 3.0); // 300 max (30%)
+  const pVal = Math.round(projScore * 2.5); // 250 max (25%)
+  const gVal = Math.round(gitScore * 1.5); // 150 max (15%)
+  const indVal = Math.round(indChalScore * 1.0); // 100 max (10%)
+  const comVal = Math.round(commScore * 1.0); // 100 max (10%)
+  const cVal = Math.round(consScore * 1.0); // 100 max (10%)
 
-  const totalScore = Math.min(1000, aVal + pVal + gVal + cVal + chVal);
+  const totalScore = Math.min(1000, aVal + pVal + gVal + indVal + comVal + cVal);
 
   const breakdown: BuilderScoreBreakdownItem[] = [
     {
-      pillar: 'Verified Assessments',
+      pillar: 'Assessments',
       score: aVal,
       maxScore: 300,
       weightPercent: 30,
-      description: 'Strict proctored MCQs & debugging test cases',
+      description: 'Strict verified MCQs, debugging benchmarks, and architecture challenges',
     },
     {
-      pillar: 'Verified Projects',
+      pillar: 'Projects',
       score: pVal,
-      maxScore: 300,
-      weightPercent: 30,
-      description: 'Production implementations & peer-reviewed code',
+      maxScore: 250,
+      weightPercent: 25,
+      description: 'Verified production capstones, deployed demos, and runnable repositories',
     },
     {
-      pillar: 'GitHub Proof of Work',
+      pillar: 'GitHub',
       score: gVal,
-      maxScore: 200,
-      weightPercent: 20,
-      description: 'Active repositories, stars, and commit density',
+      maxScore: 150,
+      weightPercent: 15,
+      description: 'Commit density, language diversity, and open-source star validation',
     },
     {
-      pillar: 'Daily Consistency',
+      pillar: 'Industry Challenges',
+      score: indVal,
+      maxScore: 100,
+      weightPercent: 10,
+      description: 'Partner hiring challenges, hackathons, and company-sponsored tracks',
+    },
+    {
+      pillar: 'Communication',
+      score: comVal,
+      maxScore: 100,
+      weightPercent: 10,
+      description: 'Technical RFC writing, code review etiquette, and architectural pitch',
+    },
+    {
+      pillar: 'Consistency',
       score: cVal,
       maxScore: 100,
       weightPercent: 10,
-      description: 'Active builder streak and weekly cadence',
-    },
-    {
-      pillar: 'Challenge Milestones',
-      score: chVal,
-      maxScore: 100,
-      weightPercent: 10,
-      description: 'Track progression and boss final exams',
+      description: 'Continuous builder streak, daily missions, and verification cadence',
     },
   ];
 
@@ -477,9 +496,38 @@ export function calculateTransparentBuilderScore(metrics: {
       assessments: aVal,
       projects: pVal,
       github: gVal,
+      industryChallenges: indVal,
+      communication: comVal,
       consistency: cVal,
-      challenges: chVal,
     },
+  };
+}
+
+export interface SkillConfidenceData {
+  verifiedScore: number;
+  confidenceScore: number;
+  evidenceSources: ('Assessment' | 'Project' | 'GitHub' | 'Industry Challenge' | 'Certification')[];
+  lastVerifiedDate: string;
+  verificationCode: string;
+}
+
+/**
+ * Skill Confidence Engine computes verification score, confidence % and source matrix
+ */
+export function calculateSkillConfidence(
+  baseScore: number,
+  sources: ('Assessment' | 'Project' | 'GitHub' | 'Industry Challenge' | 'Certification')[] = ['Assessment']
+): SkillConfidenceData {
+  const safeScore = Math.min(100, Math.max(0, baseScore));
+  const sourceWeight = Math.min(25, sources.length * 7);
+  const confidenceScore = Math.min(98, Math.max(70, Math.round(65 + (safeScore * 0.15) + sourceWeight)));
+
+  return {
+    verifiedScore: safeScore,
+    confidenceScore,
+    evidenceSources: sources,
+    lastVerifiedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+    verificationCode: `SB-${Math.random().toString(36).substring(2, 7).toUpperCase()}-${Math.floor(10000 + Math.random() * 90000)}`,
   };
 }
 

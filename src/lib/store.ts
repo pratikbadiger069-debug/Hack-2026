@@ -166,10 +166,30 @@ interface AppState {
     deptName: string;
     globalPercentile: string;
   };
+  tierRankings: {
+    deptRank: number;
+    deptName: string;
+    collegeRank: number;
+    collegeName: string;
+    stateRank: number;
+    stateName: string;
+    nationalRank: number;
+    globalPercentile: string;
+  };
   achievements: AchievementBadge[];
   quests: LearningQuest[];
   learningPaths: LearningPath[];
   githubData: GitHubData;
+  checklist: {
+    id: string;
+    title: string;
+    description: string;
+    category: 'Onboarding' | 'Verification' | 'Capstone' | 'Industry';
+    xpReward: number;
+    completed: boolean;
+    actionUrl: string;
+    completedAt?: string;
+  }[];
 
   // Appearance & Themes
   themeColor: ThemeColor;
@@ -184,6 +204,8 @@ interface AppState {
   syncGitHub: () => void;
   completeQuest: (questId: string) => void;
   unlockAchievement: (id: string) => void;
+  completeChecklistItem: (itemId: string) => void;
+  publishIndustryAssessment: (draft: any) => void;
 
   // Student Portal State
   studentProfile: StudentProfile;
@@ -236,6 +258,76 @@ export const useAppStore = create<AppState>()(
         deptName: 'CSE',
         globalPercentile: 'Top 3%',
       },
+      tierRankings: {
+        deptRank: 2,
+        deptName: 'CSE',
+        collegeRank: 5,
+        collegeName: 'HITAM',
+        stateRank: 18,
+        stateName: 'Telangana',
+        nationalRank: 142,
+        globalPercentile: 'Top 3%',
+      },
+      checklist: [
+        {
+          id: 'chk-profile',
+          title: 'Complete Builder Profile',
+          description: 'Define target engineering role, university metadata, and bio.',
+          category: 'Onboarding',
+          xpReward: 25,
+          completed: true,
+          actionUrl: '/student/profile',
+          completedAt: 'Yesterday',
+        },
+        {
+          id: 'chk-github',
+          title: 'Connect GitHub Account',
+          description: 'Authenticate GitHub OAuth to enable commit scanning and repo verification.',
+          category: 'Verification',
+          xpReward: 50,
+          completed: true,
+          actionUrl: '/student/journey#github',
+          completedAt: '3 days ago',
+        },
+        {
+          id: 'chk-assessment',
+          title: 'Pass First Skill Verification Challenge',
+          description: 'Score >= 70% in a proctored MCQ or coding benchmark test.',
+          category: 'Verification',
+          xpReward: 50,
+          completed: true,
+          actionUrl: '/student/assessments',
+          completedAt: 'Yesterday',
+        },
+        {
+          id: 'chk-project',
+          title: 'Submit Verified Production Project',
+          description: 'Upload runnable repository URL with architecture documentation.',
+          category: 'Capstone',
+          xpReward: 100,
+          completed: true,
+          actionUrl: '/student/journey',
+          completedAt: '2 days ago',
+        },
+        {
+          id: 'chk-boss',
+          title: 'Conquer Boss Architecture Exam',
+          description: 'Pass the Distributed Rate Limiter enterprise capstone evaluation.',
+          category: 'Capstone',
+          xpReward: 250,
+          completed: false,
+          actionUrl: '/student/assessments',
+        },
+        {
+          id: 'chk-opportunity',
+          title: 'Apply to First Verified Opportunity',
+          description: 'Submit verified builder passport to top matching industry roles.',
+          category: 'Industry',
+          xpReward: 50,
+          completed: false,
+          actionUrl: '/student/opportunities',
+        },
+      ],
       achievements: mockAchievements as AchievementBadge[],
       quests: mockQuests as LearningQuest[],
       learningPaths: mockLearningPaths as LearningPath[],
@@ -404,19 +496,65 @@ export const useAppStore = create<AppState>()(
             return ach;
           });
 
+          // Auto-tick checklist
+          const updatedChecklist = state.checklist.map((chk) => {
+            if (chk.id === 'chk-assessment') return { ...chk, completed: true, completedAt: 'Today' };
+            if (chk.id === 'chk-boss' && targetQuest?.isBossChallenge) return { ...chk, completed: true, completedAt: 'Today' };
+            return chk;
+          });
+
           return {
             quests: updatedQuests,
             xp: newXP,
             level: levelInfo.level,
             achievements: updatedAchievements,
+            checklist: updatedChecklist,
             studentProfile: {
               ...state.studentProfile,
               verifiedSkills: updatedSkills,
               builderScores: {
                 ...state.studentProfile.builderScores,
-                overall: Math.min(1000, state.studentProfile.builderScores.overall + 5),
+                overall: Math.min(1000, state.studentProfile.builderScores.overall + 8),
               },
             },
+          };
+        }),
+
+      completeChecklistItem: (itemId) =>
+        set((state) => {
+          const target = state.checklist.find((c) => c.id === itemId);
+          if (!target || target.completed) return state;
+
+          const updatedChecklist = state.checklist.map((c) =>
+            c.id === itemId ? { ...c, completed: true, completedAt: 'Today' } : c
+          );
+          const newXP = state.xp + target.xpReward;
+          const levelInfo = getLevelInfo(newXP);
+
+          return {
+            checklist: updatedChecklist,
+            xp: newXP,
+            level: levelInfo.level,
+          };
+        }),
+
+      publishIndustryAssessment: (draft) =>
+        set((state) => {
+          const newQuest: LearningQuest = {
+            id: draft.id || `quest-ind-${Date.now()}`,
+            title: draft.title || 'Industry Hiring Benchmark',
+            category: draft.category || 'Backend',
+            difficulty: draft.difficulty || 'Advanced',
+            xpReward: draft.xpReward || 50,
+            estimatedMinutes: draft.estimatedMinutes || 20,
+            description: draft.description || 'Industry-verified technical assessment.',
+            skillsGained: draft.skillsGained || ['API Architecture'],
+            completed: false,
+            questions: draft.questions || [],
+          };
+
+          return {
+            quests: [newQuest, ...state.quests],
           };
         }),
 

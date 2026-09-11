@@ -213,8 +213,10 @@ export interface StudentProfile {
   verifiedSkills: VerifiedSkill[];
   evidences: BuilderEvidence[];
   targetRole: string;
-  // Aliases for Builder OS V5
+  // Aliases for Builder OS V5 & V7
   college?: string;
+  department?: string;
+  branch?: string;
   skills?: { name: string; score: number; level: string; category: string; verified: boolean }[];
   projects?: { id: string; title: string; description: string; techStack: string[]; verified: boolean; githubUrl?: string }[];
 }
@@ -507,4 +509,43 @@ export interface PlatformUser {
   status: 'Active' | 'Pending' | 'Suspended';
   joinedDate: string;
   activityScore: number;
+}
+
+// V7 Ecosystem Types
+export interface BuilderChecklistItem {
+  id: string;
+  title: string;
+  description: string;
+  category: 'Onboarding' | 'Verification' | 'Capstone' | 'Industry';
+  xpReward: number;
+  completed: boolean;
+  actionUrl: string;
+  completedAt?: string;
+}
+
+export interface TierRankings {
+  deptRank: number;
+  deptName: string;
+  collegeRank: number;
+  collegeName: string;
+  stateRank: number;
+  stateName: string;
+  nationalRank: number;
+  globalPercentile: string;
+}
+
+export interface IndustryAssessmentDraft {
+  id?: string;
+  title: string;
+  category: 'Backend' | 'Frontend' | 'AI & ML' | 'DevOps' | 'Database' | 'Systems';
+  type: 'MCQ' | 'Coding' | 'Debugging' | 'Case Study' | 'Text Response' | 'Mixed';
+  difficulty: 'Easy' | 'Medium' | 'Advanced' | 'Expert' | 'Boss';
+  xpReward: number;
+  estimatedMinutes: number;
+  description: string;
+  skillsGained: string[];
+  passingScore: number;
+  roleTarget: string;
+  companyName: string;
+  questions: QuestQuestion[];
 }

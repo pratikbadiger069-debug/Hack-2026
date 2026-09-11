@@ -105,6 +105,32 @@
       "emailVerificationToken": "vt_1789124286176_8js9t1b",
       "createdAt": "2026-09-11T10:58:06.176Z",
       "updatedAt": "2026-09-11T10:58:06.176Z"
+    },
+    "manutejreddy@gmail.com": {
+      "id": "usr_1789148645714_20tlt0r",
+      "email": "manutejreddy@gmail.com",
+      "name": "manu",
+      "role": "institute",
+      "passwordHash": "$2b$12$55vwtrVpvPZYNMf5bwlCT.GKdgDyPGMG2yhjglGD8ZC9rT7n8HBdK",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      "isDemoUser": false,
+      "isEmailVerified": false,
+      "emailVerificationToken": "vt_1789148645714_kmoaywy",
+      "createdAt": "2026-09-11T17:44:05.714Z",
+      "updatedAt": "2026-09-11T17:44:05.714Z"
+    },
+    "pranitha12@gmail.com": {
+      "id": "usr_1789148818117_r151md3",
+      "email": "pranitha12@gmail.com",
+      "name": "Pranitha",
+      "role": "industry",
+      "passwordHash": "$2b$12$vA604yb9TE3cPjYaM.q0auz3Zr5YVxjmrUk8/xB.TNhQDYsqoF2Su",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      "isDemoUser": false,
+      "isEmailVerified": false,
+      "emailVerificationToken": "vt_1789148818117_n5snm7u",
+      "createdAt": "2026-09-11T17:46:58.117Z",
+      "updatedAt": "2026-09-11T17:46:58.117Z"
     }
   },
   "studentProfiles": {
@@ -896,6 +922,30 @@
     ]
   },
   "auditLogs": [
+    {
+      "id": "log-1789149037877",
+      "timestamp": "2026-09-11T17:50:37.877Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789148818117",
+      "timestamp": "2026-09-11T17:46:58.117Z",
+      "action": "USER_REGISTERED_BCRYPT",
+      "userId": "usr_1789148818117_r151md3",
+      "role": "INDUSTRY",
+      "details": "Registered new verified industry identity: pranitha12@gmail.com"
+    },
+    {
+      "id": "log-1789148645714",
+      "timestamp": "2026-09-11T17:44:05.714Z",
+      "action": "USER_REGISTERED_BCRYPT",
+      "userId": "usr_1789148645714_20tlt0r",
+      "role": "INSTITUTE",
+      "details": "Registered new verified institute identity: manutejreddy@gmail.com"
+    },
     {
       "id": "log-1789147972408",
       "timestamp": "2026-09-11T17:32:52.408Z",
