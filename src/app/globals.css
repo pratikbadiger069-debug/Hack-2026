@@ -1,23 +1,72 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap');
 
 @layer base {
   :root {
-    --bg-warm: #FAF9F5;
-    --bg-surface: #FFFFFF;
-    --border-subtle: #ECEAE4;
-    --text-primary: #1F1F1F;
-    --text-secondary: #6B6B6B;
-    --accent-warm: #D97706;
-    --accent-blue: #2563EB;
-    --success-green: #16A34A;
+    --bg-page: #FAFAF8;
+    --bg-card: #FFFFFF;
+    --border-color: #E4E4E7;
+    --text-primary: #09090B;
+    --text-secondary: #71717A;
+    --brand-primary: #2563EB;
+    --brand-accent: #F97316;
+    --brand-success: #22C55E;
+    --radius-card: 16px;
+  }
+
+  .dark {
+    --bg-page: #09090B;
+    --bg-card: #111114;
+    --border-color: #1F1F23;
+    --text-primary: #FAFAFA;
+    --text-secondary: #A1A1AA;
+    --brand-primary: #3B82F6;
+    --brand-accent: #FB923C;
+    --brand-success: #4ADE80;
+  }
+
+  /* Theme Accents */
+  [data-theme='sunset-orange'] {
+    --brand-primary: #EA580C;
+    --brand-accent: #F97316;
+  }
+
+  [data-theme='forest-green'] {
+    --brand-primary: #16A34A;
+    --brand-accent: #22C55E;
+  }
+
+  [data-theme='purple-haze'] {
+    --brand-primary: #7C3AED;
+    --brand-accent: #A855F7;
+  }
+
+  [data-theme='cyber-teal'] {
+    --brand-primary: #0D9488;
+    --brand-accent: #14B8A6;
+  }
+
+  [data-theme='monochrome'] {
+    --brand-primary: #18181B;
+    --brand-accent: #52525B;
   }
 
   body {
-    background-color: #FAF9F5;
-    color: #1F1F1F;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  h1, h2, h3, .font-heading {
+    font-family: 'Plus Jakarta Sans', 'Space Grotesk', 'Inter', sans-serif;
+    letter-spacing: -0.025em;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
   }
 }
 
@@ -32,43 +81,57 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #ECEAE4;
+  background: var(--border-color);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #D5D2C9;
+  background: #A1A1AA;
 }
 
-/* Anthropic & Linear Inspired Cards */
-.saas-card, .anthropic-card {
-  background: #FFFFFF;
-  border: 1px solid #ECEAE4;
-  border-radius: 1rem; /* 16px */
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+/* Gen Z Builder Card */
+.builder-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.saas-card:hover, .anthropic-card:hover {
-  border-color: #DDD9D0;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+.builder-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
 }
 
-/* Interactive Button Hover Lift */
-.btn-anthropic {
+.dark .builder-card:hover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 20px 0 rgba(59, 130, 246, 0.08);
+  border-color: #27272A;
+}
+
+/* Linear & Raycast Interactive Lift */
+.lift-hover {
   transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.btn-anthropic:hover {
-  transform: translateY(-1px);
+.lift-hover:hover {
+  transform: translateY(-1.5px) scale(1.01);
 }
 
-.btn-anthropic:active {
+.lift-hover:active {
   transform: translateY(0.5px) scale(0.99);
 }
 
-/* Shimmer Loading Animation */
+/* XP Glow Effect */
+.xp-pill {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(249, 115, 22, 0.1) 100%);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.streak-pill {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.12) 0%, rgba(239, 68, 68, 0.12) 100%);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+/* Shimmer Loader */
 @keyframes shimmer {
   0% {
     background-position: -200% 0;
@@ -79,8 +142,14 @@
 }
 
 .shimmer-loader {
-  background: linear-gradient(90deg, #F4F2EB 25%, #EBE8DE 50%, #F4F2EB 75%);
+  background: linear-gradient(90deg, #F4F4F5 25%, #E4E4E7 50%, #F4F4F5 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
-  border-radius: 0.5rem;
+  border-radius: 8px;
+}
+
+.dark .shimmer-loader {
+  background: linear-gradient(90deg, #18181B 25%, #27272A 50%, #18181B 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }

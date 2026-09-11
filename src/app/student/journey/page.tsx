@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
+import confetti from 'canvas-confetti';
 import {
   Award,
   ShieldCheck,
@@ -16,6 +17,16 @@ import {
   Trophy,
   X,
   Flame,
+  Zap,
+  Star,
+  GitBranch,
+  GitCommit,
+  GitPullRequest,
+  CheckCircle2,
+  Lock,
+  Layers,
+  Cpu,
+  Server,
 } from 'lucide-react';
 
 function GithubIcon({ className = 'w-5 h-5' }: { className?: string }) {
@@ -31,12 +42,24 @@ function GithubIcon({ className = 'w-5 h-5' }: { className?: string }) {
 }
 
 export default function MyJourneyPage() {
-  const { studentProfile, addBuilderEvidence, addVerifiedSkill } = useAppStore();
-  const [activeFilter, setActiveFilter] = useState<'all' | 'skills' | 'projects' | 'github' | 'timeline' | 'achievements'>('all');
+  const {
+    studentProfile,
+    addBuilderEvidence,
+    addVerifiedSkill,
+    xp,
+    level,
+    githubData,
+    connectGitHub,
+    achievements,
+    unlockAchievement,
+  } = useAppStore();
+
+  const [activeFilter, setActiveFilter] = useState<'all' | 'github' | 'skills' | 'projects' | 'achievements' | 'timeline'>('all');
+  const [isConnectingGitHub, setIsConnectingGitHub] = useState(false);
   const [isAddEvidenceOpen, setIsAddEvidenceOpen] = useState(false);
   const [isAddSkillOpen, setIsAddSkillOpen] = useState(false);
 
-  // Modal forms
+  // Form states
   const [newTitle, setNewTitle] = useState('');
   const [newType, setNewType] = useState<any>('GitHub Repo');
   const [newUrl, setNewUrl] = useState('');
@@ -46,6 +69,30 @@ export default function MyJourneyPage() {
   const [newSkillCategory, setNewSkillCategory] = useState<any>('Programming');
   const [newSkillLevel, setNewSkillLevel] = useState<any>('Advanced');
 
+  const handleOAuthConnect = () => {
+    setIsConnectingGitHub(true);
+    setTimeout(() => {
+      connectGitHub('aarav-builder');
+      setIsConnectingGitHub(false);
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+      });
+    }, 800);
+  };
+
+  const handleBadgeClick = (badgeId: string, unlocked: boolean) => {
+    if (!unlocked) {
+      unlockAchievement(badgeId);
+      confetti({
+        particleCount: 90,
+        spread: 60,
+        origin: { y: 0.6 },
+      });
+    }
+  };
+
   const handleCreateEvidence = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle) return;
@@ -54,8 +101,14 @@ export default function MyJourneyPage() {
       title: newTitle,
       type: newType,
       url: newUrl || 'https://github.com',
-      description: newDesc || 'Production repository with tests, documentation, and CI/CD pipelines.',
+      description: newDesc || 'Production repository with tests, benchmarks, and CI/CD pipelines.',
       impactScore: Math.floor(85 + Math.random() * 12),
+    });
+
+    confetti({
+      particleCount: 70,
+      spread: 50,
+      origin: { y: 0.7 },
     });
 
     setNewTitle('');
@@ -69,183 +122,167 @@ export default function MyJourneyPage() {
     if (!newSkillName) return;
 
     addVerifiedSkill(newSkillName, newSkillLevel, newSkillCategory);
+    confetti({
+      particleCount: 50,
+      spread: 40,
+    });
     setNewSkillName('');
     setIsAddSkillOpen(false);
   };
 
   const bScores = studentProfile.builderScores;
 
-  const achievements = [
-    {
-      id: 'ach-1',
-      title: '1st Place — National AI Hackathon 2025',
-      issuer: 'OpenAI Developer Network',
-      date: 'Dec 2025',
-      description: 'Led a squad of 4 to architect an autonomous on-device vision agent with zero cloud dependency.',
-    },
-    {
-      id: 'ach-2',
-      title: 'Top 1% Rank in System Design Assessment',
-      issuer: 'SkillBridge Verification Council',
-      date: 'Nov 2025',
-      description: 'Achieved 96th percentile score in distributed caching, consensus algorithms, and database sharding.',
-    },
-    {
-      id: 'ach-3',
-      title: 'Published Research on Edge Quantization',
-      issuer: 'Undergraduate AI Journal',
-      date: 'Aug 2025',
-      description: 'Co-authored benchmark comparison on 4-bit INT quantization on low-power ARM microcontrollers.',
-    },
-  ];
-
   const timelineEvents = [
     {
       month: 'Jan 2026',
       title: 'Real-time Multimodal Vector Retrieval Engine Deployed',
-      type: 'Project Upload',
+      type: 'Project Upload (+100 XP)',
       description: 'Built HNSW vector search serving 40k QPS with sub-15ms p99 latency in C++ and Python.',
     },
     {
       month: 'Dec 2025',
       title: 'SmartCampus IoT Edge Guardian — 1st Place National Hackathon',
-      type: 'Hackathon Win',
+      type: 'Hackathon Win (+150 XP)',
       description: 'Led a 4-person engineering squad to build on-device vision models for university energy conservation.',
     },
     {
       month: 'Nov 2025',
       title: 'TypeScript & Next.js Advanced Competency Certified',
-      type: 'Assessment Passed',
+      type: 'Assessment Passed (+50 XP)',
       description: 'Scored 86% in rigorous async concurrency and SSR performance evaluations.',
     },
     {
       month: 'Aug 2025',
       title: 'Python & FastAPI Expert Diagnostic Assessment',
-      type: 'Assessment Passed',
+      type: 'Assessment Passed (+50 XP)',
       description: 'Scored 95% across 30 algorithm questions, API rate limiting, and async generators.',
     },
   ];
 
-  const githubLanguages = [
-    { name: 'Python', percentage: 48, color: 'bg-[#D97706]' },
-    { name: 'TypeScript', percentage: 32, color: 'bg-[#2563EB]' },
-    { name: 'C++', percentage: 12, color: 'bg-[#1F1F1F]' },
-    { name: 'SQL & Others', percentage: 8, color: 'bg-[#16A34A]' },
-  ];
-
   return (
     <PortalLayout>
-      <div className="space-y-12 max-w-[1200px] mx-auto pb-20">
-        {/* Editorial Header */}
-        <motion.section
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: 'easeOut' }}
-          className="space-y-3 pt-2"
-        >
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 pb-4 border-b border-[#ECEAE4]">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#D97706]" />
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-normal text-[#1F1F1F] tracking-tight">
-                  My Journey
-                </h1>
-              </div>
-              <p className="text-base sm:text-lg text-[#6B6B6B] mt-1 font-sans">
-                Your skills. Your projects. Your growth.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2.5">
-              <button
-                onClick={() => setIsAddSkillOpen(true)}
-                className="px-4 py-2 text-xs font-medium text-[#1F1F1F] bg-white border border-[#ECEAE4] hover:bg-[#F8F7F3] rounded-xl transition-all shadow-xs"
-              >
-                + Verify Skill
-              </button>
-              <button
-                onClick={() => setIsAddEvidenceOpen(true)}
-                className="px-4 py-2 text-xs font-medium text-[#FAF9F5] bg-[#1F1F1F] hover:bg-black rounded-xl transition-all shadow-xs flex items-center gap-1.5"
-              >
-                <PlusCircle className="w-3.5 h-3.5" />
-                <span>Add Project Evidence</span>
-              </button>
-            </div>
-          </div>
-        </motion.section>
-
-        {/* 1. Builder Score & 2. Learning Velocity Story Section */}
+      <div className="space-y-8 max-w-[1300px] mx-auto pb-20">
+        {/* 1. TOP HERO: GAMING PROFILE + GITHUB CONNECT HUD */}
         <motion.section
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: 0.1 }}
+          transition={{ duration: 0.3 }}
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-zinc-200 dark:border-zinc-800"
+        >
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse" />
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                Level {level} Builder Identity
+              </span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-heading font-black tracking-tight text-zinc-900 dark:text-white mt-1">
+              My Journey &amp; Proof Index
+            </h1>
+            <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 font-sans">
+              Your verified repositories, skill badges, hackathons, and on-chain proof of craft.
+            </p>
+          </div>
+
+          {/* Action CTAs */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <button
+              onClick={handleOAuthConnect}
+              disabled={isConnectingGitHub || githubData.connected}
+              className={`px-4 py-2 text-xs font-heading font-bold rounded-xl transition-all shadow-xs flex items-center gap-2 lift-hover ${
+                githubData.connected
+                  ? 'bg-zinc-900 dark:bg-zinc-800 text-white cursor-default'
+                  : 'bg-black text-white hover:bg-zinc-800'
+              }`}
+            >
+              <GithubIcon className="w-4 h-4" />
+              <span>{isConnectingGitHub ? 'Scanning Repos...' : githubData.connected ? 'GitHub Synced ✓' : 'Connect GitHub (+25 XP)'}</span>
+            </button>
+
+            <button
+              onClick={() => setIsAddEvidenceOpen(true)}
+              className="px-4 py-2 text-xs font-heading font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all shadow-xs flex items-center gap-1.5 lift-hover"
+            >
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span>+ Upload Project (+100 XP)</span>
+            </button>
+          </div>
+        </motion.section>
+
+        {/* 2. BUILDER SCORE & XP VELOCITY CARD */}
+        <motion.section
           whileHover={{ scale: 1.005 }}
-          className="p-8 bg-white rounded-2xl border border-[#ECEAE4] shadow-xs space-y-6"
+          transition={{ duration: 0.15 }}
+          className="builder-card p-7 sm:p-8 space-y-6"
         >
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
             <div className="flex items-center gap-6">
-              <div className="w-24 h-24 rounded-2xl bg-[#FAF9F5] border border-[#ECEAE4] flex flex-col items-center justify-center text-center shrink-0">
-                <span className="text-3xl font-serif text-[#1F1F1F]">{bScores.overall || 885}</span>
-                <span className="text-[10px] text-[#6B6B6B] font-mono">/ 1000</span>
+              <div className="w-24 h-24 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex flex-col items-center justify-center text-center shrink-0 shadow-md">
+                <span className="text-3xl font-heading font-black">{bScores.overall || 885}</span>
+                <span className="text-[10px] font-mono text-blue-100 font-semibold uppercase">/ 1000</span>
               </div>
 
               <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono font-medium text-[#16A34A] bg-[#16A34A]/10 px-2.5 py-0.5 rounded-full">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/80 px-2.5 py-0.5 rounded-full">
                     Top 5% National Tier
                   </span>
-                  <span className="text-xs text-[#6B6B6B]">Master Builder Rating</span>
+                  <span className="text-xs font-mono font-bold text-blue-600 dark:text-blue-400">
+                    {xp} Total XP Accumulated
+                  </span>
                 </div>
-                <h2 className="text-2xl font-serif text-[#1F1F1F]">Builder Score &amp; Proof Index</h2>
-                <p className="text-xs text-[#6B6B6B] max-w-md leading-relaxed font-sans">
-                  Consolidated multi-source score derived from your verified repositories, capstone architectures, and technical assessments.
+                <h2 className="text-2xl font-heading font-extrabold text-zinc-900 dark:text-white">
+                  Verified Builder Score
+                </h2>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-md leading-relaxed">
+                  Real-time algorithmic index computed from code complexity, commit velocity, live deployments, and peer validations.
                 </p>
               </div>
             </div>
 
-            {/* Sub-Score Dimensions */}
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 pt-4 lg:pt-0 border-t lg:border-t-0 lg:border-l border-[#ECEAE4] lg:pl-8">
-              <div className="p-3 bg-[#FAF9F5] rounded-xl border border-[#ECEAE4] text-center">
-                <span className="text-[10px] font-mono text-[#6B6B6B] block uppercase">Execution</span>
-                <strong className="text-base font-serif text-[#1F1F1F]">{bScores.execution || 92}%</strong>
+            {/* Sub-Scores Matrix */}
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 pt-4 lg:pt-0 border-t lg:border-t-0 lg:border-l border-zinc-200 dark:border-zinc-800 lg:pl-8">
+              <div className="p-3 bg-zinc-50 dark:bg-zinc-900/70 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center">
+                <span className="text-[10px] font-mono text-zinc-500 block uppercase">Execution</span>
+                <strong className="text-base font-heading font-extrabold text-zinc-900 dark:text-white">{bScores.execution || 92}%</strong>
               </div>
-              <div className="p-3 bg-[#FAF9F5] rounded-xl border border-[#ECEAE4] text-center">
-                <span className="text-[10px] font-mono text-[#6B6B6B] block uppercase">Leadership</span>
-                <strong className="text-base font-serif text-[#1F1F1F]">{bScores.leadership || 85}%</strong>
+              <div className="p-3 bg-zinc-50 dark:bg-zinc-900/70 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center">
+                <span className="text-[10px] font-mono text-zinc-500 block uppercase">Leadership</span>
+                <strong className="text-base font-heading font-extrabold text-zinc-900 dark:text-white">{bScores.leadership || 85}%</strong>
               </div>
-              <div className="p-3 bg-[#FAF9F5] rounded-xl border border-[#ECEAE4] text-center">
-                <span className="text-[10px] font-mono text-[#6B6B6B] block uppercase">Innovation</span>
-                <strong className="text-base font-serif text-[#1F1F1F]">{bScores.innovation || 90}%</strong>
+              <div className="p-3 bg-zinc-50 dark:bg-zinc-900/70 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center">
+                <span className="text-[10px] font-mono text-zinc-500 block uppercase">Innovation</span>
+                <strong className="text-base font-heading font-extrabold text-zinc-900 dark:text-white">{bScores.innovation || 90}%</strong>
               </div>
-              <div className="p-3 bg-[#FAF9F5] rounded-xl border border-[#ECEAE4] text-center">
-                <span className="text-[10px] font-mono text-[#6B6B6B] block uppercase">Solving</span>
-                <strong className="text-base font-serif text-[#1F1F1F]">{bScores.problemSolving || 94}%</strong>
+              <div className="p-3 bg-zinc-50 dark:bg-zinc-900/70 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center">
+                <span className="text-[10px] font-mono text-zinc-500 block uppercase">Solving</span>
+                <strong className="text-base font-heading font-extrabold text-zinc-900 dark:text-white">{bScores.problemSolving || 94}%</strong>
               </div>
-              <div className="p-3 bg-[#FAF9F5] rounded-xl border border-[#ECEAE4] text-center">
-                <span className="text-[10px] font-mono text-[#6B6B6B] block uppercase">Consistency</span>
-                <strong className="text-base font-serif text-[#1F1F1F]">{bScores.consistency || 88}%</strong>
+              <div className="p-3 bg-zinc-50 dark:bg-zinc-900/70 rounded-xl border border-zinc-200 dark:border-zinc-800 text-center">
+                <span className="text-[10px] font-mono text-zinc-500 block uppercase">Consistency</span>
+                <strong className="text-base font-heading font-extrabold text-zinc-900 dark:text-white">{bScores.consistency || 88}%</strong>
               </div>
             </div>
           </div>
         </motion.section>
 
-        {/* Narrative Filter Pills */}
-        <div className="flex items-center gap-2 border-b border-[#ECEAE4] pb-3 overflow-x-auto no-scrollbar">
+        {/* 3. NARRATIVE FILTER TABS */}
+        <div className="flex items-center gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-3 overflow-x-auto no-scrollbar">
           {[
-            { id: 'all', label: 'All Story' },
-            { id: 'skills', label: `Skill Verification (${studentProfile.verifiedSkills.length})` },
+            { id: 'all', label: 'All Identity' },
+            { id: 'github', label: `GitHub Repos (${githubData.publicRepos})` },
+            { id: 'skills', label: `Verified Skills (${studentProfile.verifiedSkills.length})` },
             { id: 'projects', label: `Projects (${studentProfile.evidences.length})` },
-            { id: 'github', label: 'GitHub Activity' },
-            { id: 'achievements', label: `Achievements (${achievements.length})` },
+            { id: 'achievements', label: `Badges (${achievements.length})` },
             { id: 'timeline', label: 'Growth Timeline' },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveFilter(tab.id as any)}
-              className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+              className={`px-4 py-1.5 rounded-full text-xs font-heading font-bold whitespace-nowrap transition-all lift-hover ${
                 activeFilter === tab.id
-                  ? 'bg-[#1F1F1F] text-[#FAF9F5]'
-                  : 'bg-white text-[#6B6B6B] hover:text-[#1F1F1F] border border-[#ECEAE4]'
+                  ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 shadow-xs'
+                  : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-800'
               }`}
             >
               {tab.label}
@@ -253,41 +290,95 @@ export default function MyJourneyPage() {
           ))}
         </div>
 
-        {/* 3. Skill Verification */}
-        {(activeFilter === 'all' || activeFilter === 'skills') && (
+        {/* 4. GITHUB REPOSITORIES & REAL AUTO-DETECTED SKILLS */}
+        {(activeFilter === 'all' || activeFilter === 'github') && (
           <section className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-xl font-serif text-[#1F1F1F] flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-[#16A34A]" />
-                Skill Verification
-              </h3>
-              <span className="text-xs text-[#6B6B6B] font-mono">Multi-source validated badges</span>
+              <div className="flex items-center gap-2">
+                <GithubIcon className="w-5 h-5 text-zinc-900 dark:text-white" />
+                <h3 className="text-xl font-heading font-extrabold text-zinc-900 dark:text-white">
+                  Connected GitHub Intelligence
+                </h3>
+              </div>
+              <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-bold">
+                ● Live Repo Analysis Active
+              </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {studentProfile.verifiedSkills.map((skill) => (
+            {/* GitHub Stats Row */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="builder-card p-4 text-center">
+                <span className="text-xs text-zinc-500 block font-mono">Public Repos</span>
+                <strong className="text-xl font-heading font-extrabold text-zinc-900 dark:text-white">
+                  {githubData.publicRepos}
+                </strong>
+              </div>
+              <div className="builder-card p-4 text-center">
+                <span className="text-xs text-zinc-500 block font-mono">Total Stars Earned</span>
+                <strong className="text-xl font-heading font-extrabold text-amber-500">
+                  ★ {githubData.totalStars}
+                </strong>
+              </div>
+              <div className="builder-card p-4 text-center">
+                <span className="text-xs text-zinc-500 block font-mono">Yearly Commits</span>
+                <strong className="text-xl font-heading font-extrabold text-blue-600 dark:text-blue-400">
+                  {githubData.recentCommitsCount}
+                </strong>
+              </div>
+              <div className="builder-card p-4 text-center">
+                <span className="text-xs text-zinc-500 block font-mono">Followers</span>
+                <strong className="text-xl font-heading font-extrabold text-zinc-900 dark:text-white">
+                  {githubData.followers}
+                </strong>
+              </div>
+            </div>
+
+            {/* Pinned Repositories Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {githubData.pinnedRepos.map((repo, idx) => (
                 <motion.div
-                  key={skill.id}
+                  key={idx}
                   whileHover={{ scale: 1.01 }}
-                  className="p-5 bg-white rounded-2xl border border-[#ECEAE4] space-y-3 shadow-xs"
+                  className="builder-card p-5 space-y-3 flex flex-col justify-between"
                 >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h4 className="font-serif text-base text-[#1F1F1F]">{skill.name}</h4>
-                      <span className="text-xs text-[#6B6B6B]">{skill.category}</span>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5 text-xs font-heading font-bold text-zinc-900 dark:text-white">
+                        <Code className="w-3.5 h-3.5 text-blue-600" />
+                        <span className="truncate">{repo.name}</span>
+                      </div>
+                      <span className="text-xs font-mono font-bold text-amber-500 flex items-center gap-0.5">
+                        ★ {repo.stars}
+                      </span>
                     </div>
-                    <span className="text-xs font-mono font-medium text-[#16A34A] bg-[#16A34A]/10 px-2 py-0.5 rounded-full">
-                      {skill.score}%
-                    </span>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2">
+                      {repo.description}
+                    </p>
                   </div>
 
-                  <div className="w-full bg-[#FAF9F5] rounded-full h-1.5 overflow-hidden border border-[#ECEAE4]">
-                    <div className="bg-[#16A34A] h-1.5 rounded-full" style={{ width: `${skill.score}%` }} />
-                  </div>
-
-                  <div className="flex items-center justify-between text-[11px] text-[#6B6B6B] pt-1">
-                    <span>{skill.level}</span>
-                    <span className="font-mono text-[10px] text-[#D97706]">{skill.verificationCode}</span>
+                  <div className="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                    <div className="flex flex-wrap gap-1">
+                      {repo.topics.map((t) => (
+                        <span
+                          key={t}
+                          className="text-[10px] font-mono px-2 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300"
+                        >
+                          #{t}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-zinc-500 pt-1">
+                      <span className="font-mono text-[11px] font-bold text-blue-600">{repo.language}</span>
+                      <a
+                        href={repo.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:text-blue-600 inline-flex items-center gap-1"
+                      >
+                        <span>Repo</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
                   </div>
                 </motion.div>
               ))}
@@ -295,15 +386,121 @@ export default function MyJourneyPage() {
           </section>
         )}
 
-        {/* 4. Projects */}
+        {/* 5. UNLOCKABLE GAMIFIED BADGES & ACHIEVEMENTS */}
+        {(activeFilter === 'all' || activeFilter === 'achievements') && (
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-amber-500" />
+                <h3 className="text-xl font-heading font-extrabold text-zinc-900 dark:text-white">
+                  Unlockable Builder Badges
+                </h3>
+              </div>
+              <span className="text-xs font-mono text-zinc-500">
+                Click unlocked badges for celebration
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {achievements.map((badge) => (
+                <motion.div
+                  key={badge.id}
+                  whileHover={{ scale: 1.02 }}
+                  onClick={() => handleBadgeClick(badge.id, badge.unlocked)}
+                  className={`builder-card p-5 text-center space-y-2 cursor-pointer transition-all ${
+                    badge.unlocked
+                      ? 'border-blue-200 dark:border-blue-900/50 bg-blue-50/20 dark:bg-blue-950/10'
+                      : 'opacity-60 grayscale'
+                  }`}
+                >
+                  <div className="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-xl bg-zinc-100 dark:bg-zinc-800 shadow-xs">
+                    {badge.unlocked ? (
+                      <Sparkles className="w-6 h-6 text-amber-500" />
+                    ) : (
+                      <Lock className="w-5 h-5 text-zinc-400" />
+                    )}
+                  </div>
+                  <div>
+                    <h4 className="font-heading font-bold text-sm text-zinc-900 dark:text-white">
+                      {badge.title}
+                    </h4>
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-2 mt-0.5">
+                      {badge.description}
+                    </p>
+                  </div>
+                  <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 text-xs font-mono font-bold text-blue-600 dark:text-blue-400">
+                    +{badge.xpReward} XP
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 6. VERIFIED SKILLS PASSPORT */}
+        {(activeFilter === 'all' || activeFilter === 'skills') && (
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-emerald-500" />
+                <h3 className="text-xl font-heading font-extrabold text-zinc-900 dark:text-white">
+                  Verified Skills Passport
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsAddSkillOpen(true)}
+                className="text-xs font-heading font-bold text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                + Verify New Skill
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {studentProfile.verifiedSkills.map((skill) => (
+                <motion.div
+                  key={skill.id}
+                  whileHover={{ scale: 1.01 }}
+                  className="builder-card p-5 space-y-2.5"
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h4 className="font-heading font-bold text-sm text-zinc-900 dark:text-white">
+                        {skill.name}
+                      </h4>
+                      <span className="text-[11px] text-zinc-500">{skill.category}</span>
+                    </div>
+                    <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full">
+                      {skill.score}%
+                    </span>
+                  </div>
+
+                  <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-1.5 overflow-hidden">
+                    <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: `${skill.score}%` }} />
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px] text-zinc-400 pt-1 font-mono">
+                    <span>{skill.level}</span>
+                    <span className="text-blue-600 dark:text-blue-400 font-bold">{skill.verificationCode}</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 7. PROJECTS & CAPSTONES */}
         {(activeFilter === 'all' || activeFilter === 'projects') && (
           <section className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-xl font-serif text-[#1F1F1F] flex items-center gap-2">
-                <Code className="w-5 h-5 text-[#2563EB]" />
-                Projects &amp; Capstones
-              </h3>
-              <span className="text-xs text-[#6B6B6B] font-mono">{studentProfile.evidences.length} Verified Evidence</span>
+              <div className="flex items-center gap-2">
+                <Code className="w-5 h-5 text-blue-600" />
+                <h3 className="text-xl font-heading font-extrabold text-zinc-900 dark:text-white">
+                  Production Capstone Evidence
+                </h3>
+              </div>
+              <span className="text-xs font-mono text-zinc-500">
+                {studentProfile.evidences.length} Verified Repositories
+              </span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -311,31 +508,35 @@ export default function MyJourneyPage() {
                 <motion.div
                   key={ev.id}
                   whileHover={{ scale: 1.01 }}
-                  className="p-6 bg-white rounded-2xl border border-[#ECEAE4] space-y-3 shadow-xs flex flex-col justify-between"
+                  className="builder-card p-6 space-y-3 flex flex-col justify-between"
                 >
                   <div className="space-y-2">
                     <div className="flex items-start justify-between">
                       <div>
-                        <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-[#FAF9F5] text-[#6B6B6B] border border-[#ECEAE4]">
+                        <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-bold">
                           {ev.type}
                         </span>
-                        <h4 className="text-base font-serif text-[#1F1F1F] mt-1.5">{ev.title}</h4>
+                        <h4 className="text-base font-heading font-bold text-zinc-900 dark:text-white mt-1.5">
+                          {ev.title}
+                        </h4>
                       </div>
-                      <span className="text-xs font-mono font-medium text-[#16A34A] bg-[#16A34A]/10 px-2.5 py-0.5 rounded-full">
+                      <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2.5 py-0.5 rounded-full">
                         {ev.impactScore}/100 Impact
                       </span>
                     </div>
-                    <p className="text-xs text-[#6B6B6B] leading-relaxed">{ev.description}</p>
+                    <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                      {ev.description}
+                    </p>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-[#ECEAE4] text-xs">
-                    <span className="text-[#6B6B6B] font-mono">{ev.date}</span>
+                  <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-zinc-800 text-xs">
+                    <span className="text-zinc-400 font-mono">{ev.date}</span>
                     {ev.url && (
                       <a
                         href={ev.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-xs font-medium text-[#1F1F1F] hover:text-[#D97706] inline-flex items-center gap-1"
+                        className="font-heading font-bold text-zinc-900 dark:text-white hover:text-blue-600 inline-flex items-center gap-1"
                       >
                         <span>View Repository</span>
                         <ExternalLink className="w-3 h-3" />
@@ -348,109 +549,34 @@ export default function MyJourneyPage() {
           </section>
         )}
 
-        {/* 5. GitHub Activity */}
-        {(activeFilter === 'all' || activeFilter === 'github') && (
-          <section className="p-8 bg-white rounded-2xl border border-[#ECEAE4] space-y-6 shadow-xs">
-            <div className="flex items-center justify-between pb-3 border-b border-[#ECEAE4]">
-              <div className="flex items-center gap-2.5">
-                <GithubIcon className="w-5 h-5 text-[#1F1F1F]" />
-                <h3 className="text-lg font-serif text-[#1F1F1F]">Connected GitHub Activity</h3>
-              </div>
-              <a
-                href={studentProfile.professional.githubUrl || 'https://github.com'}
-                target="_blank"
-                rel="noreferrer"
-                className="text-xs text-[#D97706] hover:underline font-mono inline-flex items-center gap-1"
-              >
-                <span>github.com/student-builder</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="p-4 bg-[#FAF9F5] rounded-xl border border-[#ECEAE4] text-center">
-                <span className="text-xs text-[#6B6B6B] block font-mono">Repositories</span>
-                <strong className="text-xl font-serif text-[#1F1F1F]">{studentProfile.professional.totalProjects || 14}</strong>
-              </div>
-              <div className="p-4 bg-[#FAF9F5] rounded-xl border border-[#ECEAE4] text-center">
-                <span className="text-xs text-[#6B6B6B] block font-mono">Yearly Commits</span>
-                <strong className="text-xl font-serif text-[#1F1F1F]">348</strong>
-              </div>
-              <div className="p-4 bg-[#FAF9F5] rounded-xl border border-[#ECEAE4] text-center">
-                <span className="text-xs text-[#6B6B6B] block font-mono">Open Source PRs</span>
-                <strong className="text-xl font-serif text-[#1F1F1F]">48</strong>
-              </div>
-              <div className="p-4 bg-[#FAF9F5] rounded-xl border border-[#ECEAE4] text-center">
-                <span className="text-xs text-[#6B6B6B] block font-mono">Velocity Rate</span>
-                <strong className="text-xl font-serif text-[#16A34A]">+38% MoM</strong>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <span className="text-xs font-mono uppercase text-[#6B6B6B]">Language Breakdown</span>
-              <div className="w-full h-2 rounded-full bg-[#FAF9F5] border border-[#ECEAE4] flex overflow-hidden">
-                {githubLanguages.map((lang) => (
-                  <div key={lang.name} className={`${lang.color} h-full`} style={{ width: `${lang.percentage}%` }} />
-                ))}
-              </div>
-              <div className="flex flex-wrap gap-4 text-xs text-[#6B6B6B] pt-1 font-mono">
-                {githubLanguages.map((lang) => (
-                  <span key={lang.name}>{lang.name} ({lang.percentage}%)</span>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* 6. Achievements */}
-        {(activeFilter === 'all' || activeFilter === 'achievements') && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl font-serif text-[#1F1F1F] flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-[#D97706]" />
-                Achievements &amp; Honors
-              </h3>
-              <span className="text-xs text-[#6B6B6B] font-mono">{achievements.length} Verified</span>
-            </div>
-
-            <div className="space-y-3">
-              {achievements.map((ach) => (
-                <div
-                  key={ach.id}
-                  className="p-5 bg-white rounded-2xl border border-[#ECEAE4] space-y-1.5 shadow-xs"
-                >
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-serif text-base text-[#1F1F1F]">{ach.title}</h4>
-                    <span className="text-xs font-mono text-[#6B6B6B]">{ach.date}</span>
-                  </div>
-                  <div className="text-xs text-[#D97706] font-medium">{ach.issuer}</div>
-                  <p className="text-xs text-[#6B6B6B] leading-relaxed pt-1">{ach.description}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* 7. Growth Timeline */}
+        {/* 8. GROWTH TIMELINE */}
         {(activeFilter === 'all' || activeFilter === 'timeline') && (
-          <section className="p-8 bg-white rounded-2xl border border-[#ECEAE4] space-y-6 shadow-xs">
-            <div className="flex items-center justify-between pb-3 border-b border-[#ECEAE4]">
+          <section className="builder-card p-8 space-y-6">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
               <div className="flex items-center gap-2.5">
-                <Calendar className="w-5 h-5 text-[#D97706]" />
-                <h3 className="text-lg font-serif text-[#1F1F1F]">Growth Timeline</h3>
+                <Calendar className="w-5 h-5 text-orange-500" />
+                <h3 className="text-lg font-heading font-extrabold text-zinc-900 dark:text-white">
+                  Growth Timeline Story
+                </h3>
               </div>
-              <span className="text-xs text-[#6B6B6B] font-mono">Chronological progression</span>
+              <span className="text-xs font-mono text-zinc-500">Chronological XP log</span>
             </div>
 
-            <div className="space-y-6 relative before:absolute before:left-3 before:top-2 before:bottom-2 before:w-px before:bg-[#ECEAE4]">
+            <div className="space-y-6 relative before:absolute before:left-3 before:top-2 before:bottom-2 before:w-px before:bg-zinc-200 dark:before:bg-zinc-800">
               {timelineEvents.map((evt, idx) => (
                 <div key={idx} className="relative pl-8 space-y-1">
-                  <div className="absolute left-2 top-1.5 w-2.5 h-2.5 rounded-full bg-white border-2 border-[#D97706]" />
+                  <div className="absolute left-2 top-1.5 w-2.5 h-2.5 rounded-full bg-blue-600 ring-4 ring-blue-100 dark:ring-blue-950" />
                   <div className="flex items-center justify-between text-xs">
-                    <strong className="text-sm font-serif text-[#1F1F1F]">{evt.title}</strong>
-                    <span className="text-[#6B6B6B] font-mono">{evt.month}</span>
+                    <strong className="text-sm font-heading font-bold text-zinc-900 dark:text-white">
+                      {evt.title}
+                    </strong>
+                    <span className="text-xs font-mono font-bold text-blue-600 dark:text-blue-400">
+                      {evt.type}
+                    </span>
                   </div>
-                  <p className="text-xs text-[#6B6B6B] leading-relaxed">{evt.description}</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                    {evt.description}
+                  </p>
                 </div>
               ))}
             </div>
@@ -460,33 +586,33 @@ export default function MyJourneyPage() {
 
       {/* Add Project Evidence Modal */}
       {isAddEvidenceOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-xs p-4">
-          <div className="w-full max-w-lg bg-white rounded-2xl border border-[#ECEAE4] p-6 space-y-4 shadow-xl text-xs">
-            <div className="flex items-center justify-between pb-2 border-b border-[#ECEAE4]">
-              <h3 className="font-serif text-base text-[#1F1F1F]">Add Project Evidence</h3>
-              <button onClick={() => setIsAddEvidenceOpen(false)} className="p-1 text-[#6B6B6B] hover:text-[#1F1F1F]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+          <div className="w-full max-w-lg bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-6 space-y-4 shadow-2xl text-xs">
+            <div className="flex items-center justify-between pb-2 border-b border-zinc-200 dark:border-zinc-800">
+              <h3 className="font-heading font-bold text-base text-zinc-900 dark:text-white">Upload Project Evidence (+100 XP)</h3>
+              <button onClick={() => setIsAddEvidenceOpen(false)} className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-white">
                 <X className="w-4 h-4" />
               </button>
             </div>
             <form onSubmit={handleCreateEvidence} className="space-y-4">
               <div>
-                <label className="font-mono uppercase text-[#6B6B6B] text-[10px] block mb-1">Project Title</label>
+                <label className="font-mono text-zinc-500 text-[10px] uppercase block mb-1">Project Title</label>
                 <input
                   type="text"
                   required
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="e.g. Distributed Token Bucket Rate Limiter"
-                  className="w-full p-2.5 bg-[#FAF9F5] border border-[#ECEAE4] rounded-xl text-[#1F1F1F] focus:outline-none focus:border-[#D97706]"
+                  className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:outline-none focus:border-blue-600"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-mono uppercase text-[#6B6B6B] text-[10px] block mb-1">Type</label>
+                  <label className="font-mono text-zinc-500 text-[10px] uppercase block mb-1">Type</label>
                   <select
                     value={newType}
                     onChange={(e) => setNewType(e.target.value as any)}
-                    className="w-full p-2.5 bg-[#FAF9F5] border border-[#ECEAE4] rounded-xl text-[#1F1F1F]"
+                    className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
                   >
                     <option value="GitHub Repo">GitHub Repo</option>
                     <option value="Live Product">Live Product</option>
@@ -495,39 +621,39 @@ export default function MyJourneyPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="font-mono uppercase text-[#6B6B6B] text-[10px] block mb-1">Repository URL</label>
+                  <label className="font-mono text-zinc-500 text-[10px] uppercase block mb-1">Repository URL</label>
                   <input
                     type="url"
                     value={newUrl}
                     onChange={(e) => setNewUrl(e.target.value)}
                     placeholder="https://github.com/..."
-                    className="w-full p-2.5 bg-[#FAF9F5] border border-[#ECEAE4] rounded-xl text-[#1F1F1F]"
+                    className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
                   />
                 </div>
               </div>
               <div>
-                <label className="font-mono uppercase text-[#6B6B6B] text-[10px] block mb-1">Description</label>
+                <label className="font-mono text-zinc-500 text-[10px] uppercase block mb-1">Description &amp; Tech Stack</label>
                 <textarea
                   rows={3}
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
-                  placeholder="Describe your architecture, benchmarks, and tech stack..."
-                  className="w-full p-2.5 bg-[#FAF9F5] border border-[#ECEAE4] rounded-xl text-[#1F1F1F]"
+                  placeholder="Describe your system architecture, benchmarks, and performance metrics..."
+                  className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
                 />
               </div>
-              <div className="flex justify-end gap-2 pt-2 border-t border-[#ECEAE4]">
+              <div className="flex justify-end gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setIsAddEvidenceOpen(false)}
-                  className="px-4 py-2 text-[#6B6B6B] hover:text-[#1F1F1F]"
+                  className="px-4 py-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#1F1F1F] text-[#FAF9F5] rounded-xl font-medium hover:bg-black shadow-xs"
+                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-heading font-bold shadow-xs lift-hover"
                 >
-                  Save Proof
+                  Save &amp; Claim 100 XP
                 </button>
               </div>
             </form>
@@ -537,33 +663,33 @@ export default function MyJourneyPage() {
 
       {/* Add Skill Modal */}
       {isAddSkillOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md bg-white rounded-2xl border border-[#ECEAE4] p-6 space-y-4 shadow-xl text-xs">
-            <div className="flex items-center justify-between pb-2 border-b border-[#ECEAE4]">
-              <h3 className="font-serif text-base text-[#1F1F1F]">Add Verified Skill</h3>
-              <button onClick={() => setIsAddSkillOpen(false)} className="p-1 text-[#6B6B6B] hover:text-[#1F1F1F]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+          <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-6 space-y-4 shadow-2xl text-xs">
+            <div className="flex items-center justify-between pb-2 border-b border-zinc-200 dark:border-zinc-800">
+              <h3 className="font-heading font-bold text-base text-zinc-900 dark:text-white">Verify New Skill (+50 XP)</h3>
+              <button onClick={() => setIsAddSkillOpen(false)} className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-white">
                 <X className="w-4 h-4" />
               </button>
             </div>
             <form onSubmit={handleCreateSkill} className="space-y-4">
               <div>
-                <label className="font-mono uppercase text-[#6B6B6B] text-[10px] block mb-1">Skill Name</label>
+                <label className="font-mono text-zinc-500 text-[10px] uppercase block mb-1">Skill Name</label>
                 <input
                   type="text"
                   required
                   value={newSkillName}
                   onChange={(e) => setNewSkillName(e.target.value)}
                   placeholder="e.g. Docker, PyTorch, Kubernetes"
-                  className="w-full p-2.5 bg-[#FAF9F5] border border-[#ECEAE4] rounded-xl text-[#1F1F1F]"
+                  className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-mono uppercase text-[#6B6B6B] text-[10px] block mb-1">Category</label>
+                  <label className="font-mono text-zinc-500 text-[10px] uppercase block mb-1">Category</label>
                   <select
                     value={newSkillCategory}
                     onChange={(e) => setNewSkillCategory(e.target.value as any)}
-                    className="w-full p-2.5 bg-[#FAF9F5] border border-[#ECEAE4] rounded-xl text-[#1F1F1F]"
+                    className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
                   >
                     <option value="Programming">Programming</option>
                     <option value="AI & ML">AI & ML</option>
@@ -573,11 +699,11 @@ export default function MyJourneyPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="font-mono uppercase text-[#6B6B6B] text-[10px] block mb-1">Level</label>
+                  <label className="font-mono text-zinc-500 text-[10px] uppercase block mb-1">Level</label>
                   <select
                     value={newSkillLevel}
                     onChange={(e) => setNewSkillLevel(e.target.value as any)}
-                    className="w-full p-2.5 bg-[#FAF9F5] border border-[#ECEAE4] rounded-xl text-[#1F1F1F]"
+                    className="w-full p-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
                   >
                     <option value="Intermediate">Intermediate</option>
                     <option value="Advanced">Advanced</option>
@@ -585,19 +711,19 @@ export default function MyJourneyPage() {
                   </select>
                 </div>
               </div>
-              <div className="flex justify-end gap-2 pt-2 border-t border-[#ECEAE4]">
+              <div className="flex justify-end gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setIsAddSkillOpen(false)}
-                  className="px-4 py-2 text-[#6B6B6B] hover:text-[#1F1F1F]"
+                  className="px-4 py-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-[#1F1F1F] text-[#FAF9F5] rounded-xl font-medium hover:bg-black shadow-xs"
+                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-heading font-bold shadow-xs lift-hover"
                 >
-                  Verify Skill
+                  Verify &amp; Claim 50 XP
                 </button>
               </div>
             </form>

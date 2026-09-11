@@ -21,6 +21,10 @@ import {
   Layers,
   Sparkles,
   Award,
+  Swords,
+  Trophy,
+  Flame,
+  Zap,
 } from 'lucide-react';
 
 interface NavItem {
@@ -33,7 +37,7 @@ interface NavItem {
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { currentRole, isDemoMode, studentProfile, jobs } = useAppStore();
+  const { currentRole, studentProfile, level, streakDays } = useAppStore();
 
   const studentLinks: NavItem[] = [
     { name: 'Home', href: '/student', icon: LayoutDashboard },
@@ -41,14 +45,26 @@ export function Sidebar() {
       name: 'My Journey',
       href: '/student/journey',
       icon: Award,
-      badge: studentProfile.builderScores.overall > 0 ? `${studentProfile.builderScores.overall}` : undefined,
+      badge: `Lv.${level}`,
     },
-    { name: 'Career Copilot', href: '/student/career-copilot', icon: Bot, highlight: true },
+    {
+      name: 'Assessments',
+      href: '/student/assessments',
+      icon: Swords,
+      badge: 'Quests',
+      highlight: true,
+    },
+    { name: 'Career Copilot', href: '/student/career-copilot', icon: Bot },
     {
       name: 'Opportunities',
       href: '/student/opportunities',
       icon: Compass,
       badge: '6',
+    },
+    {
+      name: 'Leaderboard',
+      href: '/student/leaderboard',
+      icon: Trophy,
     },
     { name: 'Settings', href: '/student/settings', icon: Settings },
   ];
@@ -91,7 +107,7 @@ export function Sidebar() {
       : adminLinks;
 
   return (
-    <aside className="w-60 bg-[#FAF9F5] border-r border-[#ECEAE4] flex flex-col shrink-0 min-h-[calc(100vh-4rem)] p-3">
+    <aside className="w-60 bg-transparent border-r border-zinc-200 dark:border-zinc-800 flex flex-col shrink-0 min-h-[calc(100vh-4rem)] p-3">
       {/* Navigation Links */}
       <nav className="flex-1 space-y-1">
         {links.map((item) => {
@@ -101,20 +117,20 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center justify-between px-3.5 py-2.5 text-xs rounded-xl font-medium transition-all group btn-anthropic ${
+              className={`flex items-center justify-between px-3.5 py-2.5 text-xs rounded-xl font-medium transition-all group lift-hover ${
                 isActive
-                  ? 'bg-[#F0EEE6] text-[#1F1F1F] font-semibold shadow-2xs'
-                  : 'text-[#6B6B6B] hover:text-[#1F1F1F] hover:bg-[#F5F3EB]'
+                  ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-semibold shadow-sm'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
                 <Icon
                   className={`w-4 h-4 transition-colors ${
                     isActive
-                      ? 'text-[#D97706]'
+                      ? 'text-blue-400 dark:text-blue-600'
                       : item.highlight
-                      ? 'text-[#D97706]'
-                      : 'text-[#6B6B6B] group-hover:text-[#1F1F1F]'
+                      ? 'text-orange-500'
+                      : 'text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white'
                   }`}
                 />
                 <span>{item.name}</span>
@@ -122,10 +138,10 @@ export function Sidebar() {
 
               {item.badge && (
                 <span
-                  className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+                  className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-semibold ${
                     isActive
-                      ? 'bg-[#E3E0D5] text-[#1F1F1F]'
-                      : 'bg-[#ECEAE4] text-[#6B6B6B] group-hover:bg-[#E3E0D5]'
+                      ? 'bg-zinc-800 dark:bg-zinc-100 text-zinc-300 dark:text-zinc-700'
+                      : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-700'
                   }`}
                 >
                   {item.badge}
@@ -136,14 +152,19 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Subtle Quote / Philosophy at Bottom */}
-      <div className="p-3 bg-[#FFFFFF] rounded-2xl border border-[#ECEAE4] text-[11px] text-[#6B6B6B] space-y-1 mt-auto shadow-2xs">
-        <div className="font-semibold text-[#1F1F1F] flex items-center gap-1">
-          <Sparkles className="w-3 h-3 text-[#D97706]" />
-          <span>SkillBridge V3</span>
+      {/* Builder Quick Card at Bottom */}
+      <div className="p-3.5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-xs space-y-2 mt-auto shadow-2xs">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 font-bold text-zinc-900 dark:text-white text-xs">
+            <Flame className="w-4 h-4 text-orange-500" />
+            <span>Builder Tier</span>
+          </div>
+          <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-bold">
+            Lv. {level}
+          </span>
         </div>
-        <p className="leading-snug text-[10px]">
-          Build proof. Not just profiles.
+        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug">
+          Complete quests to unlock tier badges and placement fast-tracks.
         </p>
       </div>
     </aside>

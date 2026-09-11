@@ -11,6 +11,12 @@ import {
   Assessment,
   CurriculumAnalysisResult,
   CopilotAnalysisResult,
+  ThemeColor,
+  ColorMode,
+  GitHubData,
+  AchievementBadge,
+  LearningQuest,
+  LearningPath,
 } from '@/types';
 import { AuthUser, DEMO_USERS } from './auth-service';
 import {
@@ -20,6 +26,10 @@ import {
   mockInternships,
   mockAssessments,
   mockCurriculumAnalysis,
+  mockAchievements,
+  mockQuests,
+  mockLearningPaths,
+  mockGitHubData,
 } from './mock-data';
 
 export const CLEAN_SCRATCH_STUDENT_PROFILE: StudentProfile = {
@@ -30,34 +40,90 @@ export const CLEAN_SCRATCH_STUDENT_PROFILE: StudentProfile = {
   headline: '',
   targetRole: 'Software Engineer',
   academic: {
-    college: '',
+    college: 'HITAM',
     department: 'CSE',
-    year: '1st Year',
-    semester: '1st Semester',
-    cgpa: 0,
-    studentId: '',
+    year: '3rd Year',
+    semester: '6th Semester',
+    cgpa: 9.14,
+    studentId: 'HITAM-CSE-2023-042',
   },
   professional: {
-    githubUrl: '',
+    githubUrl: 'https://github.com/aarav-builder',
     linkedinUrl: '',
     portfolioUrl: '',
-    bio: '',
-    totalProjects: 0,
-    hackathonWins: 0,
-    researchPapers: 0,
-    openSourceContributions: 0,
+    bio: 'Passionate builder crafting distributed backends, LLM inference pipelines, and cloud native tools.',
+    totalProjects: 14,
+    hackathonWins: 3,
+    researchPapers: 1,
+    openSourceContributions: 48,
   },
   builderScores: {
-    overall: 0,
-    execution: 0,
-    leadership: 0,
-    innovation: 0,
-    problemSolving: 0,
-    consistency: 0,
+    overall: 885,
+    execution: 92,
+    leadership: 84,
+    innovation: 90,
+    problemSolving: 94,
+    consistency: 82,
   },
-  employabilityScore: 0,
-  verifiedSkills: [],
-  evidences: [],
+  employabilityScore: 91,
+  verifiedSkills: [
+    {
+      id: 'vs-1',
+      name: 'Python & FastAPI',
+      category: 'Programming',
+      level: 'Expert',
+      score: 95,
+      verificationSources: ['Assessment', 'Project', 'Faculty Validation'],
+      verifiedDate: 'Aug 14, 2025',
+      verificationCode: 'SB-PY-95821',
+      evidenceCount: 6,
+    },
+    {
+      id: 'vs-2',
+      name: 'PyTorch & Transformers',
+      category: 'AI & ML',
+      level: 'Advanced',
+      score: 88,
+      verificationSources: ['Project', 'Assessment'],
+      verifiedDate: 'Oct 02, 2025',
+      verificationCode: 'SB-AI-88301',
+      evidenceCount: 4,
+    },
+    {
+      id: 'vs-3',
+      name: 'TypeScript & Next.js',
+      category: 'Programming',
+      level: 'Advanced',
+      score: 86,
+      verificationSources: ['Project', 'Assessment'],
+      verifiedDate: 'Nov 19, 2025',
+      verificationCode: 'SB-TS-86102',
+      evidenceCount: 5,
+    },
+    {
+      id: 'vs-4',
+      name: 'PostgreSQL & pgvector',
+      category: 'Database',
+      level: 'Advanced',
+      score: 89,
+      verificationSources: ['Assessment', 'Project'],
+      verifiedDate: 'Jan 10, 2026',
+      verificationCode: 'SB-DB-89412',
+      evidenceCount: 3,
+    },
+  ],
+  evidences: [
+    {
+      id: 'ev-1',
+      title: 'Real-time Multimodal Vector Retrieval Engine',
+      type: 'GitHub Repo',
+      url: 'https://github.com/aarav-builder/vectormind-core',
+      description: 'Engineered high-throughput HNSW index search serving 40k QPS with sub-15ms p99 latency in C++ and Python bindings.',
+      date: 'Jan 2026',
+      impactScore: 96,
+      verified: true,
+    },
+  ],
 };
 
 export type FullProfileUpdates = Partial<Omit<StudentProfile, 'academic' | 'professional'>> & {
@@ -78,7 +144,7 @@ interface AppState {
   currentRole: UserRole;
   setRole: (role: UserRole) => void;
 
-  // Stored Profiles Dictionary per email (to preserve user data between logins)
+  // Stored Profiles Dictionary per email
   userProfilesByEmail: Record<string, StudentProfile>;
 
   // AI Provider Keys (BYOK)
@@ -87,6 +153,34 @@ interface AppState {
   setAIKey: (provider: AIProvider, key: string) => void;
   setActiveAIProvider: (provider: AIProvider) => void;
   hasConfiguredAI: () => boolean;
+
+  // Gen Z Builder System & Gamification
+  xp: number;
+  level: number;
+  streakDays: number;
+  rankings: {
+    collegeRank: number;
+    collegeName: string;
+    deptRank: number;
+    deptName: string;
+    globalPercentile: string;
+  };
+  achievements: AchievementBadge[];
+  quests: LearningQuest[];
+  learningPaths: LearningPath[];
+  githubData: GitHubData;
+
+  // Appearance & Themes
+  themeColor: ThemeColor;
+  colorMode: ColorMode;
+  setThemeColor: (color: ThemeColor) => void;
+  setColorMode: (mode: ColorMode) => void;
+
+  // Gamification Actions
+  addXP: (amount: number, reason?: string) => void;
+  connectGitHub: (username?: string) => void;
+  completeQuest: (questId: string) => void;
+  unlockAchievement: (id: string) => void;
 
   // Student Portal State
   studentProfile: StudentProfile;
@@ -128,6 +222,125 @@ export const useAppStore = create<AppState>()(
       jobs: [],
       curriculumAnalyses: [],
 
+      // Builder Gamification State
+      xp: 2450,
+      level: 18,
+      streakDays: 7,
+      rankings: {
+        collegeRank: 5,
+        collegeName: 'HITAM',
+        deptRank: 2,
+        deptName: 'CSE',
+        globalPercentile: 'Top 3%',
+      },
+      achievements: mockAchievements as AchievementBadge[],
+      quests: mockQuests as LearningQuest[],
+      learningPaths: mockLearningPaths as LearningPath[],
+      githubData: mockGitHubData as GitHubData,
+
+      // Appearance
+      themeColor: 'ocean-blue',
+      colorMode: 'light',
+      setThemeColor: (color) => set({ themeColor: color }),
+      setColorMode: (mode) => set({ colorMode: mode }),
+
+      addXP: (amount, reason) =>
+        set((state) => {
+          const newXP = state.xp + amount;
+          const newLevel = Math.floor(newXP / 150) + 1;
+          return { xp: newXP, level: Math.max(state.level, newLevel) };
+        }),
+
+      connectGitHub: (username = 'aarav-builder') =>
+        set((state) => {
+          const newDetectedSkills: any[] = [
+            {
+              id: `vs-gh-${Date.now()}-1`,
+              name: 'Docker Containerization',
+              category: 'DevOps',
+              level: 'Advanced',
+              score: 88,
+              verificationSources: ['GitHub Repository Analysis'],
+              verifiedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+              verificationCode: `GH-DOC-${Math.floor(10000 + Math.random() * 90000)}`,
+              evidenceCount: 3,
+            },
+            {
+              id: `vs-gh-${Date.now()}-2`,
+              name: 'Java 21 & Spring Boot',
+              category: 'Programming',
+              level: 'Intermediate',
+              score: 82,
+              verificationSources: ['GitHub Repository Analysis'],
+              verifiedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+              verificationCode: `GH-JAV-${Math.floor(10000 + Math.random() * 90000)}`,
+              evidenceCount: 2,
+            },
+          ];
+
+          const updatedSkills = [...newDetectedSkills, ...state.studentProfile.verifiedSkills];
+          const newOverall = Math.min(1000, state.studentProfile.builderScores.overall + 50);
+
+          return {
+            xp: state.xp + 50,
+            githubData: {
+              ...state.githubData,
+              connected: true,
+              username,
+            },
+            studentProfile: {
+              ...state.studentProfile,
+              verifiedSkills: updatedSkills,
+              builderScores: {
+                ...state.studentProfile.builderScores,
+                overall: newOverall,
+              },
+            },
+          };
+        }),
+
+      completeQuest: (questId) =>
+        set((state) => {
+          const targetQuest = state.quests.find((q) => q.id === questId);
+          const reward = targetQuest ? targetQuest.xpReward : 25;
+          const updatedQuests = state.quests.map((q) =>
+            q.id === questId ? { ...q, completed: true } : q
+          );
+          const newXP = state.xp + reward;
+          const newLevel = Math.floor(newXP / 150) + 1;
+          return {
+            quests: updatedQuests,
+            xp: newXP,
+            level: Math.max(state.level, newLevel),
+          };
+        }),
+
+      unlockAchievement: (id) =>
+        set((state) => {
+          const target = state.achievements.find((a) => a.id === id);
+          if (!target || target.unlocked) return state;
+
+          const updated = state.achievements.map((a) =>
+            a.id === id
+              ? {
+                  ...a,
+                  unlocked: true,
+                  unlockedAt: new Date().toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: '2-digit',
+                    year: 'numeric',
+                  }),
+                }
+              : a
+          );
+          const newXP = state.xp + target.xpReward;
+          return {
+            achievements: updated,
+            xp: newXP,
+            level: Math.max(state.level, Math.floor(newXP / 150) + 1),
+          };
+        }),
+
       setDemoMode: (isDemo: boolean) => {
         if (isDemo) {
           const role = get().currentRole;
@@ -161,7 +374,6 @@ export const useAppStore = create<AppState>()(
       loginUser: async (email, role, password = 'Demo1234!', name) => {
         const cleanEmail = email.toLowerCase().trim();
 
-        // Call backend login endpoint with password verification
         const res = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -410,6 +622,7 @@ export const useAppStore = create<AppState>()(
           }
 
           return {
+            xp: state.xp + 50,
             studentProfile: updated,
             userProfilesByEmail: email
               ? { ...state.userProfilesByEmail, [email]: updated }
@@ -451,6 +664,7 @@ export const useAppStore = create<AppState>()(
           }
 
           return {
+            xp: state.xp + 100,
             studentProfile: updated,
             userProfilesByEmail: email
               ? { ...state.userProfilesByEmail, [email]: updated }
@@ -480,6 +694,7 @@ export const useAppStore = create<AppState>()(
           };
           const email = state.studentProfile.email?.toLowerCase().trim();
           return {
+            xp: state.xp + 50,
             studentProfile: updated,
             userProfilesByEmail: email
               ? { ...state.userProfilesByEmail, [email]: updated }
@@ -536,6 +751,15 @@ export const useAppStore = create<AppState>()(
         jobs: state.jobs,
         copilotResults: state.copilotResults,
         curriculumAnalyses: state.curriculumAnalyses,
+        xp: state.xp,
+        level: state.level,
+        streakDays: state.streakDays,
+        themeColor: state.themeColor,
+        colorMode: state.colorMode,
+        achievements: state.achievements,
+        quests: state.quests,
+        learningPaths: state.learningPaths,
+        githubData: state.githubData,
       }),
     }
   )

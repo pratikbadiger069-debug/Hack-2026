@@ -19,9 +19,28 @@ export interface AIKeys {
   claude: string;
 }
 
+export type ThemeColor =
+  | 'ocean-blue'
+  | 'sunset-orange'
+  | 'forest-green'
+  | 'purple-haze'
+  | 'monochrome'
+  | 'cyber-teal';
+
+export type ColorMode = 'light' | 'dark';
+
+export type BuilderLevelTitle =
+  | 'Explorer'
+  | 'Builder'
+  | 'Creator'
+  | 'Architect'
+  | 'Innovator'
+  | 'Elite Builder'
+  | 'Industry Ready';
+
 export type SkillLevel = 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
 
-export type VerificationSource = 'Assessment' | 'Project' | 'Certification' | 'Faculty Validation';
+export type VerificationSource = 'Assessment' | 'Project' | 'Certification' | 'Faculty Validation' | 'GitHub Repository Analysis';
 
 export interface VerifiedSkill {
   id: string;
@@ -75,6 +94,89 @@ export interface ProfessionalDetails {
   openSourceContributions: number;
 }
 
+export interface GitHubPinnedRepo {
+  name: string;
+  description: string;
+  stars: number;
+  forks: number;
+  language: string;
+  url: string;
+  topics: string[];
+}
+
+export interface GitHubData {
+  connected: boolean;
+  username: string;
+  avatarUrl: string;
+  bio: string;
+  publicRepos: number;
+  totalStars: number;
+  followers: number;
+  following: number;
+  languages: { name: string; percentage: number; color: string }[];
+  pinnedRepos: GitHubPinnedRepo[];
+  detectedSkills: string[];
+  recentCommitsCount: number;
+  streakDays: number;
+}
+
+export interface AchievementBadge {
+  id: string;
+  title: string;
+  category: 'Code' | 'Hackathon' | 'Community' | 'Streak' | 'Architecture';
+  description: string;
+  icon: string;
+  xpReward: number;
+  unlocked: boolean;
+  unlockedAt?: string;
+}
+
+export interface QuestOption {
+  id: string;
+  text: string;
+  correct: boolean;
+}
+
+export interface QuestQuestion {
+  id: string;
+  question: string;
+  codeSnippet?: string;
+  options: QuestOption[];
+  explanation: string;
+}
+
+export interface LearningQuest {
+  id: string;
+  title: string;
+  category: 'Backend' | 'Frontend' | 'DevOps' | 'AI & ML' | 'Database' | 'Systems';
+  difficulty: 'Easy' | 'Medium' | 'Advanced' | 'Expert';
+  xpReward: number;
+  estimatedMinutes: number;
+  description: string;
+  skillsGained: string[];
+  completed: boolean;
+  questions?: QuestQuestion[];
+}
+
+export interface LearningPathStep {
+  id: string;
+  stepNumber: number;
+  title: string;
+  status: 'completed' | 'in_progress' | 'locked';
+  xpReward: number;
+  questId?: string;
+}
+
+export interface LearningPath {
+  id: string;
+  title: string;
+  targetRole: string;
+  description: string;
+  totalSteps: number;
+  completedSteps: number;
+  steps: LearningPathStep[];
+}
+
 export interface StudentProfile {
   id: string;
   name: string;
@@ -115,6 +217,8 @@ export interface Assessment {
   questions?: AssessmentQuestion[];
 }
 
+export type PipelineStage = 'Matched' | 'Shortlisted' | 'Assessment' | 'Interview' | 'Selected';
+
 export interface LeaderboardEntry {
   rank: number;
   studentName: string;
@@ -122,6 +226,8 @@ export interface LeaderboardEntry {
   department: string;
   builderScore: number;
   verifiedSkillsCount: number;
+  level?: number;
+  xp?: number;
   badge: string;
   avatar: string;
 }
@@ -325,8 +431,6 @@ export interface JobRequirement {
   status: 'Active' | 'Draft' | 'Closed';
 }
 
-export type PipelineStage = 'Matched' | 'Shortlisted' | 'Assessment' | 'Interview' | 'Selected';
-
 export interface CandidateApplication {
   id: string;
   studentId: string;
@@ -339,7 +443,7 @@ export interface CandidateApplication {
   builderScore: number;
   employabilityScore: number;
   matchScore: number;
-  stage: PipelineStage;
+  stage: 'Matched' | 'Shortlisted' | 'Assessment' | 'Interview' | 'Selected';
   appliedDate: string;
   topSkills: string[];
   githubUrl: string;
