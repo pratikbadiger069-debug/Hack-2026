@@ -18,7 +18,9 @@
       "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
       "isDemoUser": false,
       "createdAt": "2026-09-11T09:37:51.837Z",
-      "updatedAt": "2026-09-11T09:37:51.837Z"
+      "updatedAt": "2026-09-11T09:37:51.837Z",
+      "passwordResetToken": "rst_1789154461901_8fa7i1g",
+      "passwordResetExpires": 1789158061901
     },
     "pratik.badiger2007@gmail.com": {
       "id": "usr-1789119815379",
@@ -130,7 +132,7 @@
       "isEmailVerified": false,
       "emailVerificationToken": "vt_1789148818117_n5snm7u",
       "createdAt": "2026-09-11T17:46:58.117Z",
-      "updatedAt": "2026-09-11T19:19:11.867Z",
+      "updatedAt": "2026-09-11T19:20:43.012Z",
       "googleName": "Aarav Sharma"
     },
     "aarav-builder@github.user": {
@@ -1254,6 +1256,14 @@
     ]
   },
   "auditLogs": [
+    {
+      "id": "log-1789154461902",
+      "timestamp": "2026-09-11T19:21:01.902Z",
+      "action": "PASSWORD_RESET_REQUEST",
+      "userId": "usr-1789119471837",
+      "role": "STUDENT",
+      "details": "Password recovery token issued for: pratik.badiger069@gmail.com"
+    },
     {
       "id": "log-1789154371055",
       "timestamp": "2026-09-11T19:19:31.055Z",

@@ -430,12 +430,13 @@ export const useAppStore = create<AppState>()(
       connectGitHub: async (username = 'aarav-builder') => {
         const cleanUser = username.trim();
         const currentEmail = get().studentProfile.email || get().currentUser?.email || '';
+        const geminiApiKey = get().aiKeys.gemini;
 
         try {
           const res = await fetch('/api/auth/github/sync', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: cleanUser, email: currentEmail }),
+            body: JSON.stringify({ username: cleanUser, email: currentEmail, geminiApiKey }),
           });
           const data = await res.json();
           if (data.success && data.githubData) {
@@ -509,12 +510,13 @@ export const useAppStore = create<AppState>()(
       syncGitHub: async () => {
         const username = get().githubData?.username || 'aarav-builder';
         const currentEmail = get().studentProfile.email || get().currentUser?.email || '';
+        const geminiApiKey = get().aiKeys.gemini;
 
         try {
           const res = await fetch('/api/auth/github/sync', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, email: currentEmail }),
+            body: JSON.stringify({ username, email: currentEmail, geminiApiKey }),
           });
           const data = await res.json();
           if (data.success && data.githubData) {
@@ -808,11 +810,12 @@ export const useAppStore = create<AppState>()(
       loginWithGitHub: async (username) => {
         const cleanUsername = (username || 'builder-dev').trim();
         const email = `${cleanUsername.toLowerCase()}@github.user`;
+        const geminiApiKey = get().aiKeys.gemini;
 
         const res = await fetch('/api/auth/github', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ githubUsername: cleanUsername, email }),
+          body: JSON.stringify({ githubUsername: cleanUsername, email, geminiApiKey }),
         });
 
         const data = await res.json();
@@ -821,16 +824,18 @@ export const useAppStore = create<AppState>()(
         }
 
         const isExisting = Boolean(get().userProfilesByEmail[email]);
+        const analyzedSkills = data.analysis?.verifiedSkills || [];
         const profile = isExisting ? get().userProfilesByEmail[email] : {
           ...EMPTY_FRESH_STUDENT_PROFILE,
           id: `std-${Date.now()}`,
           name: cleanUsername,
           email,
-          avatar: `https://github.com/${cleanUsername}.png`,
+          avatar: data.githubData?.avatarUrl || `https://github.com/${cleanUsername}.png`,
           professional: {
             ...EMPTY_FRESH_STUDENT_PROFILE.professional,
             githubUrl: `https://github.com/${cleanUsername}`,
           },
+          verifiedSkills: analyzedSkills,
         };
 
         set((state) => ({
@@ -839,7 +844,7 @@ export const useAppStore = create<AppState>()(
             name: cleanUsername,
             email,
             role: 'student',
-            avatar: `https://github.com/${cleanUsername}.png`,
+            avatar: data.githubData?.avatarUrl || `https://github.com/${cleanUsername}.png`,
             isEmailVerified: true,
             isDemoMode: false,
             createdAt: new Date().toISOString(),
@@ -847,7 +852,7 @@ export const useAppStore = create<AppState>()(
           currentRole: 'student',
           isDemoMode: false,
           studentProfile: profile,
-          githubData: {
+          githubData: data.githubData || {
             connected: true,
             username: cleanUsername,
             avatarUrl: `https://github.com/${cleanUsername}.png`,
@@ -866,7 +871,7 @@ export const useAppStore = create<AppState>()(
             recentCommitsCount: data.totalCommits || 45,
             streakDays: 3,
           },
-          xp: isExisting ? state.xp : 25,
+          xp: isExisting ? state.xp : 0,
           level: isExisting ? state.level : 1,
           userProfilesByEmail: {
             ...state.userProfilesByEmail,

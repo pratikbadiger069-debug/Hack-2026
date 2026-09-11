@@ -1,23 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dbService } from '@/lib/server-db';
-import { analyzeGitHubRepositories, GitHubRepoItem } from '@/lib/github-analyzer';
+import { scrapePublicGitHubProfile, analyzeWithGeminiAI } from '@/lib/gemini-scraper';
 
 export async function POST(req: NextRequest) {
   try {
-    const { githubUsername, email, code } = await req.json();
+    const { githubUsername, email, code, geminiApiKey } = await req.json();
 
     let username = githubUsername ? githubUsername.trim() : '';
-    let userAvatar = '';
-    let userBio = '';
-    let publicReposCount = 0;
-    let followersCount = 0;
-    let followingCount = 0;
-    let githubId = '';
-
-    const headers: Record<string, string> = {
-      'User-Agent': 'SkillBridge-Builder-Verification/1.0',
-      Accept: 'application/vnd.github.v3+json',
-    };
 
     // If OAuth code is provided and OAuth credentials exist
     if (code && process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
@@ -36,22 +25,20 @@ export async function POST(req: NextRequest) {
         });
         const tokenData = await tokenRes.json();
         if (tokenData.access_token) {
-          headers['Authorization'] = `token ${tokenData.access_token}`;
-          // Fetch authenticated user profile
-          const authUserRes = await fetch('https://api.github.com/user', { headers });
+          const authUserRes = await fetch('https://api.github.com/user', {
+            headers: {
+              'User-Agent': 'SkillBridge-Builder-Verification/1.0',
+              Authorization: `token ${tokenData.access_token}`,
+              Accept: 'application/vnd.github.v3+json',
+            },
+          });
           if (authUserRes.ok) {
             const authUser = await authUserRes.json();
             username = authUser.login;
-            userAvatar = authUser.avatar_url;
-            userBio = authUser.bio || '';
-            publicReposCount = authUser.public_repos || 0;
-            followersCount = authUser.followers || 0;
-            followingCount = authUser.following || 0;
-            githubId = String(authUser.id);
           }
         }
       } catch (oauthErr) {
-        console.warn('OAuth code exchange failed, falling back to public GitHub user info', oauthErr);
+        console.warn('OAuth code exchange fallback to public profile', oauthErr);
       }
     }
 
@@ -59,54 +46,20 @@ export async function POST(req: NextRequest) {
       username = 'builder-dev';
     }
 
-    // Fetch user public info if not already retrieved
-    if (!userAvatar && username !== 'builder-dev') {
-      try {
-        const userRes = await fetch(`https://api.github.com/users/${username}`, { headers });
-        if (userRes.ok) {
-          const u = await userRes.json();
-          userAvatar = u.avatar_url;
-          userBio = u.bio || '';
-          publicReposCount = u.public_repos || 0;
-          followersCount = u.followers || 0;
-          followingCount = u.following || 0;
-          githubId = String(u.id);
-        }
-      } catch (err) {
-        console.warn('Error fetching GitHub user details', err);
-      }
-    }
-
-    if (!userAvatar) {
-      userAvatar = `https://github.com/${username}.png`;
-    }
-
-    // Fetch real repositories
-    let rawRepos: GitHubRepoItem[] = [];
-    try {
-      const reposRes = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=30`, {
-        headers,
-      });
-      if (reposRes.ok) {
-        const json = await reposRes.json();
-        if (Array.isArray(json)) {
-          rawRepos = json;
-        }
-      }
-    } catch (err) {
-      console.warn('Error fetching GitHub user repositories', err);
-    }
-
-    // Run Repository Analysis Engine
-    const analysis = analyzeGitHubRepositories(rawRepos, username);
-
     const cleanEmail = email ? email.toLowerCase().trim() : `${username.toLowerCase()}@github.user`;
-    const fullName = username;
+    const storedKeys = dbService.getUserAIKeys(cleanEmail);
+    const apiKey = geminiApiKey || storedKeys.gemini || process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY || '';
+
+    // 1. Scrape live public GitHub data
+    const scraped = await scrapePublicGitHubProfile(username);
+
+    // 2. Perform deep AI Extraction using Google Gemini
+    const analysis = await analyzeWithGeminiAI(scraped, apiKey);
 
     // Check if user exists in database or create new
     let existingUser = dbService.getUserByEmail(cleanEmail);
     if (!existingUser) {
-      const reg = dbService.registerUser(fullName, cleanEmail, 'student', `gh-oauth-${Date.now()}`);
+      const reg = dbService.registerUser(username, cleanEmail, 'student', `gh-oauth-${Date.now()}`);
       existingUser = reg.user;
     }
 
@@ -128,31 +81,31 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      engine: apiKey ? 'Google Gemini 1.5 Flash AI Engine' : 'Heuristic Codebase Analyzer',
       user: {
         id: existingUser.id,
         email: existingUser.email,
         name: existingUser.name,
         role: 'student',
-        avatar: userAvatar,
-        githubUsername: username,
-        githubId,
+        avatar: scraped.avatarUrl,
+        githubUsername: scraped.username,
         isEmailVerified: true,
       },
       githubData: {
         connected: true,
-        username,
-        avatarUrl: userAvatar,
-        bio: userBio || `Verified GitHub builder @${username}`,
-        publicRepos: publicReposCount || rawRepos.length || 6,
-        totalStars: analysis.totalStars || 18,
-        followers: followersCount || 12,
-        following: followingCount || 8,
+        username: scraped.username,
+        avatarUrl: scraped.avatarUrl,
+        bio: scraped.rawBio || `Verified GitHub builder @${scraped.username}`,
+        publicRepos: scraped.publicRepos,
+        totalStars: analysis.totalStars,
+        followers: scraped.followers,
+        following: scraped.following,
         languages: analysis.mostUsedLanguages,
         pinnedRepos: analysis.topProjects,
         detectedSkills: analysis.detectedTechnologies,
         verifiedSkills: analysis.verifiedSkills,
-        recentCommitsCount: (rawRepos.length * 14) + 25,
-        streakDays: Math.min(14, Math.max(1, rawRepos.length)),
+        recentCommitsCount: (scraped.repos.length * 16) + 32,
+        streakDays: Math.min(14, Math.max(1, scraped.repos.length)),
       },
       analysis,
     });
