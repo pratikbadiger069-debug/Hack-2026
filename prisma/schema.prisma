@@ -1,0 +1,386 @@
+// SkillBridge AI - Enterprise Prisma Schema
+// Supports Neon PostgreSQL & SQLite via DATABASE_URL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  INSTITUTE
+  INDUSTRY
+  ADMIN
+}
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum PipelineStage {
+  MATCHED
+  SHORTLISTED
+  ASSESSMENT
+  INTERVIEW
+  SELECTED
+}
+
+enum OpportunityType {
+  INTERNSHIP
+  JOB
+  SCHOLARSHIP
+  HACKATHON
+  RESEARCH
+  STARTUP
+  CHALLENGE
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String?
+  name          String
+  avatar        String?
+  role          Role      @default(STUDENT)
+  isDemoUser    Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  studentProfile  Student?
+  instituteProfile Institute?
+  companyProfile  Company?
+  aiKeys          AIProviderKey[]
+  auditLogs       AuditLog[]
+  notifications   Notification[]
+
+  @@map("users")
+}
+
+model Student {
+  id            String    @id @default(uuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  college       String
+  department    String
+  year          String
+  semester      String
+  cgpa          Float
+  studentIdNumber String?
+  headline      String?
+  bio           String?
+  targetRole    String    @default("AI Engineer")
+  employabilityScore Int  @default(0)
+
+  // Social Links
+  githubUrl     String?
+  linkedinUrl   String?
+  portfolioUrl  String?
+  kaggleUrl     String?
+  leetcodeUrl   String?
+  hackerrankUrl String?
+  codechefUrl   String?
+  behanceUrl    String?
+  dribbbleUrl   String?
+
+  builderPassport BuilderPassport?
+  verifiedSkills  SkillPassport[]
+  projects        Project[]
+  certifications  Certification[]
+  assessmentResults AssessmentResult[]
+  applications    Application[]
+  assignmentSubmissions AssignmentSubmission[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("students")
+}
+
+model Institute {
+  id            String    @id @default(uuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  code          String?
+  location      String?
+  accreditation String?   // NBA, NAAC, ABET
+  deanName      String?
+  deanEmail     String?
+  curriculums   Curriculum[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("institutes")
+}
+
+model Company {
+  id            String    @id @default(uuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  industry      String?
+  website       String?
+  logoUrl       String?
+  location      String?
+  jobs          Job[]
+  assignments   Assignment[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("companies")
+}
+
+model BuilderPassport {
+  id            String    @id @default(uuid())
+  studentId     String    @unique
+  student       Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  overallScore  Int       @default(0) // 0 - 1000
+  execution     Int       @default(0) // 0 - 100
+  leadership    Int       @default(0)
+  innovation    Int       @default(0)
+  problemSolving Int      @default(0)
+  consistency   Int       @default(0)
+  evidenceHash  String?
+  updatedAt     DateTime  @updatedAt
+
+  @@map("builder_passports")
+}
+
+model SkillPassport {
+  id            String        @id @default(uuid())
+  studentId     String
+  student       Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  skillName     String
+  category      String
+  level         SkillLevel    @default(BEGINNER)
+  score         Int           @default(0)
+  verificationCode String    @unique
+  verifiedDate  DateTime      @default(now())
+  sources       String[]      // Assessment, Project, Certification, Faculty Validation
+
+  @@map("skill_passports")
+}
+
+model Project {
+  id            String    @id @default(uuid())
+  studentId     String
+  student       Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title         String
+  description   String
+  repoUrl       String?
+  liveUrl       String?
+  techStack     String[]
+  impactScore   Int       @default(0)
+  verified      Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+
+  @@map("projects")
+}
+
+model Certification {
+  id            String    @id @default(uuid())
+  studentId     String
+  student       Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title         String
+  issuer        String
+  issueDate     String?
+  credentialUrl String?
+  verified      Boolean   @default(false)
+
+  @@map("certifications")
+}
+
+model Assessment {
+  id            String    @id @default(uuid())
+  title         String
+  category      String
+  durationMins  Int
+  passingScore  Int
+  difficulty    String
+  skillsTested  String[]
+  questions     Json?     // Array of MCQs
+  results       AssessmentResult[]
+
+  createdAt     DateTime  @default(now())
+
+  @@map("assessments")
+}
+
+model AssessmentResult {
+  id            String      @id @default(uuid())
+  studentId     String
+  student       Student     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  assessmentId  String
+  assessment    Assessment  @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  score         Int
+  percentile    Float?
+  completedAt   DateTime    @default(now())
+
+  @@map("assessment_results")
+}
+
+model Curriculum {
+  id            String      @id @default(uuid())
+  instituteId   String
+  institute     Institute   @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  title         String
+  department    String
+  semester      String
+  rawSyllabusText String?   @db.Text
+  analysis      CurriculumAnalysis?
+
+  createdAt     DateTime    @default(now())
+
+  @@map("curriculums")
+}
+
+model CurriculumAnalysis {
+  id            String      @id @default(uuid())
+  curriculumId  String      @unique
+  curriculum    Curriculum  @relation(fields: [curriculumId], references: [id], onDelete: Cascade)
+  relevanceScore Int        @default(0)
+  missingTopics Json        // Array of missing topics
+  outdatedTopics Json       // Array of outdated topics
+  improvements  Json        // Recommendations
+  analyzedAt    DateTime    @default(now())
+
+  @@map("curriculum_analysis")
+}
+
+model Job {
+  id            String        @id @default(uuid())
+  companyId     String
+  company       Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  title         String
+  department    String?
+  experience    String
+  location      String
+  salaryRange   String?
+  minMatchScore Int           @default(70)
+  requiredSkills String[]
+  preferredSkills String[]
+  status        String        @default("Active")
+  applications  Application[]
+  createdAt     DateTime      @default(now())
+
+  @@map("jobs")
+}
+
+model Application {
+  id            String        @id @default(uuid())
+  jobId         String
+  job           Job           @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  studentId     String
+  student       Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  matchScore    Int           @default(0)
+  stage         PipelineStage @default(MATCHED)
+  appliedAt     DateTime      @default(now())
+
+  @@map("applications")
+}
+
+model Assignment {
+  id            String        @id @default(uuid())
+  companyId     String
+  company       Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  title         String
+  type          String        // Coding Challenge, Case Study, Mini Project
+  roleTarget    String
+  duration      String
+  dueDate       DateTime?
+  submissions   AssignmentSubmission[]
+  createdAt     DateTime      @default(now())
+
+  @@map("assignments")
+}
+
+model AssignmentSubmission {
+  id            String      @id @default(uuid())
+  assignmentId  String
+  assignment    Assignment  @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  studentId     String
+  student       Student     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  submissionUrl String
+  score         Int?
+  feedback      String?
+  submittedAt   DateTime    @default(now())
+
+  @@map("assignment_submissions")
+}
+
+model Opportunity {
+  id            String          @id @default(uuid())
+  title         String
+  organization  String
+  category      OpportunityType @default(INTERNSHIP)
+  stipendOrPrize String?
+  deadline      String?
+  location      String?
+  description   String          @db.Text
+  linkUrl       String?
+  createdAt     DateTime        @default(now())
+
+  @@map("opportunities")
+}
+
+model IndustryTrend {
+  id            String    @id @default(uuid())
+  skill         String    @unique
+  category      String
+  demandScore   Int
+  growthRateYoY Float
+  avgSalary     String
+  openRolesCount Int
+  updatedAt     DateTime  @updatedAt
+
+  @@map("industry_trends")
+}
+
+model Notification {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title         String
+  message       String
+  category      String
+  isRead        Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+
+  @@map("notifications")
+}
+
+model AuditLog {
+  id            String    @id @default(uuid())
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action        String
+  entityType    String
+  entityId      String?
+  ipAddress     String?
+  metadata      Json?
+  createdAt     DateTime  @default(now())
+
+  @@map("audit_logs")
+}
+
+model AIProviderKey {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider      String    // gemini, openai, claude
+  encryptedKey  String
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+
+  @@unique([userId, provider])
+  @@map("ai_provider_keys")
+}

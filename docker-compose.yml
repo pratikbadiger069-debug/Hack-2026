@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # Frontend Application
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: skillbridge-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://skillbridge:skillbridge_secret@db:5432/skillbridge_ai?schema=public
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - db
+      - backend
+
+  # FastAPI Backend Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: skillbridge-backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://skillbridge:skillbridge_secret@db:5432/skillbridge_ai
+    depends_on:
+      - db
+
+  # PostgreSQL Database with pgvector
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: skillbridge-db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: skillbridge
+      POSTGRES_PASSWORD: skillbridge_secret
+      POSTGRES_DB: skillbridge_ai
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
