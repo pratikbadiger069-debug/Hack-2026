@@ -60,6 +60,11 @@ export const CLEAN_SCRATCH_STUDENT_PROFILE: StudentProfile = {
   evidences: [],
 };
 
+export type FullProfileUpdates = Partial<Omit<StudentProfile, 'academic' | 'professional'>> & {
+  academic?: Partial<StudentProfile['academic']>;
+  professional?: Partial<StudentProfile['professional']>;
+};
+
 interface AppState {
   // Auth & Mode State
   isDemoMode: boolean;
@@ -88,6 +93,7 @@ interface AppState {
   updateStudentTargetRole: (role: string) => void;
   updateStudentAcademic: (academic: Partial<StudentProfile['academic']>) => void;
   updateStudentSocials: (socials: Partial<StudentProfile['professional']>) => void;
+  updateStudentFullProfile: (updates: FullProfileUpdates) => void;
   addVerifiedSkill: (skillName: string, level: any, category: any) => void;
   addBuilderEvidence: (evidence: any) => void;
   applyForInternship: (internshipId: string) => void;
@@ -318,6 +324,48 @@ export const useAppStore = create<AppState>()(
             }).catch(() => {});
           }
           return {
+            studentProfile: updated,
+            userProfilesByEmail: email
+              ? { ...state.userProfilesByEmail, [email]: updated }
+              : state.userProfilesByEmail,
+          };
+        }),
+
+      updateStudentFullProfile: (updates) =>
+        set((state) => {
+          const updated: StudentProfile = {
+            ...state.studentProfile,
+            ...updates,
+            academic: {
+              ...state.studentProfile.academic,
+              ...(updates.academic || {}),
+            },
+            professional: {
+              ...state.studentProfile.professional,
+              ...(updates.professional || {}),
+            },
+          };
+
+          const email = (updates.email || state.studentProfile.email || state.currentUser?.email || '').toLowerCase().trim();
+          if (email && !state.isDemoMode) {
+            fetch('/api/students/profile', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, ...updates }),
+            }).catch(() => {});
+          }
+
+          const updatedUser = state.currentUser
+            ? {
+                ...state.currentUser,
+                name: updates.name || state.currentUser.name,
+                linkedInName: updates.linkedInName || state.currentUser.linkedInName,
+                googleName: updates.googleName || state.currentUser.googleName,
+              }
+            : state.currentUser;
+
+          return {
+            currentUser: updatedUser,
             studentProfile: updated,
             userProfilesByEmail: email
               ? { ...state.userProfilesByEmail, [email]: updated }

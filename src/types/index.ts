@@ -81,6 +81,8 @@ export interface StudentProfile {
   email: string;
   avatar: string;
   headline: string;
+  linkedInName?: string;
+  googleName?: string;
   academic: AcademicDetails;
   professional: ProfessionalDetails;
   builderScores: BuilderScores;

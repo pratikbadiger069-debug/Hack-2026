@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { UserRole } from '@/types';
+import { getUserDisplayName } from '@/lib/user-utils';
 import {
   Sparkles,
   ArrowRight,
@@ -30,7 +31,7 @@ import {
 
 export default function LandingPage() {
   const router = useRouter();
-  const { setRole, setDemoMode } = useAppStore();
+  const { setRole, setDemoMode, currentUser, studentProfile } = useAppStore();
 
   const handleLaunchDemo = (role: UserRole = 'student') => {
     setDemoMode(true);
@@ -228,18 +229,31 @@ export default function LandingPage() {
               <Play className="w-3 h-3 fill-current" />
               <span>View Demo</span>
             </button>
-            <Link
-              href="/login"
-              className="px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:text-slate-900 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-            >
-              Login
-            </Link>
-            <Link
-              href="/register"
-              className="px-3.5 py-1.5 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-xs"
-            >
-              Register
-            </Link>
+
+            {currentUser ? (
+              <Link
+                href={`/${currentUser.role}`}
+                className="px-3.5 py-1.5 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-xs flex items-center gap-1.5"
+              >
+                <span>Dashboard ({getUserDisplayName({ user: currentUser, profile: studentProfile })})</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:text-slate-900 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/register"
+                  className="px-3.5 py-1.5 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-xs"
+                >
+                  Register
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>

@@ -897,6 +897,30 @@
   },
   "auditLogs": [
     {
+      "id": "log-1789135333668",
+      "timestamp": "2026-09-11T14:02:13.668Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789134946456",
+      "timestamp": "2026-09-11T13:55:46.456Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789131572631",
+      "timestamp": "2026-09-11T12:59:32.631Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
       "id": "log-1789126014684",
       "timestamp": "2026-09-11T11:26:54.684Z",
       "action": "USER_LOGIN_SUCCESS",

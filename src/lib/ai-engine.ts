@@ -23,34 +23,21 @@ export async function generateCopilotAnalysis({
   provider,
   apiKey,
 }: GenerateCopilotParams): Promise<CopilotAnalysisResult> {
-  // If user provided a valid API key, we call the selected provider endpoint directly
-  if (apiKey && apiKey.trim().length > 10) {
+  if (apiKey && apiKey.trim().length > 8) {
     try {
-      if (provider === 'gemini') {
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [
-                {
-                  parts: [
-                    {
-                      text: `You are an elite enterprise Workforce & Career Intelligence AI.
-Analyze the following student profile for their target career role: "${targetRole}".
-Student Details:
+      const systemPrompt = `You are an elite enterprise Workforce & Career Intelligence AI. Return ONLY a valid JSON object matching the requested schema. No markdown formatting.`;
+      const userPrompt = `Analyze the student profile for target role "${targetRole}":
 - Name: ${studentName}
 - Department: ${department}
 - CGPA: ${cgpa}
 - Verified Skills: ${currentSkills.join(', ')}
 - Builder Score: ${builderScore}/1000
 
-Return ONLY a valid raw JSON object (NO markdown backticks, NO extra commentary) with the following structure:
+Schema required:
 {
   "targetRole": "${targetRole}",
-  "currentReadinessScore": <number between 40 and 95>,
-  "summary": "<crisp executive assessment of current readiness and delta>",
+  "currentReadinessScore": <number between 45 and 95>,
+  "summary": "<executive summary of readiness and delta>",
   "missingSkills": ["<skill1>", "<skill2>", "<skill3>"],
   "strengths": ["<strength1>", "<strength2>"],
   "projectsNeeded": [
@@ -68,146 +55,97 @@ Return ONLY a valid raw JSON object (NO markdown backticks, NO extra commentary)
       "priority": "High"
     }
   ],
-  "estimatedTimeline": "<e.g. 10 - 14 Weeks>",
+  "estimatedTimeline": "<e.g. 8 - 12 Weeks>",
   "actionPlan": [
-    {
-      "week": "Weeks 1-3",
-      "milestone": "<Milestone>",
-      "focusArea": "<Focus>"
-    },
-    {
-      "week": "Weeks 4-7",
-      "milestone": "<Milestone>",
-      "focusArea": "<Focus>"
-    },
-    {
-      "week": "Weeks 8-12",
-      "milestone": "<Milestone>",
-      "focusArea": "<Focus>"
-    }
+    { "week": "Weeks 1-3", "milestone": "<Milestone>", "focusArea": "<Focus Area>" },
+    { "week": "Weeks 4-7", "milestone": "<Milestone>", "focusArea": "<Focus Area>" },
+    { "week": "Weeks 8-12", "milestone": "<Milestone>", "focusArea": "<Focus Area>" }
   ]
-}`
-                    }
-                  ]
-                }
-              ]
-            })
-          }
-        );
+}`;
 
-        if (response.ok) {
-          const data = await response.json();
-          const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-          const cleanedText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+      const res = await fetch('/api/ai/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ provider, apiKey: apiKey.trim(), systemPrompt, userPrompt }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.result) {
+          const cleanedText = data.result.replace(/```json/g, '').replace(/```/g, '').trim();
           const parsed = JSON.parse(cleanedText);
           return parsed as CopilotAnalysisResult;
         }
-      } else if (provider === 'openai') {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${apiKey}`,
-          },
-          body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            response_format: { type: 'json_object' },
-            messages: [
-              {
-                role: 'system',
-                content: 'You are an enterprise workforce intelligence career advisor. Output structured JSON only.',
-              },
-              {
-                role: 'user',
-                content: `Analyze readiness for target role: "${targetRole}" for candidate with skills: ${currentSkills.join(', ')} and Builder score ${builderScore}. Return JSON matching CopilotAnalysisResult schema with keys: targetRole, currentReadinessScore, summary, missingSkills, strengths, projectsNeeded, certificationsNeeded, estimatedTimeline, actionPlan.`,
-              },
-            ],
-          }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const content = data.choices?.[0]?.message?.content;
-          return JSON.parse(content) as CopilotAnalysisResult;
-        }
       }
     } catch (err) {
-      console.warn('Live AI provider call encountered error, defaulting to local intelligence engine:', err);
+      console.warn('Live server AI generation error, utilizing calibrated fallback engine:', err);
     }
   }
 
-  // Fallback Enterprise Heuristic Reasoner
+  // Calibrated Enterprise Heuristic Reasoner
   const isAI = targetRole.toLowerCase().includes('ai') || targetRole.toLowerCase().includes('machine learning');
-  const isBackend = targetRole.toLowerCase().includes('backend') || targetRole.toLowerCase().includes('distributed');
-  const isFrontend = targetRole.toLowerCase().includes('frontend') || targetRole.toLowerCase().includes('full');
+  const isCloud = targetRole.toLowerCase().includes('cloud') || targetRole.toLowerCase().includes('devops');
+  const isSecurity = targetRole.toLowerCase().includes('security') || targetRole.toLowerCase().includes('cyber');
 
-  let readiness = 82;
-  let missingSkills = ['Kubernetes & Triton Inference Engine', 'Distributed Training (FSDP / DeepSpeed)', 'Graph Neural Networks'];
+  let missingSkills = ['Distributed Systems (Raft/Paxos)', 'gRPC & Protocol Buffers', 'Redis Cache Invalidation'];
+  let strengths = ['TypeScript Core Competence', 'PostgreSQL Schema Design', 'REST API Architecture'];
   let projectsNeeded = [
     {
-      title: 'Low-Latency Speculative Decoding Inference Service',
-      description: 'Build a production C++/Python microservice integrating vLLM with batched KV-cache paged attention.',
-      techStack: ['Python', 'vLLM', 'CUDA', 'FastAPI'],
-      difficulty: 'Hard',
+      title: 'High-Throughput Distributed Rate Limiter & Message Queue',
+      description: 'Implement a token-bucket and sliding-window log rate limiter with Redis clustering and gRPC event streaming.',
+      techStack: ['Go / Node.js', 'Redis Cluster', 'gRPC', 'Docker', 'Prometheus'],
+      difficulty: 'Advanced',
     },
     {
-      title: 'Agentic RAG Pipeline with Self-Correction & LangGraph',
-      description: 'Implement multi-agent query routing with semantic caching on pgvector and real-time hallucination evaluation.',
-      techStack: ['LangGraph', 'pgvector', 'PostgreSQL', 'Docker'],
-      difficulty: 'Advanced',
+      title: 'Real-Time Telemetry Pipeline with Kafka & WebSockets',
+      description: 'Construct a pub/sub event pipeline handling 20,000 events/sec with Apache Kafka, ClickHouse analytics, and real-time dashboarding.',
+      techStack: ['TypeScript', 'Apache Kafka', 'ClickHouse', 'Next.js', 'TailwindCSS'],
+      difficulty: 'Intermediate',
     },
   ];
 
-  if (isBackend) {
-    readiness = 88;
-    missingSkills = ['Apache Kafka Partitioning', 'gRPC Protocol Buffers', 'Distributed Lock Manager (Raft / etcd)'];
+  if (isAI) {
+    missingSkills = ['LangChain / LlamaIndex Vector Pipelines', 'RAG Retrieval Optimization', 'PyTorch Tensor Operations', 'HuggingFace Transformers'];
+    strengths = ['Python Fundamentals', 'NumPy & Pandas', 'Data Modeling'];
     projectsNeeded = [
       {
-        title: 'High-Throughput Distributed Event Ledger',
-        description: 'Design a partitioned append-only write-ahead log processing 50k transactions/sec with snapshotting.',
-        techStack: ['Go / Python', 'Kafka', 'PostgreSQL', 'Docker'],
-        difficulty: 'Hard',
-      },
-      {
-        title: 'Zero-Downtime Microservice Gateway',
-        description: 'Dynamic load balancer with rate-limiting token buckets and circuit breakers.',
-        techStack: ['FastAPI', 'Redis', 'Envoy', 'Prometheus'],
+        title: 'Hybrid Multi-Vector Semantic Search & RAG Evaluation Platform',
+        description: 'Build an end-to-end RAG system utilizing Qdrant vector store, hybrid BM25 + dense embedding reranking, and automated RAGAS evaluation.',
+        techStack: ['Python', 'FastAPI', 'Qdrant / pgvector', 'LangChain', 'OpenAI / Gemini'],
         difficulty: 'Advanced',
       },
     ];
-  } else if (isFrontend) {
-    readiness = 86;
-    missingSkills = ['Server-Driven UI Architecture', 'WebAssembly Canvas Rendering', 'Core Web Vitals INP/LCP Optimization'];
+  } else if (isCloud) {
+    missingSkills = ['Terraform Infrastructure-as-Code (IaC)', 'Kubernetes Operator Pattern', 'Helm Charts', 'AWS IAM Least-Privilege'];
+    strengths = ['Docker Containerization', 'Linux Shell Scripting', 'Git Operations'];
     projectsNeeded = [
       {
-        title: 'Real-Time Collaborative Enterprise Canvas',
-        description: 'Multiplayer reactive workspace utilizing CRDTs and WebSockets with optimistic client updates.',
-        techStack: ['Next.js 15', 'TypeScript', 'WebSockets', 'Tailwind CSS'],
-        difficulty: 'Hard',
+        title: 'Multi-Region Kubernetes Ingress & Zero-Downtime Canary Engine',
+        description: 'Provision AWS EKS cluster with Terraform, configure ArgoCD GitOps, automated Canary rollouts with Flagger and Istio service mesh.',
+        techStack: ['Terraform', 'Kubernetes', 'ArgoCD', 'Istio', 'AWS EKS'],
+        difficulty: 'Advanced',
       },
     ];
   }
 
+  const baseReadiness = Math.min(94, Math.max(52, Math.round(builderScore / 11) + 20));
+
   return {
     targetRole,
-    currentReadinessScore: readiness,
-    summary: `Candidate exhibits exceptional foundational engineering velocity with a Builder Score of ${builderScore}/1000 and ${verifiedSkillsCount} verified credentials. Closing ${missingSkills.length} targeted infrastructure and systems gaps will elevate industry match to top 5th percentile.`,
+    currentReadinessScore: baseReadiness,
+    summary: `Candidate exhibits strong architectural foundations with a Builder score of ${builderScore}/1000. To reach tier-1 recruiter shortlists for ${targetRole}, focus on verified evidence across distributed synchronization and production telemetry.`,
     missingSkills,
-    strengths: [
-      'Strong core proficiency in asynchronous API engineering and database modeling',
-      'Proven hands-on hackathon execution track record and open-source contributions',
-      'High problem-solving index across verified assessment evaluations',
-    ],
+    strengths,
     projectsNeeded,
     certificationsNeeded: [
       {
-        name: isAI ? 'NVIDIA Certified Associate: Generative AI & LLMs' : 'AWS Certified Solutions Architect Associate',
-        issuer: isAI ? 'NVIDIA Deep Learning Institute' : 'Amazon Web Services',
+        name: isAI ? 'NVIDIA Certified Associate: Generative AI & LLMs' : isCloud ? 'AWS Certified Solutions Architect Associate' : 'Certified Kubernetes Application Developer (CKAD)',
+        issuer: isAI ? 'NVIDIA Deep Learning Institute' : isCloud ? 'Amazon Web Services' : 'Cloud Native Computing Foundation',
         priority: 'High',
       },
       {
-        name: 'Kubernetes and Cloud Native Associate (KCNA)',
-        issuer: 'Linux Foundation / CNCF',
+        name: 'Professional Cloud DevOps Engineer Certification',
+        issuer: 'Google Cloud / AWS',
         priority: 'Medium',
       },
     ],
@@ -243,22 +181,13 @@ export async function analyzeCurriculum({
   provider: AIProvider;
   apiKey?: string;
 }): Promise<CurriculumAnalysisResult> {
-  if (apiKey && apiKey.trim().length > 10 && provider === 'gemini') {
+  if (apiKey && apiKey.trim().length > 8) {
     try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  {
-                    text: `Analyze this academic syllabus text for ${department} against 2026 industry demand.
-Syllabus: ${syllabusText.slice(0, 4000)}
+      const systemPrompt = `You are a university dean and enterprise curriculum auditor. Output ONLY structured JSON without markdown backticks.`;
+      const userPrompt = `Analyze this academic syllabus text for ${department} against 2026 industry demand:
+${syllabusText.slice(0, 4000)}
 
-Return ONLY a valid raw JSON object matching this schema:
+Return JSON schema:
 {
   "syllabusTitle": "${department} Modernized Syllabus Analysis",
   "department": "${department}",
@@ -268,32 +197,32 @@ Return ONLY a valid raw JSON object matching this schema:
   "modernTopicsCount": <number>,
   "missingTopics": [
     {
-      "topic": "<missing cutting-edge topic>",
+      "topic": "<missing topic>",
       "importance": "Critical",
-      "industryUsagePercentage": 90,
+      "industryUsagePercentage": 92,
       "recommendedModule": "<module name>"
     }
   ],
   "outdatedTopics": ["<outdated topic 1>", "<outdated topic 2>"],
   "suggestedImprovements": ["<actionable recommendation 1>", "<actionable recommendation 2>"],
   "topSkillsCovered": ["<skill1>", "<skill2>"]
-}`
-                  }
-                ]
-              }
-            ]
-          })
-        }
-      );
+}`;
 
-      if (response.ok) {
-        const data = await response.json();
-        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        const cleanedText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-        return JSON.parse(cleanedText) as CurriculumAnalysisResult;
+      const res = await fetch('/api/ai/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ provider, apiKey: apiKey.trim(), systemPrompt, userPrompt }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.result) {
+          const cleanedText = data.result.replace(/```json/g, '').replace(/```/g, '').trim();
+          return JSON.parse(cleanedText) as CurriculumAnalysisResult;
+        }
       }
     } catch (e) {
-      console.warn('AI curriculum analysis error:', e);
+      console.warn('Server AI curriculum analysis error, using calibrated baseline:', e);
     }
   }
 
@@ -302,9 +231,9 @@ Return ONLY a valid raw JSON object matching this schema:
     syllabusTitle: `${department} - Syllabus Intelligence & Market Alignment Analysis`,
     department,
     semester: 'Academic Year 2025-2026',
-    industryRelevanceScore: 76,
+    industryRelevanceScore: 78,
     totalTopicsAnalyzed: 38,
-    modernTopicsCount: 26,
+    modernTopicsCount: 28,
     missingTopics: [
       {
         topic: 'Vector Databases & Semantic Embeddings (pgvector / HNSW)',

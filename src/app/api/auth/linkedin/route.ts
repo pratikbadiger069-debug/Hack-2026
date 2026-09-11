@@ -3,22 +3,25 @@ import { dbService } from '@/lib/server-db';
 
 export async function POST(req: NextRequest) {
   try {
-    const { linkedinUrl, email } = await req.json();
+    const { linkedinUrl, email, customName } = await req.json();
 
-    // Standardized official LinkedIn data model according to LinkedIn API specifications
-    const username = linkedinUrl ? linkedinUrl.split('/in/')[1]?.replace('/', '') : 'aarav-sharma';
-    const cleanName = username
-      ? username
-          .split('-')
-          .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-          .join(' ')
-      : 'Aarav Sharma';
+    // Parse clean username from LinkedIn URL or custom name
+    let cleanName = customName;
+    if (!cleanName && linkedinUrl) {
+      const parts = linkedinUrl.split('/in/')[1]?.replace('/', '').split('-');
+      if (parts && parts.length > 0) {
+        cleanName = parts.map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      }
+    }
+    if (!cleanName) {
+      cleanName = email ? email.split('@')[0].split('.').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'Verified Candidate';
+    }
 
     const importedLinkedInProfile = {
       fullName: cleanName,
       headline: 'Software Engineer & Distributed Systems Builder',
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
-      linkedinUrl: linkedinUrl || `https://linkedin.com/in/${username}`,
+      linkedinUrl: linkedinUrl || `https://linkedin.com/in/${cleanName.toLowerCase().replace(/\s+/g, '-')}`,
       education: {
         college: 'Stanford University',
         degree: 'Bachelor of Science in Computer Science',
@@ -39,7 +42,8 @@ export async function POST(req: NextRequest) {
 
     if (email) {
       dbService.updateStudentProfile(email, {
-        name: importedLinkedInProfile.fullName,
+        name: cleanName,
+        linkedInName: cleanName,
         headline: importedLinkedInProfile.headline,
         avatar: importedLinkedInProfile.avatar,
         academic: {

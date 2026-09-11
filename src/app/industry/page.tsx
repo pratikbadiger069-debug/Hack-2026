@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
+import { getUserDisplayName } from '@/lib/user-utils';
 import {
   Briefcase,
   Users,
@@ -39,7 +40,7 @@ export default function IndustryDashboardPage() {
 
   const orgName = isDemoMode
     ? 'Anthropic Labs Partner Network'
-    : currentUser?.company || currentUser?.name || 'Recruiter Workspace';
+    : currentUser?.company || getUserDisplayName({ user: currentUser }) || 'Recruiter Workspace';
 
   const stageCounts = {
     Matched: candidates.filter((c) => c.stage === 'Matched').length,

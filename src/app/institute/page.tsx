@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
 import { mockDepartmentMetrics, mockCandidatesPipeline } from '@/lib/mock-data';
+import { getUserDisplayName } from '@/lib/user-utils';
 import {
   Building2,
   Users,
@@ -44,7 +45,7 @@ export default function InstituteDashboardPage() {
 
   const institutionName = isDemoMode
     ? 'Apex Institute of Technology'
-    : currentUser?.institution || currentUser?.name || 'Institutional Workspace';
+    : currentUser?.institution || getUserDisplayName({ user: currentUser }) || 'Institutional Workspace';
 
   const totalStudents = isDemoMode ? 950 : 0;
   const placementReadiness = isDemoMode ? '84.6%' : 'N/A';

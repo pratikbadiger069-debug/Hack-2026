@@ -6,6 +6,7 @@ import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
 import { mockRadarData, mockProgressTrend, mockInternships } from '@/lib/mock-data';
 import { calculateProfileCompletion } from '@/lib/profile-completion';
+import { getUserFirstName, getUserDisplayName } from '@/lib/user-utils';
 import {
   Award,
   TrendingUp,
@@ -41,7 +42,7 @@ import {
 } from 'recharts';
 
 export default function StudentDashboardPage() {
-  const { studentProfile, setRole, isDemoMode } = useAppStore();
+  const { studentProfile, currentUser, setRole, isDemoMode } = useAppStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -84,7 +85,7 @@ export default function StudentDashboardPage() {
               <span className="text-xs text-slate-500">{studentProfile.academic.college || 'Not Assigned'}</span>
             </div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-              Welcome back, {studentProfile.name.split(' ')[0] || 'Builder'}
+              Welcome back, {getUserFirstName({ user: currentUser, profile: studentProfile })}
             </h1>
             <p className="text-xs text-slate-500 mt-1">
               Target Role: <span className="font-semibold text-slate-700">{studentProfile.targetRole || 'Full Stack Engineer'}</span> • Ready for 2026 Enterprise Hiring Cycle

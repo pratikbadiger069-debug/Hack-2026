@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { AIProviderModal } from '@/components/ai/AIProviderModal';
+import { getUserDisplayName } from '@/lib/user-utils';
 import {
   Sparkles,
   Bell,
@@ -185,13 +186,13 @@ export function Navbar() {
             {/* User Profile Mini Badge & Sign Out */}
             <div className="flex items-center gap-2.5 pl-2 border-l border-slate-200">
               <img
-                src={studentProfile.avatar || currentUser?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'}
-                alt={currentUser?.name || studentProfile.name}
+                src={currentUser?.avatar || studentProfile.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'}
+                alt={getUserDisplayName({ user: currentUser, profile: studentProfile })}
                 className="w-8 h-8 rounded-full object-cover ring-1 ring-slate-200"
               />
               <div className="hidden lg:flex flex-col text-left">
                 <span className="text-xs font-semibold text-slate-900 leading-tight">
-                  {currentUser?.name || studentProfile.name || 'Verified User'}
+                  {getUserDisplayName({ user: currentUser, profile: studentProfile })}
                 </span>
                 <span className="text-[10px] text-slate-500">
                   {currentUser?.email || studentProfile.email || 'Session Active'}

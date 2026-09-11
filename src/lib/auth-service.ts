@@ -10,6 +10,8 @@ export interface AuthUser {
   createdAt: string;
   company?: string;
   institution?: string;
+  linkedInName?: string;
+  googleName?: string;
   isEmailVerified?: boolean;
 }
 

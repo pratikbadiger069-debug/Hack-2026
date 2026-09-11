@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
 import { calculateVerificationAudit } from '@/lib/verification-engine';
+import { getUserDisplayName } from '@/lib/user-utils';
 import {
   GraduationCap,
   Building,
@@ -25,11 +26,12 @@ import {
 } from 'lucide-react';
 
 export default function StudentProfilePage() {
-  const { studentProfile, updateStudentAcademic, updateStudentSocials, isDemoMode } = useAppStore();
+  const { studentProfile, currentUser, updateStudentFullProfile, isDemoMode } = useAppStore();
   const [isEditing, setIsEditing] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   // Form states
+  const [name, setName] = useState(studentProfile.name || currentUser?.name || '');
   const [college, setCollege] = useState(studentProfile.academic.college || '');
   const [department, setDepartment] = useState(studentProfile.academic.department || 'CSE');
   const [cgpa, setCgpa] = useState(studentProfile.academic.cgpa || 0);
@@ -42,15 +44,19 @@ export default function StudentProfilePage() {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    updateStudentAcademic({
-      college,
-      department: department as any,
-      cgpa: Number(cgpa),
-    });
-    updateStudentSocials({
-      githubUrl,
-      linkedinUrl,
-      bio,
+    updateStudentFullProfile({
+      name: name.trim(),
+      headline: headline.trim(),
+      academic: {
+        college: college.trim(),
+        department: department as any,
+        cgpa: Number(cgpa),
+      },
+      professional: {
+        githubUrl: githubUrl.trim(),
+        linkedinUrl: linkedinUrl.trim(),
+        bio: bio.trim(),
+      },
     });
     setIsEditing(false);
     setSavedSuccess(true);
@@ -70,7 +76,9 @@ export default function StudentProfilePage() {
             />
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold text-slate-900">{studentProfile.name}</h1>
+                <h1 className="text-xl font-bold text-slate-900">
+                  {getUserDisplayName({ user: currentUser, profile: studentProfile })}
+                </h1>
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                   {audit.trustTier.replace(/_/g, ' ')}
                 </span>
@@ -164,11 +172,24 @@ export default function StudentProfilePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Full Legal Name</label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. Pratik Badiger"
+                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-600 font-semibold"
+                />
+              </div>
+
+              <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Headline</label>
                 <input
                   type="text"
                   value={headline}
                   onChange={(e) => setHeadline(e.target.value)}
+                  placeholder="e.g. Full Stack & AI Systems Engineer"
                   className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-600"
                 />
               </div>

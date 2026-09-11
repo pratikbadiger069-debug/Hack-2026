@@ -11,6 +11,10 @@ export interface DBUser {
   role: UserRole;
   passwordHash: string;
   avatar: string;
+  linkedInName?: string;
+  googleName?: string;
+  company?: string;
+  institution?: string;
   isDemoUser: boolean;
   isEmailVerified: boolean;
   emailVerificationToken?: string;
@@ -209,7 +213,7 @@ export const dbService = {
     const verificationToken = `vt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
     const newUser: DBUser = {
-      id: `usr-${Date.now()}`,
+      id: `usr_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
       email: cleanEmail,
       name: name || cleanEmail.split('@')[0],
       role,
@@ -398,8 +402,42 @@ export const dbService = {
     };
 
     db.studentProfiles[cleanEmail] = merged;
+
+    // Synchronize display name back to user record
+    if (db.users[cleanEmail]) {
+      if (updates.name && updates.name.trim().length > 0) {
+        db.users[cleanEmail].name = updates.name.trim();
+      }
+      if (updates.linkedInName) {
+        db.users[cleanEmail].linkedInName = updates.linkedInName.trim();
+      }
+      if (updates.googleName) {
+        db.users[cleanEmail].googleName = updates.googleName.trim();
+      }
+      db.users[cleanEmail].updatedAt = new Date().toISOString();
+    }
+
     saveDb(db);
     return merged;
+  },
+
+  auditAndRepairDatabase: () => {
+    const db = ensureDbFile();
+    let repaired = 0;
+
+    // Check all users have profiles
+    Object.keys(db.users).forEach((email) => {
+      const u = db.users[email];
+      if (u.role === 'student' && !db.studentProfiles[email]) {
+        db.studentProfiles[email] = createCleanStudentProfile(u.name, email);
+        repaired++;
+      }
+    });
+
+    if (repaired > 0) {
+      saveDb(db);
+    }
+    return { status: 'Database integrity verified', repairedCount: repaired };
   },
 
   addStudentEvidence: (email: string, evidence: any): StudentProfile => {

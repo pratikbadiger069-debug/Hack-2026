@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
 import { mockSkillDemandMetrics } from '@/lib/mock-data';
+import { getUserDisplayName } from '@/lib/user-utils';
 import {
   ShieldCheck,
   Users,
@@ -26,7 +27,7 @@ import {
 } from 'recharts';
 
 export default function AdminDashboardPage() {
-  const { setRole } = useAppStore();
+  const { setRole, currentUser, isDemoMode } = useAppStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -55,7 +56,9 @@ export default function AdminDashboardPage() {
                 Global Network Administration
               </span>
               <span className="text-xs text-slate-400">•</span>
-              <span className="text-xs text-slate-500">Master Governance Console</span>
+              <span className="text-xs text-slate-500 font-medium">
+                {isDemoMode ? 'Master Governance Console' : getUserDisplayName({ user: currentUser })}
+              </span>
             </div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
               SkillBridge AI Global Intelligence
