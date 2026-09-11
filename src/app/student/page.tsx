@@ -39,26 +39,17 @@ export default function StudentHomePage() {
   const [mounted, setMounted] = useState(false);
   const [isEditingGoal, setIsEditingGoal] = useState(false);
   const [selectedRole, setSelectedRole] = useState(studentProfile.targetRole || 'AI Engineer');
-
-  useEffect(() => {
-    setRole('student');
-    setMounted(true);
-  }, [setRole]);
-
-  if (!mounted) return null;
-
-  const firstName = getUserFirstName({ user: currentUser, profile: studentProfile });
-  const currentHour = new Date().getHours();
-  const timeGreeting = currentHour < 12 ? 'Good Morning' : currentHour < 18 ? 'Good Afternoon' : 'Good Evening';
-
-  const context = analyzeStudentCareerContext(studentProfile, selectedRole);
-
   const [missions, setMissions] = useState([
     { id: 'm-1', title: 'Complete SQL & Database Assessment', category: 'Assessment', completed: true, xp: 120 },
     { id: 'm-2', title: 'Build Expense Tracker API with Docker', category: 'Project', completed: false, xp: 350 },
     { id: 'm-3', title: 'Connect & Verify GitHub Activity Graph', category: 'Profile', completed: true, xp: 80 },
     { id: 'm-4', title: 'Optimize LinkedIn Headline & Skills', category: 'Profile', completed: false, xp: 100 },
   ]);
+
+  useEffect(() => {
+    setRole('student');
+    setMounted(true);
+  }, [setRole]);
 
   const toggleMission = (id: string) => {
     setMissions((prev) =>
@@ -73,6 +64,20 @@ export default function StudentHomePage() {
     updateStudentTargetRole(newRole);
     setIsEditingGoal(false);
   };
+
+  const firstName = getUserFirstName({ user: currentUser, profile: studentProfile });
+  const currentHour = mounted ? new Date().getHours() : 10;
+  const timeGreeting = currentHour < 12 ? 'Good Morning' : currentHour < 18 ? 'Good Afternoon' : 'Good Evening';
+
+  const context = analyzeStudentCareerContext(studentProfile, selectedRole);
+
+  if (!mounted) {
+    return (
+      <PortalLayout>
+        <div className="p-8 text-center text-xs text-slate-500">Loading Student Command Center...</div>
+      </PortalLayout>
+    );
+  }
 
   const sampleRoles = Object.keys(ROLE_BENCHMARKS);
 
