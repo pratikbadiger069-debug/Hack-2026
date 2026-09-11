@@ -148,6 +148,19 @@
       "emailVerificationToken": "vt_1789154371055_dbbhqa4",
       "createdAt": "2026-09-11T19:19:31.055Z",
       "updatedAt": "2026-09-11T19:19:31.055Z"
+    },
+    "pratik.badige12r@gmail.com": {
+      "id": "usr_1789161544074_trgl0y0",
+      "email": "pratik.badige12r@gmail.com",
+      "name": "Pranitha12",
+      "role": "student",
+      "passwordHash": "$2b$12$BH7CFZ.jOrwfouzm7hG7aOohT1fQ8ssQAOiyrZPmhcV.lm2eA/rnO",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      "isDemoUser": false,
+      "isEmailVerified": false,
+      "emailVerificationToken": "vt_1789161544074_b4dy27b",
+      "createdAt": "2026-09-11T21:19:04.074Z",
+      "updatedAt": "2026-09-11T21:23:55.000Z"
     }
   },
   "studentProfiles": {
@@ -1010,6 +1023,137 @@
       "employabilityScore": 0,
       "verifiedSkills": [],
       "evidences": []
+    },
+    "pratik.badige12r@gmail.com": {
+      "id": "std-1789161544074-wau6g",
+      "name": "Pranitha12",
+      "email": "pratik.badige12r@gmail.com",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      "headline": "Software Development Candidate | Hyderabad Institute of Technology and Management '29",
+      "targetRole": "Software Development",
+      "academic": {
+        "college": "Hyderabad Institute of Technology and Management",
+        "department": "CSE",
+        "year": "1st Year",
+        "semester": "3rd Semester",
+        "cgpa": 8.5,
+        "studentId": "STU-2029-5768",
+        "degree": "B.Tech",
+        "branch": "CSE",
+        "graduationYear": "2029",
+        "country": "India",
+        "city": "Hyderabad"
+      },
+      "professional": {
+        "githubUrl": "https://github.com/pranitha12",
+        "linkedinUrl": "https://linkedin.com/in/pranitha12",
+        "portfolioUrl": "",
+        "bio": "Beginner builder focused on Software Development with a target goal of Job Placement.",
+        "totalProjects": 2,
+        "hackathonWins": 1,
+        "researchPapers": 0,
+        "openSourceContributions": 12,
+        "resumeUrl": "",
+        "careerPath": "Software Development",
+        "skillLevel": "Beginner",
+        "careerGoal": "Job Placement",
+        "knownSkills": [
+          "Python",
+          "C",
+          "JavaScript",
+          "Node.js"
+        ],
+        "projectCountRange": "1–2",
+        "hasHackathonExperience": true
+      },
+      "builderScores": {
+        "overall": 600,
+        "execution": 60,
+        "leadership": 70,
+        "innovation": 85,
+        "problemSolving": 78,
+        "consistency": 75
+      },
+      "employabilityScore": 72,
+      "verifiedSkills": [
+        {
+          "id": "vs-onboard-1789161834998-0",
+          "name": "Python",
+          "category": "AI & ML",
+          "level": "Beginner",
+          "score": 72,
+          "verificationSources": [
+            "Assessment",
+            "Project"
+          ],
+          "verifiedDate": "Sep 12, 2026",
+          "verificationCode": "SB-PYT-28777",
+          "evidenceCount": 1
+        },
+        {
+          "id": "vs-onboard-1789161834999-1",
+          "name": "C",
+          "category": "Programming",
+          "level": "Beginner",
+          "score": 74,
+          "verificationSources": [
+            "Assessment",
+            "Project"
+          ],
+          "verifiedDate": "Sep 12, 2026",
+          "verificationCode": "SB-C-18413",
+          "evidenceCount": 1
+        },
+        {
+          "id": "vs-onboard-1789161834999-2",
+          "name": "JavaScript",
+          "category": "Programming",
+          "level": "Beginner",
+          "score": 76,
+          "verificationSources": [
+            "Assessment",
+            "Project"
+          ],
+          "verifiedDate": "Sep 12, 2026",
+          "verificationCode": "SB-JAV-41931",
+          "evidenceCount": 1
+        },
+        {
+          "id": "vs-onboard-1789161834999-3",
+          "name": "Node.js",
+          "category": "Programming",
+          "level": "Beginner",
+          "score": 78,
+          "verificationSources": [
+            "Assessment",
+            "Project"
+          ],
+          "verifiedDate": "Sep 12, 2026",
+          "verificationCode": "SB-NOD-88147",
+          "evidenceCount": 1
+        }
+      ],
+      "evidences": [],
+      "careerReadinessScore": 72,
+      "onboardingCompleted": true,
+      "college": "Hyderabad Institute of Technology and Management",
+      "department": "CSE",
+      "branch": "CSE",
+      "degree": "B.Tech",
+      "graduationYear": "2029",
+      "country": "India",
+      "city": "Hyderabad",
+      "careerPath": "Software Development",
+      "skillLevel": "Beginner",
+      "careerGoal": "Job Placement",
+      "knownSkills": [
+        "Python",
+        "C",
+        "JavaScript",
+        "Node.js"
+      ],
+      "projectCount": "1–2",
+      "hackathonExperience": "Yes"
     }
   },
   "instituteData": {
@@ -1258,6 +1402,14 @@
     ]
   },
   "auditLogs": [
+    {
+      "id": "log-1789161544074",
+      "timestamp": "2026-09-11T21:19:04.074Z",
+      "action": "USER_REGISTERED_BCRYPT",
+      "userId": "usr_1789161544074_trgl0y0",
+      "role": "STUDENT",
+      "details": "Registered new verified student identity: pratik.badige12r@gmail.com"
+    },
     {
       "id": "log-1789160992146",
       "timestamp": "2026-09-11T21:09:52.146Z",
