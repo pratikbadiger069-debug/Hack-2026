@@ -112,6 +112,11 @@ export interface GitHubData {
   detectedSkills: string[];
   recentCommitsCount: number;
   streakDays: number;
+  // Aliases for Builder OS V5
+  repositories?: { name: string; description: string; stars: number; language: string; url: string; lastUpdated: string }[];
+  starsCount?: number;
+  followersCount?: number;
+  inferredSkills?: { skill: string; confidence: number; sourceRepo: string }[];
 }
 
 export interface AchievementBadge {
@@ -135,8 +140,10 @@ export interface QuestQuestion {
   id: string;
   question: string;
   codeSnippet?: string;
-  options: QuestOption[];
+  options: QuestOption[] | string[];
+  correctAnswer?: number;
   explanation: string;
+  topic?: string;
 }
 
 export interface LearningQuest {
@@ -161,6 +168,9 @@ export interface LearningQuest {
   description: string;
   skillsGained: string[];
   completed: boolean;
+  status?: 'completed' | 'in_progress' | 'locked';
+  pathId?: string;
+  skillCategory?: string;
   isBossChallenge?: boolean;
   portfolioImpact?: string;
   questions?: QuestQuestion[];
@@ -183,6 +193,9 @@ export interface LearningPath {
   totalSteps: number;
   completedSteps: number;
   steps: LearningPathStep[];
+  // Aliases
+  category?: string;
+  milestones?: LearningPathStep[];
 }
 
 export interface StudentProfile {
@@ -200,6 +213,10 @@ export interface StudentProfile {
   verifiedSkills: VerifiedSkill[];
   evidences: BuilderEvidence[];
   targetRole: string;
+  // Aliases for Builder OS V5
+  college?: string;
+  skills?: { name: string; score: number; level: string; category: string; verified: boolean }[];
+  projects?: { id: string; title: string; description: string; techStack: string[]; verified: boolean; githubUrl?: string }[];
 }
 
 export interface AssessmentQuestion {

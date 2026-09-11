@@ -6,15 +6,15 @@ import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { AIProviderModal } from '@/components/ai/AIProviderModal';
 import { getUserDisplayName } from '@/lib/user-utils';
+import { getLevelInfo } from '@/lib/xp-engine';
 import {
   Sparkles,
   Search,
-  Moon,
-  Sun,
-  Laptop,
   LogOut,
   Compass,
   CheckCircle2,
+  Flame,
+  ShieldCheck,
 } from 'lucide-react';
 
 function GithubIcon({ className = 'w-3.5 h-3.5' }: { className?: string }) {
@@ -38,10 +38,7 @@ export function Navbar() {
     activeProvider,
     studentProfile,
     xp,
-    level,
     streakDays,
-    colorMode,
-    setColorMode,
     githubData,
   } = useAppStore();
 
@@ -68,31 +65,24 @@ export function Navbar() {
   };
 
   const displayName = getUserDisplayName({ user: currentUser, profile: studentProfile });
-  const xpInCurrentLevel = xp % 1000;
-  const levelTarget = 1000;
-
-  const cycleColorMode = () => {
-    if (colorMode === 'light') setColorMode('dark');
-    else if (colorMode === 'dark') setColorMode('system');
-    else setColorMode('light');
-  };
+  const levelInfo = getLevelInfo(xp);
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full bg-[#FFFFFF]/95 dark:bg-[#161B22]/95 backdrop-blur-md border-b border-[#E6E4DD] dark:border-[#2D333B] transition-colors">
+      <header className="sticky top-0 z-40 w-full bg-[#FFFFFF]/90 backdrop-blur-md border-b border-[#E8E5DD] transition-colors">
         <div className="flex items-center justify-between h-14 px-4 sm:px-6 max-w-[1440px] mx-auto">
           {/* Brand Identity */}
           <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-[#1F2328] dark:bg-[#F0F6FC] flex items-center justify-center text-white dark:text-[#0F1115] font-semibold text-xs shadow-xs">
-                <Compass className="w-3.5 h-3.5 text-white dark:text-[#0F1115]" />
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="w-8 h-8 rounded-xl bg-[#1B1B1B] flex items-center justify-center text-white font-semibold text-xs shadow-xs group-hover:bg-[#C76A2A] transition-colors">
+                <Compass className="w-4 h-4 text-white" />
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="font-semibold text-[#1F2328] dark:text-[#F0F6FC] tracking-tight text-sm">
+                <span className="font-bold text-[#1B1B1B] tracking-tight text-sm">
                   SKILLBRIDGE
                 </span>
-                <span className="text-[11px] text-[#656D76] dark:text-[#8B949E] hidden sm:inline">
-                  Workforce Intelligence
+                <span className="text-[11px] text-[#6F6A60] hidden sm:inline font-medium">
+                  Builder OS
                 </span>
               </div>
             </Link>
@@ -101,74 +91,74 @@ export function Navbar() {
           {/* Center Search Input */}
           <div className="hidden md:flex items-center flex-1 max-w-sm mx-6">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8C959F] dark:text-[#6E7681]" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#6F6A60]" />
               <input
                 type="text"
-                placeholder="Search skills, challenges, peer builders..."
-                className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg focus:outline-none focus:border-blue-500 text-[#1F2328] dark:text-[#F0F6FC] placeholder:text-[#8C959F] dark:placeholder:text-[#6E7681] transition-colors"
+                placeholder="Search verified skills, challenges, tracks..."
+                className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#F6F4EE] border border-[#E8E5DD] rounded-xl focus:outline-none focus:border-[#C76A2A] text-[#1B1B1B] placeholder:text-[#6F6A60] transition-colors"
               />
             </div>
           </div>
 
           {/* Right Controls */}
           <div className="flex items-center gap-2.5 sm:gap-3">
-            {/* Level & XP Minimal Capsule */}
+            {/* Level & XP Capsule */}
             <Link
               href="/student/journey"
-              className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] text-xs font-medium text-[#1F2328] dark:text-[#F0F6FC] hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+              className="flex items-center gap-2 px-3 py-1 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD] text-xs font-semibold text-[#1B1B1B] hover:border-[#C76A2A] transition-all shadow-xs"
             >
-              <span>Level {level} Builder</span>
-              <span className="text-[#8C959F] dark:text-[#6E7681] font-mono text-[11px]">
-                {xpInCurrentLevel} / {levelTarget} XP
+              <span>Lvl {levelInfo.level} {levelInfo.title}</span>
+              <span className="text-[#C76A2A] font-mono text-[11px]">
+                {xp} XP
               </span>
             </Link>
 
-            {/* GitHub Connected Indicator */}
-            {githubData.connected && (
-              <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] text-xs text-[#1F2328] dark:text-[#F0F6FC]">
-                <GithubIcon className="w-3.5 h-3.5 text-[#1F2328] dark:text-[#F0F6FC]" />
+            {/* Daily Streak */}
+            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD] text-xs font-medium text-[#1B1B1B]">
+              <Flame className="w-3.5 h-3.5 text-[#C76A2A]" />
+              <span className="font-mono text-[11px]">{streakDays}d streak</span>
+            </div>
+
+            {/* GitHub Sync Status */}
+            {githubData.connected ? (
+              <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD] text-xs text-[#1B1B1B]">
+                <GithubIcon className="w-3.5 h-3.5 text-[#1B1B1B]" />
                 <span className="font-mono text-[11px]">@{githubData.username}</span>
-                <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#2F7A45]" />
               </div>
+            ) : (
+              <Link
+                href="/student/journey#github"
+                className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white border border-[#E8E5DD] text-xs text-[#6F6A60] hover:text-[#1B1B1B] hover:border-[#C76A2A] transition-colors"
+              >
+                <GithubIcon className="w-3.5 h-3.5 text-[#6F6A60]" />
+                <span className="text-[11px]">Connect GitHub</span>
+              </Link>
             )}
 
-            {/* Light / Dark / System Mode Toggle */}
-            <button
-              onClick={cycleColorMode}
-              className="p-1.5 rounded-lg text-[#656D76] dark:text-[#8B949E] hover:text-[#1F2328] dark:hover:text-[#F0F6FC] hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-              title={`Current: ${colorMode} mode (Click to switch)`}
-            >
-              {mounted && colorMode === 'dark' ? (
-                <Moon className="w-4 h-4 text-blue-400" />
-              ) : mounted && colorMode === 'system' ? (
-                <Laptop className="w-4 h-4 text-[#8C959F]" />
-              ) : (
-                <Sun className="w-4 h-4 text-amber-600" />
-              )}
-            </button>
-
-            {/* AI Engine Status */}
+            {/* AI Provider Status */}
             <button
               onClick={() => setIsAiModalOpen(true)}
-              className="hidden md:flex px-2.5 py-1 bg-[#FAF9F5] dark:bg-[#0F1115] hover:bg-[#F0EEE6] dark:hover:bg-[#1C2128] text-[#1F2328] dark:text-[#F0F6FC] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg text-xs font-medium items-center gap-1.5 transition-colors"
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium border transition-colors ${
+                hasKey
+                  ? 'bg-white border-[#E8E5DD] text-[#1B1B1B] hover:border-[#C76A2A]'
+                  : 'bg-[#C76A2A]/10 border-[#C76A2A]/30 text-[#C76A2A] hover:bg-[#C76A2A]/20'
+              }`}
             >
-              <Sparkles className="w-3 h-3 text-blue-600 dark:text-blue-400" />
-              <span className="capitalize">{activeProvider}</span>
-              {hasKey && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />}
+              <Sparkles className="w-3.5 h-3.5 text-[#C76A2A]" />
+              <span className="hidden sm:inline capitalize">{activeProvider}</span>
             </button>
 
-            {/* User Profile Avatar */}
-            <div className="flex items-center gap-2 pl-2 border-l border-[#E6E4DD] dark:border-[#2D333B]">
-              <img
-                src={currentUser?.avatar || studentProfile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
-                alt={displayName}
-                className="w-6 h-6 rounded-full object-cover border border-[#E6E4DD] dark:border-[#2D333B]"
-              />
+            {/* User Avatar & Logout */}
+            <div className="flex items-center gap-2 pl-2 border-l border-[#E8E5DD]">
+              <div className="w-7 h-7 rounded-xl bg-[#1B1B1B] text-white flex items-center justify-center font-bold text-xs">
+                {displayName.charAt(0).toUpperCase()}
+              </div>
               <button
                 onClick={handleLogout}
                 disabled={isLoggingOut}
                 title="Sign Out"
-                className="p-1 text-[#8C959F] dark:text-[#6E7681] hover:text-[#1F2328] dark:hover:text-[#F0F6FC] rounded transition-colors"
+                className="p-1.5 text-[#6F6A60] hover:text-[#C76A2A] rounded-xl hover:bg-black/5 transition-colors"
               >
                 <LogOut className="w-3.5 h-3.5" />
               </button>

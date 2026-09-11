@@ -6,20 +6,34 @@ import { motion } from 'framer-motion';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
 import { getUserFirstName } from '@/lib/user-utils';
+import { getLevelInfo, calculateTransparentBuilderScore } from '@/lib/xp-engine';
 import { analyzeStudentCareerContext, ROLE_BENCHMARKS } from '@/lib/copilot-engine';
 import {
   Target,
   ArrowRight,
-  CheckCircle2,
+  ShieldCheck,
   Bot,
-  Briefcase,
-  Layers,
-  ArrowUpRight,
-  Award,
-  Sparkles,
-  ChevronRight,
-  Code2,
+  Calendar,
 } from 'lucide-react';
+
+const mockOpportunities = [
+  {
+    id: 'opp-1',
+    title: 'Distributed Backend Infrastructure Intern',
+    company: 'Razorpay Systems',
+    location: 'Bengaluru, India',
+    matchScore: 94,
+    skills: ['Java', 'SQL', 'Docker', 'REST APIs'],
+  },
+  {
+    id: 'opp-2',
+    title: 'Systems & Cloud Platform Engineer',
+    company: 'Postman Platform',
+    location: 'Remote / Bengaluru',
+    matchScore: 91,
+    skills: ['REST APIs', 'Docker', 'Git'],
+  },
+];
 
 export default function StudentHomePage() {
   const {
@@ -28,11 +42,9 @@ export default function StudentHomePage() {
     setRole,
     updateStudentTargetRole,
     xp,
-    level,
     streakDays,
-    rankings,
     quests,
-    completeQuest,
+    githubData,
   } = useAppStore();
 
   const [mounted, setMounted] = useState(false);
@@ -50,22 +62,38 @@ export default function StudentHomePage() {
     setIsEditingGoal(false);
   };
 
-  const handleQuickChallengeComplete = (questId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    completeQuest(questId);
-  };
-
   const firstName = getUserFirstName({ user: currentUser, profile: studentProfile });
+  const levelInfo = getLevelInfo(xp);
+  const builderScoreData = calculateTransparentBuilderScore({
+    verifiedSkillsCount: (studentProfile.verifiedSkills || []).length,
+    projectsCount: (studentProfile.evidences || []).length,
+    githubConnected: githubData.connected,
+    githubReposCount: (githubData.pinnedRepos || []).length,
+    consistencyStreakDays: streakDays,
+    completedChallengesCount: (quests || []).filter((q) => q.completed).length,
+  });
+
   const context = analyzeStudentCareerContext(studentProfile, selectedRole);
   const sampleRoles = Object.keys(ROLE_BENCHMARKS);
-  const xpInLevel = xp % 1000;
+
+  // Time-based greeting
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
+  // Top matching opportunity
+  const topOpportunity = mockOpportunities[0];
+  const primaryMissing = context.missingSkills.length > 0 ? context.missingSkills[0] : 'Distributed Caching';
 
   if (!mounted) {
     return (
       <PortalLayout>
-        <div className="py-24 text-center text-xs text-[#656D76] dark:text-[#8B949E]">
-          <div className="w-5 h-5 rounded-full border-2 border-blue-600 border-t-transparent animate-spin mx-auto mb-2" />
-          Loading command center...
+        <div className="py-24 text-center text-xs text-[#6F6A60]">
+          <div className="w-5 h-5 rounded-full border-2 border-[#C76A2A] border-t-transparent animate-spin mx-auto mb-2" />
+          Loading workspace...
         </div>
       </PortalLayout>
     );
@@ -73,272 +101,311 @@ export default function StudentHomePage() {
 
   return (
     <PortalLayout>
-      <div className="space-y-6 max-w-[1200px] mx-auto pb-12">
-        {/* Top Header & Overview */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25 }}
-          className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-[#E6E4DD] dark:border-[#2D333B]"
-        >
-          <div>
-            <h1 className="text-2xl font-semibold text-[#1F2328] dark:text-[#F0F6FC] tracking-tight">
-              Welcome back, {firstName}
-            </h1>
-            <p className="text-xs text-[#656D76] dark:text-[#8B949E] mt-0.5">
-              Your verified proof-of-work, challenges, and career intelligence.
-            </p>
-          </div>
-
-          {/* Minimal Status Capsule */}
-          <div className="flex items-center gap-3 flex-wrap">
-            <div className="px-3 py-1.5 rounded-lg bg-white dark:bg-[#161B22] border border-[#E6E4DD] dark:border-[#2D333B] text-xs">
-              <span className="text-[#656D76] dark:text-[#8B949E]">Status: </span>
-              <span className="font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
-                Level {level} Builder
-              </span>
-              <span className="text-[#8C959F] dark:text-[#6E7681] text-[11px] font-mono ml-1.5">
-                ({xp} XP)
-              </span>
-            </div>
-
-            <div className="px-3 py-1.5 rounded-lg bg-white dark:bg-[#161B22] border border-[#E6E4DD] dark:border-[#2D333B] text-xs">
-              <span className="text-[#656D76] dark:text-[#8B949E]">Rank: </span>
-              <span className="font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
-                #{rankings.collegeRank} in {rankings.collegeName}
-              </span>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Minimal Active Challenge Banner */}
+      <div className="space-y-8 max-w-[1100px] mx-auto pb-16">
+        
+        {/* Large Welcome Header */}
         <motion.div
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25, delay: 0.05 }}
-          className="p-5 rounded-xl bg-white dark:bg-[#161B22] border border-[#E6E4DD] dark:border-[#2D333B] flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs"
+          transition={{ duration: 0.2 }}
+          className="pt-2 pb-4 border-b border-[#E8E5DD]"
         >
-          <div className="space-y-1 max-w-2xl">
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] font-medium text-blue-600 dark:text-blue-400">
-                Recommended Daily Challenge
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#C76A2A] mb-1 block">
+                Builder Operating System
               </span>
-              <span className="text-[10px] font-mono text-[#656D76] dark:text-[#8B949E] px-1.5 py-0.5 rounded bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B]">
-                +50 XP
-              </span>
+              <h1 className="text-3xl md:text-4xl font-bold text-[#1B1B1B] tracking-tight">
+                {getGreeting()}, {firstName}.
+              </h1>
+              <p className="text-base text-[#6F6A60] mt-1 font-medium">
+                Let&apos;s build something meaningful today.
+              </p>
             </div>
-            <h2 className="text-base font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
-              Docker &amp; Multi-Stage Container Architecture
-            </h2>
-            <p className="text-xs text-[#656D76] dark:text-[#8B949E]">
-              Demonstrate container optimization for production deployment to address your primary skill gap for {selectedRole}.
-            </p>
-          </div>
 
-          <Link
-            href="/student/assessments"
-            className="px-4 py-2 bg-[#1F2328] dark:bg-[#F0F6FC] text-white dark:text-[#0F1115] rounded-lg text-xs font-medium hover:bg-black dark:hover:bg-white transition-colors shrink-0 flex items-center justify-center gap-1.5"
-          >
-            <span>Start Challenge</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </Link>
+            {/* Quick Builder Level Pill */}
+            <div className="flex items-center gap-3">
+              <div className="px-4 py-2 bg-white rounded-2xl border border-[#E8E5DD] shadow-xs text-xs">
+                <span className="text-[#6F6A60]">Level {levelInfo.level} Builder • </span>
+                <span className="font-semibold text-[#1B1B1B]">{levelInfo.title}</span>
+                <span className="font-mono text-[#C76A2A] font-semibold ml-2">#{levelInfo.rank} Rank</span>
+              </div>
+            </div>
+          </div>
         </motion.div>
 
-        {/* 2-Column Dashboard Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-          {/* Left Column (7 cols) */}
-          <div className="md:col-span-7 space-y-6">
-            {/* 1. Career Copilot Intelligence */}
-            <div className="p-5 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] space-y-3">
-              <div className="flex items-center justify-between pb-3 border-b border-[#E6E4DD] dark:border-[#2D333B]">
-                <div className="flex items-center gap-2 text-xs font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
-                  <Bot className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  <span>Career Copilot Insight</span>
-                </div>
-                <span className="text-[11px] font-mono text-blue-600 dark:text-blue-400 font-medium">
-                  {selectedRole} Track
-                </span>
-              </div>
-
-              <p className="text-xs text-[#1F2328] dark:text-[#F0F6FC] leading-relaxed">
-                Your verified strength in <strong>Python &amp; API Design</strong> is solid (95%). Completing the <strong>Docker</strong> and <strong>System Design</strong> challenges will raise your placement match probability by <strong>+18%</strong>.
-              </p>
-
-              <div className="pt-2 flex items-center justify-between text-xs text-[#656D76] dark:text-[#8B949E] border-t border-[#E6E4DD] dark:border-[#2D333B]">
-                <span>Focus area: Distributed Caching</span>
-                <Link
-                  href="/student/career-copilot"
-                  className="font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-                >
-                  <span>Open Copilot</span>
-                  <ArrowRight className="w-3 h-3" />
-                </Link>
-              </div>
-            </div>
-
-            {/* 2. Available Challenges */}
-            <div className="p-5 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] space-y-3">
-              <div className="flex items-center justify-between pb-3 border-b border-[#E6E4DD] dark:border-[#2D333B]">
-                <div className="flex items-center gap-2 text-xs font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
-                  <Code2 className="w-4 h-4 text-[#1F2328] dark:text-[#F0F6FC]" />
-                  <span>Available Challenges</span>
-                </div>
-                <Link
-                  href="/student/assessments"
-                  className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium"
-                >
-                  View All &rarr;
-                </Link>
-              </div>
-
-              <div className="space-y-2">
-                {quests.slice(0, 3).map((quest) => (
-                  <div
-                    key={quest.id}
-                    className="p-3 rounded-lg border border-[#E6E4DD] dark:border-[#2D333B] bg-[#FAF9F5] dark:bg-[#0F1115] flex items-center justify-between gap-3 text-xs"
-                  >
-                    <div className="space-y-0.5">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
-                          {quest.title}
-                        </span>
-                        <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-white dark:bg-[#161B22] border border-[#E6E4DD] dark:border-[#2D333B] text-[#656D76] dark:text-[#8B949E]">
-                          {quest.difficulty}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-[#656D76] dark:text-[#8B949E]">
-                        {quest.description}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-[11px] font-mono text-[#656D76] dark:text-[#8B949E]">
-                        +{quest.xpReward} XP
-                      </span>
-                      {quest.completed ? (
-                        <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-medium">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>Passed</span>
-                        </span>
-                      ) : (
-                        <button
-                          onClick={(e) => handleQuickChallengeComplete(quest.id, e)}
-                          className="px-2.5 py-1 bg-[#1F2328] dark:bg-[#F0F6FC] text-white dark:text-[#0F1115] rounded text-xs font-medium hover:bg-black dark:hover:bg-white transition-colors"
-                        >
-                          Start
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column (5 cols) */}
-          <div className="md:col-span-5 space-y-6">
-            {/* 3. Target Role & Readiness */}
-            <div className="p-5 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] space-y-3">
-              <div className="flex items-center justify-between pb-3 border-b border-[#E6E4DD] dark:border-[#2D333B]">
-                <div className="flex items-center gap-2 text-xs font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
-                  <Target className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  <span>Target Role Readiness</span>
+        {/* 2-Column Core Focus Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          {/* Left Main (8 cols): Goal, Focus, Career Insight */}
+          <div className="lg:col-span-8 space-y-6">
+            
+            {/* Current Goal Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: 0.05 }}
+              className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-4"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs font-semibold text-[#6F6A60] uppercase tracking-wider">
+                  <Target className="w-3.5 h-3.5 text-[#C76A2A]" />
+                  <span>Current Target Role</span>
                 </div>
                 <button
                   onClick={() => setIsEditingGoal(!isEditingGoal)}
-                  className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                  className="text-xs font-medium text-[#C76A2A] hover:underline"
                 >
-                  {isEditingGoal ? 'Save' : 'Edit'}
+                  {isEditingGoal ? 'Cancel' : 'Change Goal'}
                 </button>
               </div>
 
               {isEditingGoal ? (
-                <select
-                  value={selectedRole}
-                  onChange={(e) => handleSaveGoal(e.target.value)}
-                  className="w-full text-xs p-2 rounded-lg bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] text-[#1F2328] dark:text-[#F0F6FC] focus:outline-none"
-                >
-                  {sampleRoles.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))}
-                </select>
+                <div className="space-y-3 pt-2">
+                  <p className="text-xs text-[#6F6A60]">Select target career path:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {sampleRoles.map((role) => (
+                      <button
+                        key={role}
+                        onClick={() => handleSaveGoal(role)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+                          selectedRole === role
+                            ? 'bg-[#1B1B1B] text-white'
+                            : 'bg-[#F6F4EE] border border-[#E8E5DD] text-[#1B1B1B] hover:border-[#C76A2A]'
+                        }`}
+                      >
+                        {role}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ) : (
-                <div>
-                  <div className="text-base font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
-                    {selectedRole}
+                <div className="flex items-center justify-between pt-1">
+                  <div>
+                    <h2 className="text-xl font-bold text-[#1B1B1B]">{selectedRole}</h2>
+                    <p className="text-xs text-[#6F6A60] mt-0.5">
+                      {context.readinessScore}% benchmark readiness • {studentProfile.verifiedSkills.length} verified competencies
+                    </p>
                   </div>
-                  <div className="text-xs text-[#656D76] dark:text-[#8B949E] mt-0.5">
-                    Primary career trajectory
-                  </div>
+                  <Link
+                    href="/student/career-copilot"
+                    className="px-3.5 py-1.5 bg-[#F6F4EE] hover:bg-[#E8E5DD] text-[#1B1B1B] rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5"
+                  >
+                    <span>View Plan</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </Link>
                 </div>
               )}
+            </motion.div>
 
-              <div className="space-y-1.5 pt-2 border-t border-[#E6E4DD] dark:border-[#2D333B]">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-[#656D76] dark:text-[#8B949E]">Readiness Score</span>
-                  <span className="font-semibold text-[#1F2328] dark:text-[#F0F6FC] font-mono">
-                    {context.readinessScore}%
-                  </span>
+            {/* Weekly Focus & Verification Challenge */}
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: 0.1 }}
+              className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-4"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs font-semibold text-[#6F6A60] uppercase tracking-wider">
+                  <Calendar className="w-3.5 h-3.5 text-[#C76A2A]" />
+                  <span>Weekly Focus</span>
                 </div>
-                <div className="w-full bg-[#E6E4DD] dark:bg-[#2D333B] rounded-full h-1.5 overflow-hidden">
-                  <div
-                    className="bg-blue-600 dark:bg-blue-400 h-full progress-fill"
-                    style={{ width: `${context.readinessScore}%` }}
-                  />
-                </div>
-                <div className="flex items-center justify-between text-[11px] text-[#8C959F] dark:text-[#6E7681] font-mono pt-1">
-                  <span>Median: {context.industryAvg}%</span>
-                  <span className="text-emerald-600 dark:text-emerald-400">Top Tier: {context.topStudentsScore}%</span>
-                </div>
-              </div>
-            </div>
-
-            {/* 4. Curated Opportunities */}
-            <div className="p-5 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] space-y-3">
-              <div className="flex items-center justify-between pb-3 border-b border-[#E6E4DD] dark:border-[#2D333B]">
-                <div className="flex items-center gap-2 text-xs font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
-                  <Briefcase className="w-4 h-4 text-[#1F2328] dark:text-[#F0F6FC]" />
-                  <span>Matched Opportunities</span>
-                </div>
-                <span className="text-[11px] font-mono text-[#656D76] dark:text-[#8B949E]">
-                  6 Live
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-[#C76A2A]/10 text-[#C76A2A] font-semibold">
+                  Week 3 of 8
                 </span>
               </div>
 
-              <div className="space-y-2">
-                <div className="p-3 rounded-lg border border-[#E6E4DD] dark:border-[#2D333B] bg-[#FAF9F5] dark:bg-[#0F1115] space-y-1 text-xs">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-[#1F2328] dark:text-[#F0F6FC]">Anthropic AI Labs</span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-medium">
-                      94% Match
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-[#656D76] dark:text-[#8B949E]">AI Systems &amp; Platform Intern</p>
-                </div>
-
-                <div className="p-3 rounded-lg border border-[#E6E4DD] dark:border-[#2D333B] bg-[#FAF9F5] dark:bg-[#0F1115] space-y-1 text-xs">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-[#1F2328] dark:text-[#F0F6FC]">Stripe Engineering</span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-medium">
-                      91% Match
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-[#656D76] dark:text-[#8B949E]">Distributed Backend Infrastructure</p>
-                </div>
+              <div>
+                <h3 className="text-base font-bold text-[#1B1B1B]">
+                  Production API Architecture &amp; Containerization
+                </h3>
+                <p className="text-xs text-[#6F6A60] mt-1 leading-relaxed">
+                  Bridge the gap in {primaryMissing} by completing this week&apos;s verified assessment and building a runnable proof-of-work project.
+                </p>
               </div>
 
-              <Link
-                href="/student/opportunities"
-                className="w-full py-2 bg-[#FAF9F5] dark:bg-[#0F1115] hover:bg-[#F0EEE6] dark:hover:bg-[#1C2128] text-[#1F2328] dark:text-[#F0F6FC] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
-              >
-                <span>View All Opportunities</span>
-                <ArrowUpRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
+              <div className="pt-2 flex items-center justify-between border-t border-[#E8E5DD]">
+                <div className="flex items-center gap-2 text-xs text-[#6F6A60]">
+                  <ShieldCheck className="w-4 h-4 text-[#2F7A45]" />
+                  <span>Pass threshold: 75% • Strict anti-cheat enabled</span>
+                </div>
+                <Link
+                  href="/student/assessments"
+                  className="px-4 py-2 bg-[#1B1B1B] text-white rounded-xl text-xs font-semibold hover:bg-[#C76A2A] transition-colors flex items-center gap-1.5"
+                >
+                  <span>Start Verification</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </motion.div>
+
+            {/* Career Insight */}
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: 0.15 }}
+              className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-3"
+            >
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#6F6A60] uppercase tracking-wider">
+                <Bot className="w-3.5 h-3.5 text-[#C76A2A]" />
+                <span>Career Copilot Insight</span>
+              </div>
+              <p className="text-xs text-[#1B1B1B] leading-relaxed font-medium">
+                &ldquo;You have verified strengths in {studentProfile.verifiedSkills.slice(0, 2).map(s => s.name).join(' and ') || 'Core Programming'}. Industry recruiters for {selectedRole} are currently prioritizing candidates who can demonstrate {primaryMissing} in their GitHub repositories.&rdquo;
+              </p>
+              <div className="pt-1">
+                <Link
+                  href="/student/career-copilot"
+                  className="text-xs font-semibold text-[#C76A2A] hover:underline inline-flex items-center gap-1"
+                >
+                  <span>Ask Career Copilot for personalized roadmap</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </motion.div>
+
           </div>
+
+          {/* Right Sidebar (4 cols): XP Progress, Opportunity Match, Recent Growth */}
+          <div className="lg:col-span-4 space-y-6">
+            
+            {/* Builder Score & XP Progress */}
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: 0.1 }}
+              className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-4"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-[#6F6A60] uppercase tracking-wider">
+                  Builder Score
+                </span>
+                <Link
+                  href="/student/journey"
+                  className="text-xs font-semibold text-[#C76A2A] hover:underline"
+                >
+                  Formula →
+                </Link>
+              </div>
+
+              <div className="flex items-baseline gap-2">
+                <span className="text-4xl font-bold text-[#1B1B1B] font-mono">
+                  {builderScoreData.totalScore}
+                </span>
+                <span className="text-xs text-[#6F6A60]">/ 1000 Total Score</span>
+              </div>
+
+              {/* Level progress bar */}
+              <div className="space-y-1.5 pt-1">
+                <div className="flex justify-between text-xs font-medium">
+                  <span className="text-[#1B1B1B]">Level {levelInfo.level} {levelInfo.title}</span>
+                  <span className="text-[#C76A2A] font-mono font-semibold">{xp} XP</span>
+                </div>
+                <div className="w-full h-2 bg-[#F6F4EE] border border-[#E8E5DD] rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-[#C76A2A] rounded-full transition-all duration-500"
+                    style={{ width: `${levelInfo.percentToNext}%` }}
+                  />
+                </div>
+                <p className="text-[11px] text-[#6F6A60]">
+                  {levelInfo.nextLevelXP - levelInfo.currentLevelProgress} XP needed for Level {levelInfo.level + 1}
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Opportunity Match Card */}
+            {topOpportunity && (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2, delay: 0.15 }}
+                className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-3"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-[#6F6A60] uppercase tracking-wider">
+                    Opportunity Match
+                  </span>
+                  <span className="text-xs font-mono font-bold text-[#2F7A45] bg-[#2F7A45]/10 px-2 py-0.5 rounded-full">
+                    {topOpportunity.matchScore}% Match
+                  </span>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-bold text-[#1B1B1B]">{topOpportunity.title}</h4>
+                  <p className="text-xs text-[#6F6A60]">{topOpportunity.company} • {topOpportunity.location}</p>
+                </div>
+
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {topOpportunity.skills.slice(0, 3).map((skill: string) => (
+                    <span
+                      key={skill}
+                      className="px-2 py-0.5 rounded-md bg-[#F6F4EE] border border-[#E8E5DD] text-[11px] text-[#1B1B1B]"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+
+                <Link
+                  href="/student/opportunities"
+                  className="pt-2 text-xs font-semibold text-[#C76A2A] hover:underline flex items-center gap-1"
+                >
+                  <span>Explore opportunities</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </motion.div>
+            )}
+
+            {/* Recent Growth Log */}
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: 0.2 }}
+              className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-[#6F6A60] uppercase tracking-wider">
+                  Recent Growth
+                </span>
+                <Link
+                  href="/student/journey"
+                  className="text-xs font-semibold text-[#C76A2A] hover:underline"
+                >
+                  Full Journey
+                </Link>
+              </div>
+
+              <div className="space-y-3 pt-1 text-xs">
+                <div className="flex items-start gap-2.5">
+                  <div className="w-2 h-2 rounded-full bg-[#2F7A45] mt-1 shrink-0" />
+                  <div>
+                    <p className="font-semibold text-[#1B1B1B]">Java Foundations Verified</p>
+                    <p className="text-[11px] text-[#6F6A60]">Earned 85% score • +25 XP</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <div className="w-2 h-2 rounded-full bg-[#C76A2A] mt-1 shrink-0" />
+                  <div>
+                    <p className="font-semibold text-[#1B1B1B]">GitHub Sync Verified</p>
+                    <p className="text-[11px] text-[#6F6A60]">Inferred 4 backend repositories</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <div className="w-2 h-2 rounded-full bg-[#6F6A60] mt-1 shrink-0" />
+                  <div>
+                    <p className="font-semibold text-[#1B1B1B]">7-Day Builder Streak</p>
+                    <p className="text-[11px] text-[#6F6A60]">Consistent daily coding activity</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+          </div>
+
         </div>
+
       </div>
     </PortalLayout>
   );

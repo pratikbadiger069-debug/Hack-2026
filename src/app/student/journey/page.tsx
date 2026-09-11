@@ -4,20 +4,18 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
+import { getLevelInfo, calculateTransparentBuilderScore } from '@/lib/xp-engine';
 import {
-  Award,
   ShieldCheck,
-  Code,
-  Calendar,
   ExternalLink,
   PlusCircle,
-  Trophy,
   X,
   CheckCircle2,
-  Lock,
-  GitBranch,
   Star,
-  BookOpen,
+  MapPin,
+  Building,
+  Target,
+  Sparkles,
 } from 'lucide-react';
 
 function GithubIcon({ className = 'w-4 h-4' }: { className?: string }) {
@@ -38,34 +36,46 @@ export default function MyJourneyPage() {
     addBuilderEvidence,
     addVerifiedSkill,
     xp,
-    level,
+    streakDays,
+    quests,
     githubData,
     connectGitHub,
     achievements,
     unlockAchievement,
   } = useAppStore();
 
-  const [activeFilter, setActiveFilter] = useState<'all' | 'github' | 'skills' | 'projects' | 'badges' | 'timeline'>('all');
   const [isConnectingGitHub, setIsConnectingGitHub] = useState(false);
   const [isAddEvidenceOpen, setIsAddEvidenceOpen] = useState(false);
   const [isAddSkillOpen, setIsAddSkillOpen] = useState(false);
 
   // Form states
   const [newTitle, setNewTitle] = useState('');
-  const [newType, setNewType] = useState<any>('GitHub Repo');
+  const [newType, setNewType] = useState<'GitHub Repo' | 'Live Product' | 'Research Paper' | 'Hackathon Win' | 'Open Source PR'>('GitHub Repo');
   const [newUrl, setNewUrl] = useState('');
   const [newDesc, setNewDesc] = useState('');
 
   const [newSkillName, setNewSkillName] = useState('');
-  const [newSkillCategory, setNewSkillCategory] = useState<any>('Programming');
-  const [newSkillLevel, setNewSkillLevel] = useState<any>('Advanced');
+  const [newSkillCategory, setNewSkillCategory] = useState<'Programming' | 'Cloud' | 'AI & ML' | 'DevOps' | 'Database' | 'Soft Skills'>('Programming');
+  const [newSkillLevel, setNewSkillLevel] = useState<'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'>('Advanced');
+
+  const levelInfo = getLevelInfo(xp);
+  const completedChallenges = (quests || []).filter((q) => q.completed).length;
+
+  const builderScoreData = calculateTransparentBuilderScore({
+    verifiedSkillsCount: (studentProfile.verifiedSkills || []).length,
+    projectsCount: (studentProfile.evidences || []).length,
+    githubConnected: githubData.connected,
+    githubReposCount: (githubData.pinnedRepos || []).length,
+    consistencyStreakDays: streakDays,
+    completedChallengesCount: completedChallenges,
+  });
 
   const handleOAuthConnect = () => {
     setIsConnectingGitHub(true);
     setTimeout(() => {
       connectGitHub('aarav-builder');
       setIsConnectingGitHub(false);
-    }, 600);
+    }, 700);
   };
 
   const handleBadgeClick = (badgeId: string, unlocked: boolean) => {
@@ -101,479 +111,576 @@ export default function MyJourneyPage() {
     setIsAddSkillOpen(false);
   };
 
-  const bScores = studentProfile.builderScores;
-
   const timelineEvents = [
     {
       month: 'Jan 2026',
-      title: 'Real-time Multimodal Vector Retrieval Engine Deployed',
+      title: 'High-Throughput Distributed Rate Limiter Deployed',
       type: 'Project Verified (+100 XP)',
-      description: 'Built HNSW vector search serving 40k QPS with sub-15ms p99 latency in C++ and Python.',
+      description: 'Built token-bucket rate limiter in Go with Redis clustered state handling 15,000 req/sec.',
     },
     {
       month: 'Dec 2025',
-      title: 'SmartCampus IoT Edge Guardian — 1st Place National Hackathon',
+      title: 'National Algorithmic Challenge — 1st Place',
       type: 'Hackathon Win (+150 XP)',
-      description: 'Led a 4-person engineering squad to build on-device vision models for university energy conservation.',
+      description: 'Solved all 6 graph and dynamic programming challenges with optimal space and time complexities.',
     },
     {
       month: 'Nov 2025',
-      title: 'TypeScript & Next.js Advanced Competency Certified',
+      title: 'Microservices & Docker Infrastructure Verified',
       type: 'Assessment Passed (+50 XP)',
-      description: 'Scored 86% in rigorous async concurrency and SSR performance evaluations.',
+      description: 'Demonstrated multi-stage Docker builds and docker-compose service mesh isolation.',
     },
     {
-      month: 'Aug 2025',
-      title: 'Python & FastAPI Expert Diagnostic Assessment',
-      type: 'Assessment Passed (+50 XP)',
-      description: 'Scored 95% across 30 algorithm questions, API rate limiting, and async generators.',
+      month: 'Oct 2025',
+      title: 'Java & Spring Boot Core Assessment',
+      type: 'Assessment Passed (+25 XP)',
+      description: 'Achieved 88% verified score in concurrency, JVM memory model, and REST contracts.',
     },
   ];
 
   return (
     <PortalLayout>
-      <div className="space-y-6 max-w-[1200px] mx-auto pb-16">
-        {/* Top Hero & Header */}
+      <div className="space-y-8 max-w-[1200px] mx-auto pb-16">
+        
+        {/* SECTION 1: ABOUT & DIGITAL IDENTITY HEADER */}
         <motion.div
-          initial={{ opacity: 0, y: 8 }}
+          initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25 }}
-          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-[#E6E4DD] dark:border-[#2D333B]"
+          transition={{ duration: 0.2 }}
+          className="p-8 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs"
         >
-          <div>
-            <h1 className="text-2xl font-semibold text-[#1F2328] dark:text-[#F0F6FC] tracking-tight">
-              My Journey
-            </h1>
-            <p className="text-xs text-[#656D76] dark:text-[#8B949E] mt-0.5">
-              Verified proof-of-work, GitHub activity, skill passport, and builder milestones.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <button
-              onClick={handleOAuthConnect}
-              disabled={isConnectingGitHub || githubData.connected}
-              className={`px-3.5 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center gap-2 ${
-                githubData.connected
-                  ? 'bg-[#FAF9F5] dark:bg-[#161B22] border border-[#E6E4DD] dark:border-[#2D333B] text-[#1F2328] dark:text-[#F0F6FC]'
-                  : 'bg-[#1F2328] dark:bg-[#F0F6FC] text-white dark:text-[#0F1115] hover:bg-black dark:hover:bg-white'
-              }`}
-            >
-              <GithubIcon className="w-3.5 h-3.5" />
-              <span>
-                {isConnectingGitHub ? 'Connecting...' : githubData.connected ? 'GitHub Connected' : 'Connect GitHub (+25 XP)'}
-              </span>
-            </button>
-
-            <button
-              onClick={() => setIsAddEvidenceOpen(true)}
-              className="px-3.5 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-1.5"
-            >
-              <PlusCircle className="w-3.5 h-3.5" />
-              <span>+ Add Project (+100 XP)</span>
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Builder Score Overview Card */}
-        <div className="p-6 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] space-y-5">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="flex items-center gap-5">
-              <div className="w-18 h-18 rounded-xl bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] flex flex-col items-center justify-center text-center shrink-0 p-3">
-                <span className="text-2xl font-bold text-[#1F2328] dark:text-[#F0F6FC] font-mono">{bScores.overall || 885}</span>
-                <span className="text-[10px] text-[#8C959F] dark:text-[#6E7681] font-mono">/ 1000</span>
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+              <div className="relative">
+                <img
+                  src={studentProfile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
+                  alt={studentProfile.name}
+                  className="w-20 h-20 rounded-2xl object-cover border border-[#E8E5DD]"
+                />
+                <span className="absolute -bottom-1 -right-1 px-2 py-0.5 rounded-full bg-[#1B1B1B] text-white text-[10px] font-bold">
+                  Lvl {levelInfo.level}
+                </span>
               </div>
-
               <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
-                    Builder Score &amp; Track Record
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="text-2xl font-bold text-[#1B1B1B] tracking-tight">{studentProfile.name}</h1>
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#C76A2A]/10 text-[#C76A2A] text-xs font-semibold">
+                    {levelInfo.title}
                   </span>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-medium">
-                    Top 5%
+                  <span className="px-2 py-0.5 rounded-full bg-[#2F7A45]/10 text-[#2F7A45] text-xs font-semibold flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    Verified Builder
                   </span>
                 </div>
-                <p className="text-xs text-[#656D76] dark:text-[#8B949E] max-w-lg">
-                  Algorithmic index calculated from repository complexity, commit frequency, verified challenges, and peer validations.
+                <p className="text-xs text-[#6F6A60] flex items-center gap-3 flex-wrap">
+                  <span className="flex items-center gap-1"><Building className="w-3.5 h-3.5" /> {studentProfile.academic.college}</span>
+                  <span>•</span>
+                  <span className="flex items-center gap-1"><Target className="w-3.5 h-3.5" /> Target: {studentProfile.targetRole}</span>
+                  <span>•</span>
+                  <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> Bengaluru, India</span>
+                </p>
+                <p className="text-xs text-[#1B1B1B] pt-1 max-w-2xl leading-relaxed">
+                  Systems engineer focused on high-throughput backend services, distributed cache protocols, and zero-downtime containerized workloads.
                 </p>
               </div>
             </div>
 
-            {/* Sub-Score Dimensions */}
-            <div className="grid grid-cols-5 gap-2 pt-4 lg:pt-0 border-t lg:border-t-0 lg:border-l border-[#E6E4DD] dark:border-[#2D333B] lg:pl-6">
-              <div className="p-2.5 bg-[#FAF9F5] dark:bg-[#0F1115] rounded-lg border border-[#E6E4DD] dark:border-[#2D333B] text-center">
-                <span className="text-[10px] font-mono text-[#8C959F] dark:text-[#6E7681] block">EXEC</span>
-                <strong className="text-xs font-mono font-bold text-[#1F2328] dark:text-[#F0F6FC]">{bScores.execution || 92}%</strong>
-              </div>
-              <div className="p-2.5 bg-[#FAF9F5] dark:bg-[#0F1115] rounded-lg border border-[#E6E4DD] dark:border-[#2D333B] text-center">
-                <span className="text-[10px] font-mono text-[#8C959F] dark:text-[#6E7681] block">LEAD</span>
-                <strong className="text-xs font-mono font-bold text-[#1F2328] dark:text-[#F0F6FC]">{bScores.leadership || 85}%</strong>
-              </div>
-              <div className="p-2.5 bg-[#FAF9F5] dark:bg-[#0F1115] rounded-lg border border-[#E6E4DD] dark:border-[#2D333B] text-center">
-                <span className="text-[10px] font-mono text-[#8C959F] dark:text-[#6E7681] block">INNOV</span>
-                <strong className="text-xs font-mono font-bold text-[#1F2328] dark:text-[#F0F6FC]">{bScores.innovation || 90}%</strong>
-              </div>
-              <div className="p-2.5 bg-[#FAF9F5] dark:bg-[#0F1115] rounded-lg border border-[#E6E4DD] dark:border-[#2D333B] text-center">
-                <span className="text-[10px] font-mono text-[#8C959F] dark:text-[#6E7681] block">SOLVE</span>
-                <strong className="text-xs font-mono font-bold text-[#1F2328] dark:text-[#F0F6FC]">{bScores.problemSolving || 94}%</strong>
-              </div>
-              <div className="p-2.5 bg-[#FAF9F5] dark:bg-[#0F1115] rounded-lg border border-[#E6E4DD] dark:border-[#2D333B] text-center">
-                <span className="text-[10px] font-mono text-[#8C959F] dark:text-[#6E7681] block">CONSIST</span>
-                <strong className="text-xs font-mono font-bold text-[#1F2328] dark:text-[#F0F6FC]">{bScores.consistency || 88}%</strong>
-              </div>
+            {/* Builder Action Buttons */}
+            <div className="flex items-center gap-2 self-start">
+              <button
+                onClick={() => setIsAddEvidenceOpen(true)}
+                className="px-3.5 py-2 bg-[#F6F4EE] hover:bg-[#E8E5DD] text-[#1B1B1B] rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5"
+              >
+                <PlusCircle className="w-3.5 h-3.5 text-[#C76A2A]" />
+                <span>Add Proof</span>
+              </button>
+              <button
+                onClick={() => setIsAddSkillOpen(true)}
+                className="px-3.5 py-2 bg-[#1B1B1B] text-white hover:bg-[#C76A2A] rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5"
+              >
+                <PlusCircle className="w-3.5 h-3.5" />
+                <span>Add Skill</span>
+              </button>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Filter Tabs */}
-        <div className="flex items-center gap-1.5 border-b border-[#E6E4DD] dark:border-[#2D333B] pb-2 overflow-x-auto no-scrollbar">
-          {[
-            { id: 'all', label: 'All Items' },
-            { id: 'github', label: `GitHub Repos (${githubData.publicRepos})` },
-            { id: 'skills', label: `Verified Skills (${studentProfile.verifiedSkills.length})` },
-            { id: 'projects', label: `Projects (${studentProfile.evidences.length})` },
-            { id: 'badges', label: `Badges (${achievements.length})` },
-            { id: 'timeline', label: 'Growth Timeline' },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveFilter(tab.id as any)}
-              className={`px-3 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors ${
-                activeFilter === tab.id
-                  ? 'bg-[#1F2328] dark:bg-[#F0F6FC] text-white dark:text-[#0F1115]'
-                  : 'text-[#656D76] dark:text-[#8B949E] hover:text-[#1F2328] dark:hover:text-[#F0F6FC] hover:bg-black/5 dark:hover:bg-white/5'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* GitHub Intelligence Section */}
-        {(activeFilter === 'all' || activeFilter === 'github') && (
-          <div className="space-y-4">
+        {/* SECTION 2 & 3: BUILDER LEVEL & TRANSPARENT BUILDER SCORE BREAKDOWN */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          {/* Builder Level Card (5 cols) */}
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: 0.05 }}
+            className="lg:col-span-5 p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-4"
+          >
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
-                <GithubIcon className="w-4 h-4" />
-                <span>GitHub Repositories &amp; Analysis</span>
-              </div>
-              <span className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400">
-                Connected: @{githubData.username}
+              <span className="text-xs font-semibold text-[#6F6A60] uppercase tracking-wider">
+                Builder Level System
+              </span>
+              <span className="text-xs font-mono font-semibold text-[#C76A2A]">
+                Rank #{levelInfo.rank} Campus
               </span>
             </div>
 
-            {/* Metrics */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="p-3.5 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] text-center">
-                <span className="text-[11px] text-[#656D76] dark:text-[#8B949E] block">Public Repos</span>
-                <strong className="text-base font-mono font-semibold text-[#1F2328] dark:text-[#F0F6FC]">{githubData.publicRepos}</strong>
+            <div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-bold text-[#1B1B1B]">Level {levelInfo.level}</span>
+                <span className="text-sm font-semibold text-[#C76A2A]">{levelInfo.title}</span>
               </div>
-              <div className="p-3.5 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] text-center">
-                <span className="text-[11px] text-[#656D76] dark:text-[#8B949E] block">Stars Earned</span>
-                <strong className="text-base font-mono font-semibold text-[#1F2328] dark:text-[#F0F6FC]">★ {githubData.totalStars}</strong>
+              <p className="text-xs text-[#6F6A60] mt-0.5">
+                Earned strictly via verified assessments, passing code challenges, and production projects.
+              </p>
+            </div>
+
+            {/* XP Progress */}
+            <div className="space-y-1.5 pt-1">
+              <div className="flex justify-between text-xs font-semibold">
+                <span className="text-[#1B1B1B] font-mono">{xp} Total XP</span>
+                <span className="text-[#6F6A60] font-mono">{levelInfo.currentLevelProgress} / {levelInfo.nextLevelXP} in Level</span>
               </div>
-              <div className="p-3.5 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] text-center">
-                <span className="text-[11px] text-[#656D76] dark:text-[#8B949E] block">Commits (12m)</span>
-                <strong className="text-base font-mono font-semibold text-[#1F2328] dark:text-[#F0F6FC]">{githubData.recentCommitsCount}</strong>
+              <div className="w-full h-2.5 bg-[#F6F4EE] border border-[#E8E5DD] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#C76A2A] rounded-full transition-all duration-500"
+                  style={{ width: `${levelInfo.percentToNext}%` }}
+                />
               </div>
-              <div className="p-3.5 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] text-center">
-                <span className="text-[11px] text-[#656D76] dark:text-[#8B949E] block">Followers</span>
-                <strong className="text-base font-mono font-semibold text-[#1F2328] dark:text-[#F0F6FC]">{githubData.followers}</strong>
+              <p className="text-[11px] text-[#6F6A60]">
+                {levelInfo.nextLevelXP - levelInfo.currentLevelProgress} XP remaining to achieve Level {levelInfo.level + 1}
+              </p>
+            </div>
+
+            {/* Title Tier Progression */}
+            <div className="pt-2 border-t border-[#E8E5DD] space-y-2">
+              <span className="text-[11px] font-semibold text-[#6F6A60] uppercase tracking-wider block">
+                Rank Progression Titles
+              </span>
+              <div className="grid grid-cols-3 gap-1.5 text-[11px]">
+                {['Explorer', 'Builder', 'Creator', 'Architect', 'Innovator', 'Elite Builder'].map((t) => (
+                  <div
+                    key={t}
+                    className={`px-2 py-1 rounded-lg text-center font-medium ${
+                      levelInfo.title === t
+                        ? 'bg-[#1B1B1B] text-white font-semibold'
+                        : 'bg-[#F6F4EE] text-[#6F6A60]'
+                    }`}
+                  >
+                    {t}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Transparent Builder Score Card (7 cols) */}
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: 0.1 }}
+            className="lg:col-span-7 p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-4"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-xs font-semibold text-[#6F6A60] uppercase tracking-wider block">
+                  Transparent Builder Score
+                </span>
+                <span className="text-[11px] text-[#6F6A60]">Deterministic verification formula — No hidden metrics</span>
+              </div>
+              <div className="text-right">
+                <span className="text-3xl font-bold font-mono text-[#1B1B1B]">{builderScoreData.totalScore}</span>
+                <span className="text-xs text-[#6F6A60]"> / 1000</span>
               </div>
             </div>
 
-            {/* Pinned Repos */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {githubData.pinnedRepos.map((repo, idx) => (
-                <div
-                  key={idx}
-                  className="p-4 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] space-y-2.5 flex flex-col justify-between"
-                >
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5 text-xs font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
-                        <BookOpen className="w-3.5 h-3.5 text-[#656D76] dark:text-[#8B949E]" />
-                        <span className="truncate">{repo.name}</span>
-                      </div>
-                      <span className="text-[11px] font-mono text-[#656D76] dark:text-[#8B949E]">
-                        ★ {repo.stars}
-                      </span>
-                    </div>
-                    <p className="text-xs text-[#656D76] dark:text-[#8B949E] line-clamp-2">
-                      {repo.description}
-                    </p>
+            {/* 5-Pillar Score Breakdown (30% / 30% / 20% / 10% / 10%) */}
+            <div className="space-y-3 pt-2">
+              {builderScoreData.breakdown.map((item) => (
+                <div key={item.pillar} className="space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="font-semibold text-[#1B1B1B]">
+                      {item.pillar} <span className="text-[#6F6A60] font-normal">({item.weightPercent}%)</span>
+                    </span>
+                    <span className="font-mono font-semibold text-[#1B1B1B]">
+                      {item.score} <span className="text-[#6F6A60] font-normal">/ {item.maxScore} pts</span>
+                    </span>
                   </div>
-
-                  <div className="pt-2 border-t border-[#E6E4DD] dark:border-[#2D333B] flex items-center justify-between text-xs">
-                    <span className="font-mono text-[11px] text-blue-600 dark:text-blue-400">{repo.language}</span>
-                    <a
-                      href={repo.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-xs text-[#656D76] dark:text-[#8B949E] hover:text-[#1F2328] dark:hover:text-[#F0F6FC] inline-flex items-center gap-1 font-medium"
-                    >
-                      <span>View</span>
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
+                  <div className="w-full h-1.5 bg-[#F6F4EE] border border-[#E8E5DD] rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#1B1B1B] rounded-full transition-all duration-500"
+                      style={{ width: `${(item.score / item.maxScore) * 100}%` }}
+                    />
                   </div>
+                  <p className="text-[10px] text-[#6F6A60]">{item.description}</p>
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          </motion.div>
 
-        {/* Verified Skills Passport */}
-        {(activeFilter === 'all' || activeFilter === 'skills') && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
-                <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                <span>Verified Skills Passport</span>
+        </div>
+
+        {/* SECTION 4: GITHUB INTEGRATION */}
+        <motion.div
+          id="github"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, delay: 0.15 }}
+          className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-5"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <GithubIcon className="w-5 h-5 text-[#1B1B1B]" />
+                <h2 className="text-lg font-bold text-[#1B1B1B]">GitHub Proof of Work</h2>
+                {githubData.connected && (
+                  <span className="px-2 py-0.5 rounded-full bg-[#2F7A45]/10 text-[#2F7A45] text-xs font-semibold flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" /> OAuth Connected
+                  </span>
+                )}
               </div>
-              <button
-                onClick={() => setIsAddSkillOpen(true)}
-                className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium"
-              >
-                + Add Verified Skill
-              </button>
+              <p className="text-xs text-[#6F6A60] mt-0.5">
+                Real-time repository sync, star metrics, contribution density, and automatic skill inference.
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {studentProfile.verifiedSkills.map((skill) => (
+            {!githubData.connected ? (
+              <button
+                onClick={handleOAuthConnect}
+                disabled={isConnectingGitHub}
+                className="px-4 py-2 bg-[#1B1B1B] text-white rounded-xl text-xs font-semibold hover:bg-[#C76A2A] transition-colors flex items-center gap-2 shrink-0"
+              >
+                <GithubIcon className="w-4 h-4 text-white" />
+                <span>{isConnectingGitHub ? 'Authenticating...' : 'Connect GitHub OAuth'}</span>
+              </button>
+            ) : (
+              <div className="flex items-center gap-3 text-xs font-mono">
+                <span className="text-[#6F6A60]">@{githubData.username}</span>
+                <span className="text-[#1B1B1B] font-semibold">{githubData.totalStars} ★</span>
+                <span className="text-[#1B1B1B] font-semibold">{githubData.followers} followers</span>
+              </div>
+            )}
+          </div>
+
+          {githubData.connected ? (
+            <div className="space-y-4 pt-2">
+              {/* Inferred Skills Banner */}
+              <div className="p-3.5 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD] text-xs space-y-1.5">
+                <div className="flex items-center gap-1.5 font-semibold text-[#1B1B1B]">
+                  <Sparkles className="w-3.5 h-3.5 text-[#C76A2A]" />
+                  <span>Inferred Verified Skills from Repositories:</span>
+                </div>
+                <div className="flex flex-wrap gap-2 pt-0.5">
+                  {(githubData.detectedSkills || ['FastAPI', 'Docker', 'PostgreSQL']).map((skill) => (
+                    <span
+                      key={skill}
+                      className="px-2.5 py-1 rounded-lg bg-white border border-[#E8E5DD] text-xs text-[#1B1B1B] font-medium"
+                    >
+                      <strong className="text-[#C76A2A]">{skill}</strong>{' '}
+                      <span className="text-[#6F6A60] text-[11px]">(90% confidence from repo commits)</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Repositories Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {(githubData.pinnedRepos || []).map((repo) => (
+                  <div
+                    key={repo.name}
+                    className="p-4 rounded-xl bg-white border border-[#E8E5DD] hover:border-[#C76A2A] transition-all space-y-2"
+                  >
+                    <div className="flex items-center justify-between">
+                      <a
+                        href={repo.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="font-bold text-sm text-[#1B1B1B] hover:text-[#C76A2A] flex items-center gap-1.5"
+                      >
+                        <span>{repo.name}</span>
+                        <ExternalLink className="w-3 h-3 text-[#6F6A60]" />
+                      </a>
+                      <span className="text-xs font-mono text-[#6F6A60] flex items-center gap-1">
+                        <Star className="w-3 h-3 text-[#C76A2A]" /> {repo.stars}
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#6F6A60] line-clamp-2">{repo.description}</p>
+                    <div className="flex items-center justify-between pt-1 text-[11px]">
+                      <span className="font-mono text-[#C76A2A] font-medium">{repo.language}</span>
+                      <span className="text-[#6F6A60]">{repo.forks} forks</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="p-8 text-center rounded-xl bg-[#F6F4EE] border border-dashed border-[#E8E5DD] space-y-2">
+              <GithubIcon className="w-8 h-8 text-[#6F6A60] mx-auto" />
+              <h3 className="text-sm font-bold text-[#1B1B1B]">Connect your GitHub to verify your code</h3>
+              <p className="text-xs text-[#6F6A60] max-w-md mx-auto">
+                SkillBridge inspects commit density, test coverage, and languages to boost your Builder Score by up to 200 points.
+              </p>
+            </div>
+          )}
+        </motion.div>
+
+        {/* SECTION 5: VERIFIED SKILLS PASSPORT */}
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, delay: 0.2 }}
+          className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-5"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-[#1B1B1B]">Verified Skills Passport</h2>
+              <p className="text-xs text-[#6F6A60]">
+                Every skill requires multi-source proof: strict assessments, GitHub repos, or verified project reviews.
+              </p>
+            </div>
+            <span className="text-xs font-mono font-semibold text-[#2F7A45] bg-[#2F7A45]/10 px-2.5 py-1 rounded-full">
+              {studentProfile.verifiedSkills.length} Verified Competencies
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {studentProfile.verifiedSkills.map((skill) => {
+              const confidence = Math.min(96, 75 + skill.score * 0.2);
+              return (
                 <div
-                  key={skill.id}
-                  className="p-4 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] space-y-2"
+                  key={skill.id || skill.name}
+                  className="p-4 rounded-xl bg-white border border-[#E8E5DD] space-y-2.5 hover:border-[#1B1B1B] transition-all"
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <div className="font-semibold text-xs text-[#1F2328] dark:text-[#F0F6FC]">
-                        {skill.name}
-                      </div>
-                      <span className="text-[11px] text-[#656D76] dark:text-[#8B949E]">{skill.category}</span>
+                      <h4 className="text-sm font-bold text-[#1B1B1B]">{skill.name}</h4>
+                      <span className="text-[10px] text-[#6F6A60]">{skill.category} • {skill.level}</span>
                     </div>
-                    <span className="text-xs font-mono font-semibold text-emerald-600 dark:text-emerald-400">
-                      {skill.score}%
+                    <span className="px-2 py-0.5 rounded-md bg-[#2F7A45]/10 text-[#2F7A45] text-[10px] font-bold flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3" /> Verified
                     </span>
                   </div>
 
-                  <div className="w-full bg-[#E6E4DD] dark:bg-[#2D333B] rounded-full h-1 overflow-hidden">
-                    <div className="bg-emerald-600 dark:bg-emerald-400 h-full progress-fill" style={{ width: `${skill.score}%` }} />
-                  </div>
-
-                  <div className="flex items-center justify-between text-[10px] text-[#8C959F] dark:text-[#6E7681] pt-1 font-mono">
-                    <span>{skill.level}</span>
-                    <span>{skill.verificationCode}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Project Evidence */}
-        {(activeFilter === 'all' || activeFilter === 'projects') && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
-                <Code className="w-4 h-4 text-[#1F2328] dark:text-[#F0F6FC]" />
-                <span>Production Project Evidence</span>
-              </div>
-              <span className="text-xs font-mono text-[#656D76] dark:text-[#8B949E]">
-                {studentProfile.evidences.length} Verified
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {studentProfile.evidences.map((ev) => (
-                <div
-                  key={ev.id}
-                  className="p-5 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] space-y-2.5 flex flex-col justify-between"
-                >
-                  <div className="space-y-1.5">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] text-[#656D76] dark:text-[#8B949E]">
-                          {ev.type}
-                        </span>
-                        <h4 className="text-sm font-semibold text-[#1F2328] dark:text-[#F0F6FC] mt-1">
-                          {ev.title}
-                        </h4>
-                      </div>
-                      <span className="text-xs font-mono font-medium text-emerald-600 dark:text-emerald-400">
-                        {ev.impactScore}/100 Impact
-                      </span>
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-[11px]">
+                      <span className="text-[#6F6A60]">Verified Score: <strong className="text-[#1B1B1B]">{skill.score}%</strong></span>
+                      <span className="text-[#6F6A60]">Confidence: <strong className="text-[#C76A2A]">{Math.round(confidence)}%</strong></span>
                     </div>
-                    <p className="text-xs text-[#656D76] dark:text-[#8B949E] leading-relaxed">
-                      {ev.description}
-                    </p>
+                    <div className="w-full h-1.5 bg-[#F6F4EE] rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-[#C76A2A] rounded-full"
+                        style={{ width: `${skill.score}%` }}
+                      />
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2.5 border-t border-[#E6E4DD] dark:border-[#2D333B] text-xs">
-                    <span className="text-[#8C959F] dark:text-[#6E7681] font-mono text-[11px]">{ev.date}</span>
-                    {ev.url && (
-                      <a
-                        href={ev.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-xs font-medium text-[#1F2328] dark:text-[#F0F6FC] hover:text-blue-600 inline-flex items-center gap-1"
-                      >
-                        <span>View Repository</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
+                  <div className="pt-1 text-[10px] text-[#6F6A60] flex items-center gap-1 flex-wrap">
+                    <span className="font-semibold text-[#1B1B1B]">Evidence:</span>
+                    <span className="px-1.5 py-0.5 rounded bg-[#F6F4EE] border border-[#E8E5DD]">Strict MCQ</span>
+                    <span className="px-1.5 py-0.5 rounded bg-[#F6F4EE] border border-[#E8E5DD]">GitHub Commits</span>
+                    {skill.score > 80 && (
+                      <span className="px-1.5 py-0.5 rounded bg-[#F6F4EE] border border-[#E8E5DD]">Project Code</span>
                     )}
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
-        )}
+        </motion.div>
 
-        {/* Badges */}
-        {(activeFilter === 'all' || activeFilter === 'badges') && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
-                <Trophy className="w-4 h-4 text-[#1F2328] dark:text-[#F0F6FC]" />
-                <span>Builder Badges</span>
-              </div>
+        {/* SECTION 6: VERIFIED EVIDENCE & PROJECTS */}
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, delay: 0.25 }}
+          className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-5"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-[#1B1B1B]">Verified Builder Projects &amp; Evidence</h2>
+              <p className="text-xs text-[#6F6A60]">
+                Production applications, runnable demos, and architectural artifacts.
+              </p>
             </div>
+            <button
+              onClick={() => setIsAddEvidenceOpen(true)}
+              className="text-xs font-semibold text-[#C76A2A] hover:underline"
+            >
+              + Submit Proof
+            </button>
+          </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {achievements.map((badge) => (
-                <div
-                  key={badge.id}
-                  onClick={() => handleBadgeClick(badge.id, badge.unlocked)}
-                  className={`p-4 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] text-center space-y-1.5 cursor-pointer transition-opacity ${
-                    badge.unlocked ? 'opacity-100' : 'opacity-40'
-                  }`}
-                >
-                  <div className="w-8 h-8 rounded-lg mx-auto flex items-center justify-center bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B]">
-                    {badge.unlocked ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                    ) : (
-                      <Lock className="w-4 h-4 text-[#8C959F]" />
-                    )}
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {studentProfile.evidences.map((evidence) => (
+              <div
+                key={evidence.id}
+                className="p-5 rounded-xl bg-white border border-[#E8E5DD] space-y-3 hover:border-[#C76A2A] transition-all"
+              >
+                <div className="flex items-start justify-between">
                   <div>
-                    <div className="font-semibold text-xs text-[#1F2328] dark:text-[#F0F6FC]">
-                      {badge.title}
-                    </div>
-                    <p className="text-[11px] text-[#656D76] dark:text-[#8B949E] line-clamp-2 mt-0.5">
-                      {badge.description}
-                    </p>
+                    <h3 className="text-base font-bold text-[#1B1B1B]">{evidence.title}</h3>
+                    <p className="text-xs text-[#6F6A60] mt-0.5">{evidence.description}</p>
                   </div>
-                  <div className="text-[10px] font-mono text-[#8C959F] dark:text-[#6E7681]">
-                    +{badge.xpReward} XP
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Growth Timeline */}
-        {(activeFilter === 'all' || activeFilter === 'timeline') && (
-          <div className="p-6 bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-[#E6E4DD] dark:border-[#2D333B]">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
-                <Calendar className="w-4 h-4 text-[#1F2328] dark:text-[#F0F6FC]" />
-                <span>Growth Timeline</span>
-              </div>
-              <span className="text-xs font-mono text-[#656D76] dark:text-[#8B949E]">Milestone Log</span>
-            </div>
-
-            <div className="space-y-4 relative before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-[#E6E4DD] dark:before:bg-[#2D333B]">
-              {timelineEvents.map((evt, idx) => (
-                <div key={idx} className="relative pl-6 space-y-0.5">
-                  <div className="absolute left-1.25 top-1.5 w-1.5 h-1.5 rounded-full bg-blue-600" />
-                  <div className="flex items-center justify-between text-xs">
-                    <strong className="font-semibold text-[#1F2328] dark:text-[#F0F6FC]">
-                      {evt.title}
-                    </strong>
-                    <span className="text-[11px] font-mono text-blue-600 dark:text-blue-400">
-                      {evt.type}
+                  {evidence.verified && (
+                    <span className="px-2 py-0.5 rounded-full bg-[#2F7A45]/10 text-[#2F7A45] text-xs font-bold shrink-0 ml-2">
+                      Verified
                     </span>
-                  </div>
-                  <p className="text-xs text-[#656D76] dark:text-[#8B949E] leading-relaxed">
-                    {evt.description}
-                  </p>
+                  )}
                 </div>
-              ))}
-            </div>
+
+                <div className="pt-2 flex items-center justify-between border-t border-[#E8E5DD] text-xs">
+                  <span className="text-[#6F6A60] text-[11px]">Impact Score: <strong className="text-[#1B1B1B]">{evidence.impactScore}/100</strong></span>
+                  {evidence.url && (
+                    <a
+                      href={evidence.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[#C76A2A] hover:underline flex items-center gap-1 font-semibold"
+                    >
+                      <span>View Source</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
-        )}
+        </motion.div>
+
+        {/* SECTION 7: ACHIEVEMENTS & BADGES */}
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, delay: 0.3 }}
+          className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-5"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-[#1B1B1B]">Builder Badges &amp; Certifications</h2>
+              <p className="text-xs text-[#6F6A60]">Earned solely through rigorous milestone completion and strict pass criteria.</p>
+            </div>
+            <span className="text-xs font-mono font-semibold text-[#1B1B1B]">
+              {achievements.filter(a => a.unlocked).length} / {achievements.length} Unlocked
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+            {achievements.map((badge) => (
+              <div
+                key={badge.id}
+                onClick={() => handleBadgeClick(badge.id, badge.unlocked)}
+                className={`p-3.5 rounded-xl border text-center space-y-2 cursor-pointer transition-all ${
+                  badge.unlocked
+                    ? 'bg-white border-[#E8E5DD] hover:border-[#C76A2A]'
+                    : 'bg-[#F6F4EE]/60 border-[#E8E5DD] opacity-50'
+                }`}
+              >
+                <div className="text-2xl">{badge.icon}</div>
+                <div>
+                  <h5 className="text-xs font-bold text-[#1B1B1B]">{badge.title}</h5>
+                  <p className="text-[10px] text-[#6F6A60] line-clamp-2 mt-0.5">{badge.description}</p>
+                </div>
+                <div className="text-[10px] font-mono font-semibold text-[#C76A2A]">
+                  +{badge.xpReward} XP
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* SECTION 8: TIMELINE */}
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, delay: 0.35 }}
+          className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-5"
+        >
+          <h2 className="text-lg font-bold text-[#1B1B1B]">Builder Timeline</h2>
+          <div className="space-y-6 relative before:absolute before:inset-0 before:left-2 before:w-0.5 before:bg-[#E8E5DD]">
+            {timelineEvents.map((evt, idx) => (
+              <div key={idx} className="relative pl-6 space-y-1">
+                <div className="absolute left-0 top-1 w-4 h-4 rounded-full bg-white border-2 border-[#C76A2A]" />
+                <div className="flex items-baseline justify-between">
+                  <h4 className="text-sm font-bold text-[#1B1B1B]">{evt.title}</h4>
+                  <span className="text-[11px] font-mono text-[#6F6A60]">{evt.month}</span>
+                </div>
+                <span className="text-[11px] font-semibold text-[#C76A2A] block">{evt.type}</span>
+                <p className="text-xs text-[#6F6A60]">{evt.description}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
       </div>
 
-      {/* Add Project Evidence Modal */}
+      {/* Add Evidence Modal */}
       {isAddEvidenceOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] p-5 space-y-4 shadow-lg text-xs">
-            <div className="flex items-center justify-between pb-2 border-b border-[#E6E4DD] dark:border-[#2D333B]">
-              <h3 className="font-semibold text-sm text-[#1F2328] dark:text-[#F0F6FC]">Add Project Evidence (+100 XP)</h3>
-              <button onClick={() => setIsAddEvidenceOpen(false)} className="text-[#8C959F] hover:text-[#1F2328] dark:hover:text-[#F0F6FC]">
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl border border-[#E8E5DD] max-w-md w-full p-6 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-[#1B1B1B]">Submit Proof of Work</h3>
+              <button onClick={() => setIsAddEvidenceOpen(false)} className="text-[#6F6A60] hover:text-[#1B1B1B]">
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <form onSubmit={handleCreateEvidence} className="space-y-3">
+            <form onSubmit={handleCreateEvidence} className="space-y-3 text-xs">
               <div>
-                <label className="font-medium text-[#656D76] dark:text-[#8B949E] block mb-1">Project Title</label>
+                <label className="font-semibold text-[#1B1B1B] block mb-1">Title</label>
                 <input
                   type="text"
                   required
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="e.g. Distributed Token Bucket Rate Limiter"
-                  className="w-full p-2 bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg text-[#1F2328] dark:text-[#F0F6FC] focus:outline-none"
+                  placeholder="e.g. Distributed Key-Value Store"
+                  className="w-full p-2 bg-[#F6F4EE] border border-[#E8E5DD] rounded-xl text-[#1B1B1B]"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="font-medium text-[#656D76] dark:text-[#8B949E] block mb-1">Type</label>
-                  <select
-                    value={newType}
-                    onChange={(e) => setNewType(e.target.value as any)}
-                    className="w-full p-2 bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg text-[#1F2328] dark:text-[#F0F6FC]"
-                  >
-                    <option value="GitHub Repo">GitHub Repo</option>
-                    <option value="Live Product">Live Product</option>
-                    <option value="Research Paper">Research Paper</option>
-                    <option value="Hackathon Win">Hackathon Win</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="font-medium text-[#656D76] dark:text-[#8B949E] block mb-1">URL</label>
-                  <input
-                    type="url"
-                    value={newUrl}
-                    onChange={(e) => setNewUrl(e.target.value)}
-                    placeholder="https://github.com/..."
-                    className="w-full p-2 bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg text-[#1F2328] dark:text-[#F0F6FC]"
-                  />
-                </div>
+              <div>
+                <label className="font-semibold text-[#1B1B1B] block mb-1">Type</label>
+                <select
+                  value={newType}
+                  onChange={(e) => setNewType(e.target.value as any)}
+                  className="w-full p-2 bg-[#F6F4EE] border border-[#E8E5DD] rounded-xl text-[#1B1B1B]"
+                >
+                  <option>GitHub Repo</option>
+                  <option>Live Product</option>
+                  <option>Research Paper</option>
+                  <option>Hackathon Win</option>
+                  <option>Open Source PR</option>
+                </select>
               </div>
               <div>
-                <label className="font-medium text-[#656D76] dark:text-[#8B949E] block mb-1">Description</label>
+                <label className="font-semibold text-[#1B1B1B] block mb-1">URL</label>
+                <input
+                  type="url"
+                  value={newUrl}
+                  onChange={(e) => setNewUrl(e.target.value)}
+                  placeholder="https://github.com/username/project"
+                  className="w-full p-2 bg-[#F6F4EE] border border-[#E8E5DD] rounded-xl text-[#1B1B1B]"
+                />
+              </div>
+              <div>
+                <label className="font-semibold text-[#1B1B1B] block mb-1">Description &amp; Impact</label>
                 <textarea
                   rows={3}
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
-                  placeholder="Architecture, key libraries, benchmark metrics..."
-                  className="w-full p-2 bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg text-[#1F2328] dark:text-[#F0F6FC]"
+                  placeholder="Explain architecture, test coverage, and benchmark results..."
+                  className="w-full p-2 bg-[#F6F4EE] border border-[#E8E5DD] rounded-xl text-[#1B1B1B]"
                 />
               </div>
-              <div className="flex justify-end gap-2 pt-2 border-t border-[#E6E4DD] dark:border-[#2D333B]">
+              <div className="pt-2 flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsAddEvidenceOpen(false)}
-                  className="px-3 py-1.5 text-[#656D76] dark:text-[#8B949E]"
+                  className="px-4 py-2 rounded-xl bg-[#F6F4EE] text-[#6F6A60] font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-[#1F2328] dark:bg-[#F0F6FC] text-white dark:text-[#0F1115] rounded-lg font-medium"
+                  className="px-4 py-2 rounded-xl bg-[#1B1B1B] text-white font-semibold hover:bg-[#C76A2A]"
                 >
-                  Save Project
+                  Submit for Verification
                 </button>
               </div>
             </form>
@@ -583,73 +690,76 @@ export default function MyJourneyPage() {
 
       {/* Add Skill Modal */}
       {isAddSkillOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-sm bg-white dark:bg-[#161B22] rounded-xl border border-[#E6E4DD] dark:border-[#2D333B] p-5 space-y-4 shadow-lg text-xs">
-            <div className="flex items-center justify-between pb-2 border-b border-[#E6E4DD] dark:border-[#2D333B]">
-              <h3 className="font-semibold text-sm text-[#1F2328] dark:text-[#F0F6FC]">Add Verified Skill (+50 XP)</h3>
-              <button onClick={() => setIsAddSkillOpen(false)} className="text-[#8C959F] hover:text-[#1F2328] dark:hover:text-[#F0F6FC]">
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl border border-[#E8E5DD] max-w-md w-full p-6 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-[#1B1B1B]">Add Skill Competency</h3>
+              <button onClick={() => setIsAddSkillOpen(false)} className="text-[#6F6A60] hover:text-[#1B1B1B]">
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <form onSubmit={handleCreateSkill} className="space-y-3">
+            <form onSubmit={handleCreateSkill} className="space-y-3 text-xs">
               <div>
-                <label className="font-medium text-[#656D76] dark:text-[#8B949E] block mb-1">Skill Name</label>
+                <label className="font-semibold text-[#1B1B1B] block mb-1">Skill Name</label>
                 <input
                   type="text"
                   required
                   value={newSkillName}
                   onChange={(e) => setNewSkillName(e.target.value)}
-                  placeholder="e.g. Docker, PyTorch, Kubernetes"
-                  className="w-full p-2 bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg text-[#1F2328] dark:text-[#F0F6FC]"
+                  placeholder="e.g. Apache Kafka or Rust"
+                  className="w-full p-2 bg-[#F6F4EE] border border-[#E8E5DD] rounded-xl text-[#1B1B1B]"
                 />
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="font-medium text-[#656D76] dark:text-[#8B949E] block mb-1">Category</label>
+                  <label className="font-semibold text-[#1B1B1B] block mb-1">Category</label>
                   <select
                     value={newSkillCategory}
                     onChange={(e) => setNewSkillCategory(e.target.value as any)}
-                    className="w-full p-2 bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg text-[#1F2328] dark:text-[#F0F6FC]"
+                    className="w-full p-2 bg-[#F6F4EE] border border-[#E8E5DD] rounded-xl text-[#1B1B1B]"
                   >
                     <option value="Programming">Programming</option>
-                    <option value="AI & ML">AI & ML</option>
                     <option value="Database">Database</option>
                     <option value="DevOps">DevOps</option>
                     <option value="Cloud">Cloud</option>
+                    <option value="AI & ML">AI &amp; ML</option>
+                    <option value="Soft Skills">Soft Skills</option>
                   </select>
                 </div>
                 <div>
-                  <label className="font-medium text-[#656D76] dark:text-[#8B949E] block mb-1">Level</label>
+                  <label className="font-semibold text-[#1B1B1B] block mb-1">Level</label>
                   <select
                     value={newSkillLevel}
                     onChange={(e) => setNewSkillLevel(e.target.value as any)}
-                    className="w-full p-2 bg-[#FAF9F5] dark:bg-[#0F1115] border border-[#E6E4DD] dark:border-[#2D333B] rounded-lg text-[#1F2328] dark:text-[#F0F6FC]"
+                    className="w-full p-2 bg-[#F6F4EE] border border-[#E8E5DD] rounded-xl text-[#1B1B1B]"
                   >
+                    <option value="Beginner">Beginner</option>
                     <option value="Intermediate">Intermediate</option>
                     <option value="Advanced">Advanced</option>
                     <option value="Expert">Expert</option>
                   </select>
                 </div>
               </div>
-              <div className="flex justify-end gap-2 pt-2 border-t border-[#E6E4DD] dark:border-[#2D333B]">
+              <div className="pt-2 flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsAddSkillOpen(false)}
-                  className="px-3 py-1.5 text-[#656D76] dark:text-[#8B949E]"
+                  className="px-4 py-2 rounded-xl bg-[#F6F4EE] text-[#6F6A60] font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-blue-600 text-white rounded-lg font-medium"
+                  className="px-4 py-2 rounded-xl bg-[#1B1B1B] text-white font-semibold hover:bg-[#C76A2A]"
                 >
-                  Verify Skill
+                  Add Skill
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
     </PortalLayout>
   );
 }

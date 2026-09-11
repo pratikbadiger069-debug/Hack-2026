@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
+import { getLevelInfo } from '@/lib/xp-engine';
 import {
   Home,
   MapPin,
@@ -22,7 +23,6 @@ import {
   Sparkles,
   CheckCircle2,
   Compass,
-  FileText,
 } from 'lucide-react';
 
 interface NavItem {
@@ -34,7 +34,8 @@ interface NavItem {
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { currentRole, level, xp } = useAppStore();
+  const { currentRole, xp } = useAppStore();
+  const levelInfo = getLevelInfo(xp);
 
   const studentLinks: NavItem[] = [
     { name: 'Home', href: '/student', icon: Home },
@@ -83,9 +84,9 @@ export function Sidebar() {
       : adminLinks;
 
   return (
-    <aside className="w-56 bg-transparent border-r border-[#E6E4DD] dark:border-[#2D333B] flex flex-col shrink-0 min-h-[calc(100vh-3.5rem)] p-3">
+    <aside className="w-60 bg-transparent border-r border-[#E8E5DD] flex flex-col shrink-0 min-h-[calc(100vh-3.5rem)] p-4">
       {/* Navigation Links */}
-      <nav className="flex-1 space-y-0.5">
+      <nav className="flex-1 space-y-1">
         {links.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
@@ -93,18 +94,16 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center justify-between px-3 py-2 text-xs rounded-lg font-medium transition-colors ${
+              className={`flex items-center justify-between px-3.5 py-2.5 text-xs rounded-xl font-medium transition-all ${
                 isActive
-                  ? 'bg-[#1F2328] dark:bg-[#F0F6FC] text-white dark:text-[#0F1115] font-semibold'
-                  : 'text-[#656D76] dark:text-[#8B949E] hover:text-[#1F2328] dark:hover:text-[#F0F6FC] hover:bg-black/5 dark:hover:bg-white/5'
+                  ? 'bg-[#1B1B1B] text-white font-semibold shadow-xs'
+                  : 'text-[#6F6A60] hover:text-[#1B1B1B] hover:bg-black/4'
               }`}
             >
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-3">
                 <Icon
                   className={`w-4 h-4 ${
-                    isActive
-                      ? 'text-white dark:text-[#0F1115]'
-                      : 'text-[#8C959F] dark:text-[#6E7681]'
+                    isActive ? 'text-[#C76A2A]' : 'text-[#6F6A60]'
                   }`}
                 />
                 <span>{item.name}</span>
@@ -112,10 +111,10 @@ export function Sidebar() {
 
               {item.badge && (
                 <span
-                  className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
+                  className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${
                     isActive
-                      ? 'bg-white/20 dark:bg-black/20 text-white dark:text-[#0F1115]'
-                      : 'bg-[#E6E4DD] dark:bg-[#2D333B] text-[#656D76] dark:text-[#8B949E]'
+                      ? 'bg-white/20 text-white'
+                      : 'bg-[#E8E5DD] text-[#6F6A60]'
                   }`}
                 >
                   {item.badge}
@@ -126,21 +125,26 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Subtle Student Profile Pill */}
+      {/* Builder Status Pill */}
       {currentRole === 'student' && (
-        <div className="p-3 bg-white dark:bg-[#161B22] rounded-lg border border-[#E6E4DD] dark:border-[#2D333B] text-xs space-y-1.5 mt-auto">
+        <div className="p-3.5 bg-white rounded-2xl border border-[#E8E5DD] text-xs space-y-2 mt-auto shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-medium text-[#1F2328] dark:text-[#F0F6FC]">
-              Level {level} Builder
-            </span>
-            <span className="text-[10px] font-mono text-[#656D76] dark:text-[#8B949E]">
+            <div className="flex flex-col">
+              <span className="text-[11px] font-semibold text-[#1B1B1B]">
+                Level {levelInfo.level} {levelInfo.title}
+              </span>
+              <span className="text-[10px] text-[#6F6A60]">
+                Rank #{levelInfo.rank} • {levelInfo.nextLevelXP - levelInfo.currentLevelProgress} XP to Lvl {levelInfo.level + 1}
+              </span>
+            </div>
+            <span className="text-[11px] font-mono font-semibold text-[#C76A2A]">
               {xp} XP
             </span>
           </div>
-          <div className="w-full h-1 bg-[#E6E4DD] dark:bg-[#2D333B] rounded-full overflow-hidden">
+          <div className="w-full h-1.5 bg-[#E8E5DD] rounded-full overflow-hidden">
             <div
-              className="h-full bg-blue-600 dark:bg-blue-400 progress-fill"
-              style={{ width: `${Math.min(100, (xp % 1000) / 10)}%` }}
+              className="h-full bg-[#C76A2A] rounded-full transition-all duration-500"
+              style={{ width: `${levelInfo.percentToNext}%` }}
             />
           </div>
         </div>

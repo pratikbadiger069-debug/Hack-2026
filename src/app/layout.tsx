@@ -34,7 +34,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[#FAFAF8] text-slate-900 selection:bg-blue-100 selection:text-blue-900">
+      <body className="min-h-full flex flex-col bg-[#F6F4EE] text-[#1B1B1B] selection:bg-[#C76A2A]/15 selection:text-[#C76A2A]">
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
