@@ -26,11 +26,19 @@ import {
   Award,
   ChevronRight,
   KeyRound,
+  Compass,
+  Code2,
+  Layers,
+  GraduationCap,
+  Flame,
+  Check,
 } from 'lucide-react';
 
 export default function CareerCopilotPage() {
   const { studentProfile, aiKeys, activeProvider } = useAppStore();
-  const [targetRole, setTargetRole] = useState(studentProfile.targetRole || 'AI Engineer');
+  const [targetRole, setTargetRole] = useState(
+    studentProfile.careerPath || studentProfile.targetRole || 'Software Development'
+  );
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [inputQuery, setInputQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -45,12 +53,17 @@ export default function CareerCopilotPage() {
     setMissions(context.weeklyMissions);
   }, [targetRole]);
 
-  // Initial conversational greeting in Claude/Anthropic tone
+  // Initial personalized greeting
+  const firstName = studentProfile?.name?.split(' ')[0] || 'Builder';
+  const collegeName = studentProfile?.academic?.college || studentProfile?.college || 'University';
+  const builderScore = studentProfile?.builderScores?.overall || 480;
+  const currentGoal = studentProfile?.careerGoal || 'Internship';
+
   const [messages, setMessages] = useState<CopilotChatMessage[]>([
     {
       id: 'msg-init',
       sender: 'copilot',
-      text: `Good evening ${studentProfile.name.split(' ')[0]}. I've reviewed your verified skills in Python and PyTorch, your academic standing (${studentProfile.academic.cgpa} CGPA), and your recent vector search capstones.\n\nYour current readiness for **${targetRole}** is at **${context.readinessScore}%**.\n\nBased on your projects and recent assessment history, focusing on **Docker** and **System Design** this week would provide the fastest improvement toward your goal. Where would you like to begin?`,
+      text: `Welcome back, **${firstName}**! I've loaded your verified profile at **${collegeName}**.\n\n- **Target Career:** **${targetRole}**\n- **Primary Goal:** **${currentGoal}**\n- **Builder Score:** **${builderScore} / 1000** (Readiness: **${context.readinessScore}%**)\n\nI can analyze your skill gaps, generate a weekly plan, review your GitHub repos, or prepare you for technical interviews. What shall we tackle first?`,
       timestamp: 'Just now',
     },
   ]);
@@ -121,11 +134,18 @@ export default function CareerCopilotPage() {
 
   const sampleRoles = Object.keys(ROLE_BENCHMARKS);
 
-  const quickPrompts = [
-    'What should I learn next?',
-    'Review my readiness for placements',
-    'Which project should I build next?',
-    'Diagnose my skill gaps',
+  // 10 Copilot Abilities Chips
+  const copilotAbilities = [
+    { label: '🔍 Diagnose Skill Gaps', query: 'Diagnose my skill gaps for ' + targetRole },
+    { label: '🚀 Next Skills to Learn', query: 'What should I learn next to improve my readiness?' },
+    { label: '🛠️ Recommended Projects', query: 'Suggest high-impact projects based on my career path' },
+    { label: '📅 Weekly Learning Plan', query: 'Generate a personalized weekly learning plan for me' },
+    { label: '💼 Internships & Hackathons', query: 'Recommend internships and hackathons matched to my profile' },
+    { label: '🐙 Review GitHub Repos', query: 'Review my GitHub profile and repository evidence' },
+    { label: '💡 Explain Skill Importance', query: 'Why is system design and data structures important for ' + targetRole + '?' },
+    { label: '🎯 Interview Prep Plan', query: 'Generate a technical interview preparation plan for ' + targetRole },
+    { label: '🧭 Career GPS & Progress', query: 'Track my progress and roadmap trajectory against my career goals' },
+    { label: '🧑‍🏫 Personal Career Mentor', query: 'Act as my personal career mentor and tell me my immediate next action step' },
   ];
 
   const completedMissionsCount = missions.filter((m) => m.completed).length;
@@ -133,25 +153,25 @@ export default function CareerCopilotPage() {
   return (
     <PortalLayout>
       <div className="space-y-6 max-w-[1300px] mx-auto pb-12">
-        {/* Top Minimalist Header */}
+        {/* Top Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E8E5DD]">
           <div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#C76A2A]" />
               <h1 className="text-2xl font-bold text-[#1B1B1B] tracking-tight">
-                Career Copilot
+                AI Career Copilot
               </h1>
             </div>
             <p className="text-xs text-[#6F6A60] mt-0.5">
-              Personalized mentor analyzing your verified skills, projects, and target role trajectory.
+              Personalized mentor calibrated on your Builder Score, verified skills, and career goals.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
             {/* Goal Selector */}
-            <div className="flex items-center gap-2 bg-white border border-[#E8E5DD] rounded-xl px-3.5 py-1.5 shadow-xs">
+            <div className="flex items-center gap-2 bg-white border border-[#E8E5DD] rounded-xl px-3.5 py-1.5 shadow-none">
               <Target className="w-3.5 h-3.5 text-[#C76A2A]" />
-              <span className="text-xs text-[#6F6A60] font-medium">Goal:</span>
+              <span className="text-xs text-[#6F6A60] font-medium">Path:</span>
               <select
                 value={targetRole}
                 onChange={(e) => setTargetRole(e.target.value)}
@@ -168,7 +188,7 @@ export default function CareerCopilotPage() {
             {/* Provider Pill */}
             <button
               onClick={() => setIsAiModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-[#FAF9F5] border border-[#E8E5DD] rounded-xl text-xs font-semibold text-[#1B1B1B] transition-all shadow-xs"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-[#FAF9F5] border border-[#E8E5DD] rounded-xl text-xs font-semibold text-[#1B1B1B] transition-all shadow-none cursor-pointer"
             >
               <KeyRound className="w-3.5 h-3.5 text-[#C76A2A]" />
               <span className="capitalize">{activeProvider} AI</span>
@@ -179,7 +199,7 @@ export default function CareerCopilotPage() {
         {/* 2-Column Experience: Center Conversation + Right Career Insights */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* CENTER: Main Conversation View */}
-          <div className="lg:col-span-8 flex flex-col h-[740px] bg-white border border-[#E8E5DD] rounded-2xl shadow-xs overflow-hidden">
+          <div className="lg:col-span-8 flex flex-col h-[740px] bg-white border border-[#E8E5DD] rounded-2xl shadow-none overflow-hidden">
             {/* Chat Status Header */}
             <div className="px-6 py-3.5 border-b border-[#E8E5DD] bg-[#FAF9F5] flex items-center justify-between text-xs">
               <div className="flex items-center gap-2 text-[#6F6A60]">
@@ -194,12 +214,12 @@ export default function CareerCopilotPage() {
                     {
                       id: `msg-${Date.now()}`,
                       sender: 'copilot',
-                      text: `Conversation cleared. I am ready to guide your next steps toward **${targetRole}**.`,
+                      text: `Conversation reset. Ready to guide your path toward **${targetRole}**. How can I help you?`,
                       timestamp: 'Just now',
                     },
                   ])
                 }
-                className="text-[#6F6A60] hover:text-[#1B1B1B] flex items-center gap-1 font-medium transition-colors"
+                className="text-[#6F6A60] hover:text-[#1B1B1B] flex items-center gap-1 font-medium transition-colors cursor-pointer"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reset</span>
@@ -218,7 +238,7 @@ export default function CareerCopilotPage() {
                     className={`flex gap-3 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     {msg.sender === 'copilot' && (
-                      <div className="w-7 h-7 rounded-xl bg-[#1B1B1B] text-white flex items-center justify-center shrink-0 text-xs font-bold mt-1 shadow-xs">
+                      <div className="w-7 h-7 rounded-xl bg-[#1B1B1B] text-white flex items-center justify-center shrink-0 text-xs font-bold mt-1 shadow-none">
                         SB
                       </div>
                     )}
@@ -227,12 +247,17 @@ export default function CareerCopilotPage() {
                       className={`max-w-[85%] rounded-2xl p-4 text-xs leading-relaxed ${
                         msg.sender === 'user'
                           ? 'bg-[#1B1B1B] text-white rounded-br-xs'
-                          : 'bg-white text-[#1B1B1B] border border-[#E8E5DD] rounded-bl-xs shadow-xs'
+                          : 'bg-white text-[#1B1B1B] border border-[#E8E5DD] rounded-bl-xs shadow-none'
                       }`}
                     >
                       <div className="space-y-2 whitespace-pre-wrap">
                         {msg.text.split('\n\n').map((para, pIdx) => {
-                          if (para.startsWith('- ') || para.startsWith('1. ') || para.startsWith('2. ') || para.startsWith('3. ')) {
+                          if (
+                            para.startsWith('- ') ||
+                            para.startsWith('1. ') ||
+                            para.startsWith('2. ') ||
+                            para.startsWith('3. ')
+                          ) {
                             return (
                               <div key={pIdx} className="space-y-1.5 my-2 pl-1">
                                 {para.split('\n').map((line, lIdx) => (
@@ -263,21 +288,21 @@ export default function CareerCopilotPage() {
 
                       {/* Structured Roadmap rendering */}
                       {msg.structuredType === 'roadmap' && (
-                        <div className="mt-3 space-y-2 pt-3 border-t border-[#ECEAE4]">
+                        <div className="mt-3 space-y-2 pt-3 border-t border-[#E8E5DD]">
                           {context.roadmapPhases.map((phase) => (
                             <div
                               key={phase.id}
-                              className="p-3 bg-[#FAF9F5] border border-[#ECEAE4] rounded-xl space-y-1"
+                              className="p-3 bg-[#FAF9F5] border border-[#E8E5DD] rounded-xl space-y-1"
                             >
                               <div className="flex items-center justify-between text-xs">
-                                <span className="font-semibold text-[#1F1F1F]">
+                                <span className="font-semibold text-[#1B1B1B]">
                                   Phase {phase.phaseNumber}: {phase.title}
                                 </span>
-                                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#D97706]/10 text-[#D97706]">
+                                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#C76A2A]/10 text-[#C76A2A]">
                                   {phase.progressPercentage}%
                                 </span>
                               </div>
-                              <p className="text-xs text-[#6B6B6B]">{phase.description}</p>
+                              <p className="text-xs text-[#6E6E6A]">{phase.description}</p>
                             </div>
                           ))}
                         </div>
@@ -285,24 +310,24 @@ export default function CareerCopilotPage() {
 
                       {/* Structured Projects rendering */}
                       {msg.structuredType === 'projects' && (
-                        <div className="mt-3 space-y-2 pt-3 border-t border-[#ECEAE4]">
+                        <div className="mt-3 space-y-2 pt-3 border-t border-[#E8E5DD]">
                           {context.benchmark.recommendedProjects.map((proj, idx) => (
                             <div
                               key={idx}
-                              className="p-3 bg-[#FAF9F5] border border-[#ECEAE4] rounded-xl space-y-1.5"
+                              className="p-3 bg-[#FAF9F5] border border-[#E8E5DD] rounded-xl space-y-1.5"
                             >
                               <div className="flex items-center justify-between text-xs">
-                                <span className="font-semibold text-[#1F1F1F]">{proj.title}</span>
-                                <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-white border border-[#ECEAE4] text-[#6B6B6B]">
+                                <span className="font-semibold text-[#1B1B1B]">{proj.title}</span>
+                                <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-white border border-[#E8E5DD] text-[#6E6E6A]">
                                   {proj.difficulty}
                                 </span>
                               </div>
-                              <p className="text-xs text-[#6B6B6B]">{proj.description}</p>
+                              <p className="text-xs text-[#6E6E6A]">{proj.description}</p>
                               <div className="flex flex-wrap gap-1 pt-1">
                                 {proj.techStack.map((tech) => (
                                   <span
                                     key={tech}
-                                    className="text-[10px] px-2 py-0.5 rounded bg-white border border-[#ECEAE4] text-[#1F1F1F] font-mono"
+                                    className="text-[10px] px-2 py-0.5 rounded bg-white border border-[#E8E5DD] text-[#1B1B1B] font-mono"
                                   >
                                     {tech}
                                   </span>
@@ -315,7 +340,7 @@ export default function CareerCopilotPage() {
 
                       <div
                         className={`text-[10px] mt-2 font-mono ${
-                          msg.sender === 'user' ? 'text-[#FAF9F5]/60' : 'text-[#6B6B6B]'
+                          msg.sender === 'user' ? 'text-white/60' : 'text-[#6E6E6A]'
                         } text-right`}
                       >
                         {msg.timestamp}
@@ -323,8 +348,8 @@ export default function CareerCopilotPage() {
                     </div>
 
                     {msg.sender === 'user' && (
-                      <div className="w-7 h-7 rounded-full bg-[#ECEAE4] text-[#1F1F1F] flex items-center justify-center shrink-0 text-xs font-medium mt-1">
-                        {studentProfile.name.charAt(0)}
+                      <div className="w-7 h-7 rounded-full bg-[#E8E5DD] text-[#1B1B1B] flex items-center justify-center shrink-0 text-xs font-medium mt-1">
+                        {studentProfile.name ? studentProfile.name.charAt(0) : 'U'}
                       </div>
                     )}
                   </motion.div>
@@ -337,28 +362,28 @@ export default function CareerCopilotPage() {
                   animate={{ opacity: 1, y: 0 }}
                   className="flex gap-3 justify-start"
                 >
-                  <div className="w-7 h-7 rounded-xl bg-[#1B1B1B] text-white flex items-center justify-center shrink-0 text-xs font-bold mt-1 shadow-xs">
+                  <div className="w-7 h-7 rounded-xl bg-[#1B1B1B] text-white flex items-center justify-center shrink-0 text-xs font-bold mt-1 shadow-none">
                     SB
                   </div>
-                  <div className="bg-white border border-[#E8E5DD] rounded-2xl rounded-bl-xs p-4 text-xs text-[#6F6A60] flex items-center gap-2 shadow-xs">
+                  <div className="bg-white border border-[#E8E5DD] rounded-2xl rounded-bl-xs p-4 text-xs text-[#6F6A60] flex items-center gap-2 shadow-none">
                     <Loader2 className="w-3.5 h-3.5 animate-spin text-[#C76A2A]" />
-                    <span>Analyzing your verified skills and generating guidance...</span>
+                    <span>Analyzing your profile and generating personalized strategy...</span>
                   </div>
                 </motion.div>
               )}
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Quick Prompt Chips */}
+            {/* 10 Copilot Abilities Chips */}
             <div className="px-6 py-2.5 bg-white border-t border-[#E8E5DD] flex items-center gap-2 overflow-x-auto no-scrollbar">
-              <span className="text-[11px] text-[#6F6A60] shrink-0 font-medium">Prompts:</span>
-              {quickPrompts.map((q, idx) => (
+              <span className="text-[11px] text-[#6F6A60] shrink-0 font-medium">Abilities:</span>
+              {copilotAbilities.map((item, idx) => (
                 <button
                   key={idx}
-                  onClick={() => handleSendMessage(q)}
-                  className="text-xs px-3 py-1 rounded-xl bg-[#FAF9F5] hover:bg-[#F6F4EE] text-[#1B1B1B] border border-[#E8E5DD] hover:border-[#C76A2A] transition-all shrink-0 font-medium"
+                  onClick={() => handleSendMessage(item.query)}
+                  className="text-xs px-3 py-1 rounded-xl bg-[#FAF9F5] hover:bg-[#F6F4EE] text-[#1B1B1B] border border-[#E8E5DD] hover:border-[#C76A2A] transition-all shrink-0 font-medium cursor-pointer"
                 >
-                  {q}
+                  {item.label}
                 </button>
               ))}
             </div>
@@ -376,13 +401,13 @@ export default function CareerCopilotPage() {
                   type="text"
                   value={inputQuery}
                   onChange={(e) => setInputQuery(e.target.value)}
-                  placeholder={`Ask anything about your path to ${targetRole}...`}
+                  placeholder={`Ask anything about your ${targetRole} path, skills, or interviews...`}
                   className="flex-1 px-4 py-2.5 text-xs bg-[#FAF9F5] border border-[#E8E5DD] rounded-xl focus:outline-none focus:bg-white focus:border-[#C76A2A] text-[#1B1B1B] placeholder:text-[#6F6A60] transition-all"
                 />
                 <button
                   type="submit"
                   disabled={loading || !inputQuery.trim()}
-                  className="px-4 py-2.5 bg-[#C76A2A] hover:bg-[#B55D22] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all disabled:opacity-40 shrink-0 cursor-pointer shadow-xs"
+                  className="px-4 py-2.5 bg-[#C76A2A] hover:bg-[#B55D22] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all disabled:opacity-40 shrink-0 cursor-pointer shadow-none"
                 >
                   {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
                   <span>Send</span>
@@ -394,13 +419,13 @@ export default function CareerCopilotPage() {
           {/* RIGHT: Career Insights Panel */}
           <div className="lg:col-span-4 space-y-4">
             {/* 1. Readiness */}
-            <div className="bg-white p-5 rounded-2xl border border-[#E8E5DD] shadow-xs space-y-3">
+            <div className="bg-white p-5 rounded-2xl border border-[#E8E5DD] shadow-none space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono uppercase tracking-wider text-[#6F6A60]">
                   Career Readiness
                 </span>
                 <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#2F7A45]/10 text-[#2F7A45]">
-                  Top 10%
+                  Top Tier
                 </span>
               </div>
               <div className="flex items-baseline justify-between">
@@ -419,53 +444,64 @@ export default function CareerCopilotPage() {
               </div>
             </div>
 
-            {/* 2. Current Goal */}
-            <div className="bg-white p-5 rounded-2xl border border-[#E8E5DD] shadow-xs space-y-2">
-              <span className="text-xs font-mono uppercase tracking-wider text-[#6F6A60]">
-                Current Goal
-              </span>
-              <div className="flex items-center justify-between pt-1">
-                <div>
-                  <h3 className="text-base font-bold text-[#1B1B1B]">{targetRole}</h3>
-                  <p className="text-xs text-[#6F6A60] mt-0.5">
-                    ETA: {context.careerGps.estimatedMonths} Months to full readiness
-                  </p>
+            {/* 2. Builder Profile Context Card */}
+            <div className="bg-white p-5 rounded-2xl border border-[#E8E5DD] shadow-none space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono uppercase tracking-wider text-[#6F6A60]">
+                  Builder Profile
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#1B1B1B] text-white font-mono">
+                  {studentProfile.builderLevel || 'Explorer'}
+                </span>
+              </div>
+              <div className="pt-1">
+                <h3 className="text-sm font-bold text-[#1B1B1B]">{studentProfile.name}</h3>
+                <p className="text-xs text-[#6E6E6A] mt-0.5">
+                  {studentProfile.degree || studentProfile.academic?.degree || 'B.Tech'} • {collegeName}
+                </p>
+                <div className="flex items-center justify-between pt-2 border-t border-[#E8E5DD] mt-2 text-xs">
+                  <span className="text-[#6E6E6A]">Builder Score:</span>
+                  <strong className="text-[#1B1B1B] font-mono">{builderScore} / 1000</strong>
                 </div>
-                <div className="p-2 rounded-xl bg-[#FAF9F5] border border-[#E8E5DD]">
-                  <Target className="w-4 h-4 text-[#C76A2A]" />
+                <div className="flex items-center justify-between pt-1 text-xs">
+                  <span className="text-[#6E6E6A]">Primary Goal:</span>
+                  <strong className="text-[#C76A2A]">{currentGoal}</strong>
                 </div>
               </div>
             </div>
 
             {/* 3. Top Skills */}
-            <div className="bg-white p-5 rounded-2xl border border-[#E8E5DD] shadow-xs space-y-3">
+            <div className="bg-white p-5 rounded-2xl border border-[#E8E5DD] shadow-none space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono uppercase tracking-wider text-[#6F6A60]">
-                  Verified Top Skills
+                  Top Skills
                 </span>
                 <span className="text-xs text-[#6F6A60] font-mono">
-                  {studentProfile.verifiedSkills.length} Verified
+                  {studentProfile.verifiedSkills?.length || studentProfile.knownSkills?.length || 4} Tracked
                 </span>
               </div>
               <div className="flex flex-wrap gap-1.5">
-                {studentProfile.verifiedSkills.slice(0, 5).map((skill, idx) => (
+                {(studentProfile.verifiedSkills && studentProfile.verifiedSkills.length > 0
+                  ? studentProfile.verifiedSkills.slice(0, 5).map((s) => s.name)
+                  : studentProfile.knownSkills?.slice(0, 5) || ['Python', 'TypeScript', 'React']
+                ).map((skillName, idx) => (
                   <span
                     key={idx}
                     className="text-xs px-2.5 py-1 rounded-xl bg-[#FAF9F5] border border-[#E8E5DD] text-[#1B1B1B] font-medium"
                   >
-                    {skill.name} <span className="text-[#6F6A60] text-[10px]">({skill.score}%)</span>
+                    {skillName}
                   </span>
                 ))}
               </div>
             </div>
 
             {/* 4. Skill Gaps */}
-            <div className="bg-white p-5 rounded-2xl border border-[#E8E5DD] shadow-xs space-y-3">
+            <div className="bg-white p-5 rounded-2xl border border-[#E8E5DD] shadow-none space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono uppercase tracking-wider text-[#6F6A60]">
                   Skill Gaps to Close
                 </span>
-                <span className="text-xs text-[#C76A2A] font-semibold">High Impact</span>
+                <span className="text-xs text-[#C76A2A] font-semibold">High ROI</span>
               </div>
               <div className="space-y-2">
                 {context.missingSkills.slice(0, 3).map((skill, idx) => (
@@ -480,11 +516,11 @@ export default function CareerCopilotPage() {
               </div>
             </div>
 
-            {/* 5. Weekly Progress */}
-            <div className="bg-white p-5 rounded-2xl border border-[#E8E5DD] shadow-xs space-y-3">
+            {/* 5. Weekly Missions */}
+            <div className="bg-white p-5 rounded-2xl border border-[#E8E5DD] shadow-none space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono uppercase tracking-wider text-[#6F6A60]">
-                  Weekly Progress
+                  Weekly Action Plan
                 </span>
                 <span className="text-xs font-mono text-[#1B1B1B] font-semibold">
                   {completedMissionsCount} of {missions.length} Done
@@ -522,4 +558,3 @@ export default function CareerCopilotPage() {
     </PortalLayout>
   );
 }
-

@@ -21,120 +21,100 @@ export interface TargetRoleBenchmark {
 }
 
 export const ROLE_BENCHMARKS: Record<string, TargetRoleBenchmark> = {
-  'AI Engineer': {
-    role: 'AI Engineer',
+  'Software Development': {
+    role: 'Software Development',
     requiredSkills: [
-      { name: 'Python & FastAPI', category: 'Programming', importance: 'Core', minScore: 85 },
-      { name: 'PyTorch & Transformers', category: 'AI & ML', importance: 'Core', minScore: 85 },
-      { name: 'Vector Databases (pgvector/Pinecone/Chroma)', category: 'Database', importance: 'Core', minScore: 80 },
-      { name: 'Distributed Systems & RPC', category: 'Programming', importance: 'High', minScore: 75 },
-      { name: 'Docker & Kubernetes', category: 'DevOps', importance: 'High', minScore: 75 },
-      { name: 'LLM Fine-tuning & LoRA/PEFT', category: 'AI & ML', importance: 'High', minScore: 80 },
-      { name: 'CUDA & Kernel Optimization', category: 'AI & ML', importance: 'Complementary', minScore: 70 },
-      { name: 'MLOps & CI/CD Pipelines', category: 'DevOps', importance: 'High', minScore: 75 },
+      { name: 'TypeScript & Next.js', category: 'Programming', importance: 'Core', minScore: 85 },
+      { name: 'Data Structures & Algorithms', category: 'Programming', importance: 'Core', minScore: 85 },
+      { name: 'PostgreSQL & SQL Schema Design', category: 'Database', importance: 'Core', minScore: 80 },
+      { name: 'REST & GraphQL API Architecture', category: 'Programming', importance: 'Core', minScore: 80 },
+      { name: 'Docker Containerization', category: 'DevOps', importance: 'High', minScore: 75 },
+      { name: 'Redis Caching & State Management', category: 'Database', importance: 'High', minScore: 75 },
+      { name: 'CI/CD & Automated Testing (Jest/Playwright)', category: 'DevOps', importance: 'High', minScore: 75 },
+      { name: 'System Design & Distributed Scalability', category: 'Programming', importance: 'High', minScore: 75 },
     ],
     recommendedProjects: [
       {
-        title: 'Production RAG Vector Search Engine with Hybrid Dense-Sparse Reranking',
-        description: 'Build a multi-tenant retrieval system using FastAPI, pgvector, and cross-encoder rerankers with sub-25ms latency.',
-        techStack: ['Python', 'FastAPI', 'pgvector', 'Cross-Encoders', 'Docker'],
+        title: 'Distributed Multi-Tenant Task Execution Engine',
+        description: 'Design a queue-backed worker cluster in TypeScript with Redis pub/sub, idempotent deduplication, and failure retries.',
+        techStack: ['TypeScript', 'Node.js', 'Redis', 'PostgreSQL', 'Docker'],
+        difficulty: 'Advanced',
+      },
+      {
+        title: 'Full-Stack Real-time Collaborative Canvas',
+        description: 'Multiplayer board with WebSockets CRDT state synchronization, role-based RBAC, and responsive UI.',
+        techStack: ['React', 'Next.js', 'Tailwind', 'WebSockets', 'Prisma'],
+        difficulty: 'Intermediate',
+      },
+      {
+        title: 'High-Throughput URL Shortener & Clickstream Telemetry',
+        description: 'Sub-15ms redirection gateway with LRU memory caching, rate limiting, and partitioned analytics.',
+        techStack: ['Go/Node.js', 'PostgreSQL', 'Redis', 'Docker'],
+        difficulty: 'Intermediate',
+      },
+    ],
+    certifications: [
+      { name: 'AWS Certified Developer - Associate', issuer: 'Amazon Web Services', priority: 'High' },
+      { name: 'Meta Front-End / Back-End Professional Certificate', issuer: 'Meta / Coursera', priority: 'Medium' },
+    ],
+    industryAvgScore: 72,
+    topStudentsScore: 88,
+    avgMonthsToReady: 5,
+  },
+
+  'AI / Machine Learning': {
+    role: 'AI / Machine Learning',
+    requiredSkills: [
+      { name: 'Python & PyTorch', category: 'AI & ML', importance: 'Core', minScore: 88 },
+      { name: 'Transformers & LLM Architectures', category: 'AI & ML', importance: 'Core', minScore: 85 },
+      { name: 'Vector Databases (pgvector/Pinecone/Chroma)', category: 'Database', importance: 'Core', minScore: 82 },
+      { name: 'FastAPI & Async Inference Serving', category: 'Programming', importance: 'High', minScore: 80 },
+      { name: 'LLM Fine-tuning (LoRA / QLoRA / PEFT)', category: 'AI & ML', importance: 'High', minScore: 80 },
+      { name: 'Docker & GPU Containerization', category: 'DevOps', importance: 'High', minScore: 75 },
+      { name: 'Model Evaluation & RAG Tracing (Langfuse/Arize)', category: 'AI & ML', importance: 'High', minScore: 75 },
+    ],
+    recommendedProjects: [
+      {
+        title: 'Enterprise Multi-Modal RAG Engine with Hybrid Reranking',
+        description: 'Multi-tenant document retrieval system using cross-encoders, BM25 + dense embedding hybrid search, and citation graphs.',
+        techStack: ['Python', 'FastAPI', 'pgvector', 'Cross-Encoders', 'Next.js'],
         difficulty: 'Advanced',
       },
       {
         title: 'Autonomous Multi-Agent Workflow Engine with Tool Calling',
-        description: 'Implement a stateful agent graph with memory buffers, LangGraph orchestration, and human-in-the-loop validation.',
-        techStack: ['Python', 'LangGraph', 'Redis', 'OpenAI API', 'Next.js'],
+        description: 'Stateful cyclic agent graph using LangGraph, short/long-term memory buffers, and human approval gates.',
+        techStack: ['Python', 'LangGraph', 'Redis', 'OpenAI / Gemini API', 'Docker'],
         difficulty: 'Advanced',
-      },
-      {
-        title: 'High-Throughput Async Inference Gateway',
-        description: 'Design a queue-backed streaming gateway supporting dynamic batching and token rate limiting.',
-        techStack: ['Python', 'Redis Queue', 'vLLM', 'Prometheus', 'Grafana'],
-        difficulty: 'Advanced',
-      },
-      {
-        title: 'Quantized On-Device Edge Vision Model Pipeline',
-        description: 'Convert and prune computer vision transformer models for low-power edge deployment via ONNX Runtime.',
-        techStack: ['PyTorch', 'ONNX', 'OpenCV', 'FastAPI'],
-        difficulty: 'Intermediate',
       },
     ],
     certifications: [
       { name: 'DeepLearning.AI Deep Learning Specialization', issuer: 'DeepLearning.AI / Coursera', priority: 'High' },
       { name: 'AWS Certified Machine Learning - Specialty', issuer: 'Amazon Web Services', priority: 'High' },
-      { name: 'NVIDIA Certified Associate: Generative AI and LLMs', issuer: 'NVIDIA Deep Learning Institute', priority: 'Medium' },
     ],
     industryAvgScore: 74,
-    topStudentsScore: 88,
+    topStudentsScore: 90,
     avgMonthsToReady: 6,
   },
-  'Backend Engineer': {
-    role: 'Backend Engineer',
+
+  'Data Science': {
+    role: 'Data Science',
     requiredSkills: [
-      { name: 'TypeScript & Next.js', category: 'Programming', importance: 'Core', minScore: 85 },
-      { name: 'PostgreSQL & pgvector', category: 'Database', importance: 'Core', minScore: 85 },
-      { name: 'Distributed Systems & RPC', category: 'Programming', importance: 'Core', minScore: 80 },
-      { name: 'Docker & Kubernetes', category: 'DevOps', importance: 'High', minScore: 80 },
-      { name: 'Redis Caching & PubSub', category: 'Database', importance: 'High', minScore: 80 },
-      { name: 'gRPC & Protocol Buffers', category: 'Programming', importance: 'High', minScore: 75 },
-      { name: 'Kafka / RabbitMQ Event Streaming', category: 'Cloud', importance: 'High', minScore: 75 },
-      { name: 'Database Sharding & Query Optimization', category: 'Database', importance: 'Complementary', minScore: 75 },
+      { name: 'Python, Pandas & NumPy', category: 'Programming', importance: 'Core', minScore: 90 },
+      { name: 'Statistical Inference & Hypothesis Testing', category: 'AI & ML', importance: 'Core', minScore: 85 },
+      { name: 'Advanced SQL & Data Warehouse Modeling', category: 'Database', importance: 'Core', minScore: 85 },
+      { name: 'Scikit-Learn & Gradient Boosting (XGBoost/LightGBM)', category: 'AI & ML', importance: 'High', minScore: 82 },
+      { name: 'Data Visualization (Plotly/Seaborn/Streamlit)', category: 'Programming', importance: 'High', minScore: 80 },
+      { name: 'Feature Engineering & Data Validation (Great Expectations)', category: 'Database', importance: 'High', minScore: 78 },
     ],
     recommendedProjects: [
       {
-        title: 'Distributed Distributed Rate Limiter & Token Bucket Cluster',
-        description: 'Build a high-concurrency rate limiting middleware in Go / Node.js using Redis sliding-window log algorithms.',
-        techStack: ['TypeScript/Node', 'Redis Cluster', 'gRPC', 'Docker', 'Prometheus'],
-        difficulty: 'Advanced',
-      },
-      {
-        title: 'Real-time Financial Ledger & Transaction Engine',
-        description: 'Double-entry accounting backend with strict ACID compliance, idempotency keys, and audit event logs.',
-        techStack: ['PostgreSQL', 'TypeScript', 'Prisma', 'Docker', 'Jest'],
-        difficulty: 'Advanced',
-      },
-      {
-        title: 'Scalable URL Shortener & Analytics Ingestion Pipeline',
-        description: 'High-throughput link redirection with Redis caching, Kafka clickstream telemetry, and ClickHouse aggregation.',
-        techStack: ['Node.js', 'Redis', 'Kafka', 'ClickHouse', 'Tailwind'],
+        title: 'Predictive Customer Churn Pipeline with Explainable AI (SHAP)',
+        description: 'End-to-end ML pipeline with cross-validation, feature drift tracking, and interactive Streamlit decision dashboard.',
+        techStack: ['Python', 'XGBoost', 'SHAP', 'Streamlit', 'PostgreSQL'],
         difficulty: 'Intermediate',
       },
       {
-        title: 'Multi-Tenant Job Portal REST & GraphQL API',
-        description: 'Role-based access control with RBAC middleware, JWT auth, resume parser queue, and full-text search.',
-        techStack: ['Express', 'PostgreSQL', 'Redis', 'JWT', 'Swagger'],
-        difficulty: 'Intermediate',
-      },
-    ],
-    certifications: [
-      { name: 'AWS Certified Solutions Architect - Associate', issuer: 'Amazon Web Services', priority: 'High' },
-      { name: 'Certified Kubernetes Application Developer (CKAD)', issuer: 'Cloud Native Computing Foundation', priority: 'High' },
-      { name: 'MongoDB Certified Developer Associate', issuer: 'MongoDB Inc.', priority: 'Medium' },
-    ],
-    industryAvgScore: 72,
-    topStudentsScore: 86,
-    avgMonthsToReady: 5,
-  },
-  'Data Scientist': {
-    role: 'Data Scientist',
-    requiredSkills: [
-      { name: 'Python & FastAPI', category: 'Programming', importance: 'Core', minScore: 90 },
-      { name: 'PyTorch & Transformers', category: 'AI & ML', importance: 'Core', minScore: 80 },
-      { name: 'PostgreSQL & pgvector', category: 'Database', importance: 'Core', minScore: 85 },
-      { name: 'Statistical Modeling & Hypothesis Testing', category: 'AI & ML', importance: 'Core', minScore: 85 },
-      { name: 'Data Visualization & Streamlit/Tableau', category: 'Programming', importance: 'High', minScore: 80 },
-      { name: 'Scikit-Learn & XGBoost', category: 'AI & ML', importance: 'High', minScore: 85 },
-      { name: 'Feature Engineering & Data Cleaning', category: 'Database', importance: 'High', minScore: 85 },
-    ],
-    recommendedProjects: [
-      {
-        title: 'Predictive Customer Churn Model with Explainable AI (SHAP)',
-        description: 'End-to-end ML pipeline with XGBoost, cross-validation, and interactive Streamlit dashboard explaining feature importance.',
-        techStack: ['Python', 'XGBoost', 'SHAP', 'Streamlit', 'Pandas'],
-        difficulty: 'Intermediate',
-      },
-      {
-        title: 'Automated Financial Market Sentiment & Alpha Signal Engine',
+        title: 'Real-time Financial Sentiment & Market Alpha Signal Engine',
         description: 'Scrape earnings calls and news feeds, compute FinBERT sentiment indices, and simulate backtested portfolio returns.',
         techStack: ['Python', 'FinBERT', 'Pandas', 'yfinance', 'Plotly'],
         difficulty: 'Advanced',
@@ -145,49 +125,31 @@ export const ROLE_BENCHMARKS: Record<string, TargetRoleBenchmark> = {
       { name: 'IBM Data Science Professional Certificate', issuer: 'IBM / Coursera', priority: 'Medium' },
     ],
     industryAvgScore: 71,
-    topStudentsScore: 85,
+    topStudentsScore: 86,
     avgMonthsToReady: 6,
   },
-  'Product Manager': {
-    role: 'Product Manager',
+
+  'Cybersecurity': {
+    role: 'Cybersecurity',
     requiredSkills: [
-      { name: 'Agile & Scrum Methodologies', category: 'Soft Skills', importance: 'Core', minScore: 85 },
-      { name: 'User Research & Personas', category: 'Soft Skills', importance: 'Core', minScore: 85 },
-      { name: 'Product Analytics & SQL', category: 'Database', importance: 'Core', minScore: 80 },
-      { name: 'PRD Writing & Wireframing', category: 'Soft Skills', importance: 'Core', minScore: 85 },
-      { name: 'A/B Testing & Experimentation', category: 'AI & ML', importance: 'High', minScore: 75 },
+      { name: 'Network Protocols & Packet Analysis (Wireshark)', category: 'DevOps', importance: 'Core', minScore: 85 },
+      { name: 'Linux System Hardening & Bash Scripting', category: 'Programming', importance: 'Core', minScore: 85 },
+      { name: 'Vulnerability Assessment & Pen-testing (OWASP Top 10)', category: 'DevOps', importance: 'Core', minScore: 82 },
+      { name: 'SIEM & Threat Detection (Splunk / ELK / Suricata)', category: 'Cloud', importance: 'High', minScore: 78 },
+      { name: 'Applied Cryptography & Zero Trust Identity (OAuth/mTLS)', category: 'Programming', importance: 'High', minScore: 75 },
     ],
     recommendedProjects: [
       {
-        title: 'Zero-to-One SaaS Product Requirements Document & Interactive Prototype',
-        description: 'Complete product tear-down, customer discovery interview transcripts, Figma wireframes, and launch roadmap.',
-        techStack: ['Figma', 'Notion', 'Mixpanel', 'SQL'],
-        difficulty: 'Intermediate',
-      },
-    ],
-    certifications: [
-      { name: 'Product School Product Manager Certificate (PMC)', issuer: 'Product School', priority: 'High' },
-      { name: 'Reforge Growth & Product Strategy', issuer: 'Reforge', priority: 'Medium' },
-    ],
-    industryAvgScore: 70,
-    topStudentsScore: 84,
-    avgMonthsToReady: 4,
-  },
-  'Cybersecurity Analyst': {
-    role: 'Cybersecurity Analyst',
-    requiredSkills: [
-      { name: 'Network Security & Protocols', category: 'DevOps', importance: 'Core', minScore: 85 },
-      { name: 'Linux System Administration & Bash', category: 'Programming', importance: 'Core', minScore: 85 },
-      { name: 'Vulnerability Assessment & Penetration Testing', category: 'DevOps', importance: 'Core', minScore: 80 },
-      { name: 'SIEM & Threat Hunting (Splunk/ELK)', category: 'Cloud', importance: 'High', minScore: 75 },
-      { name: 'Cryptography & Zero Trust Architecture', category: 'Programming', importance: 'High', minScore: 75 },
-    ],
-    recommendedProjects: [
-      {
-        title: 'Automated Network Packet Sniffer & Anomaly Detection System',
-        description: 'Capture live traffic with Scapy, parse headers, and detect port scans and DDoS flood patterns.',
+        title: 'Automated Network Packet Sniffer & Port Scan Detector',
+        description: 'Live traffic monitoring daemon using Scapy to analyze packet anomalies and trigger automated firewall rules.',
         techStack: ['Python', 'Scapy', 'Wireshark', 'FastAPI', 'Docker'],
         difficulty: 'Advanced',
+      },
+      {
+        title: 'Vulnerability Assessment Scanner for Web APIs',
+        description: 'Automated fuzzing tool checking for IDOR, JWT tampering, and broken object level authorization.',
+        techStack: ['Go/Python', 'Docker', 'SQLite', 'ReportLab'],
+        difficulty: 'Intermediate',
       },
     ],
     certifications: [
@@ -198,27 +160,185 @@ export const ROLE_BENCHMARKS: Record<string, TargetRoleBenchmark> = {
     topStudentsScore: 87,
     avgMonthsToReady: 6,
   },
+
+  'Cloud Computing': {
+    role: 'Cloud Computing',
+    requiredSkills: [
+      { name: 'AWS / GCP Core Services (Compute, VPC, IAM, S3)', category: 'Cloud', importance: 'Core', minScore: 85 },
+      { name: 'Infrastructure as Code (Terraform / CloudFormation)', category: 'Cloud', importance: 'Core', minScore: 82 },
+      { name: 'Docker & Kubernetes Cluster Orchestration', category: 'DevOps', importance: 'Core', minScore: 82 },
+      { name: 'Serverless Architectures & Event-Driven Pipelines', category: 'Cloud', importance: 'High', minScore: 80 },
+      { name: 'Cloud Security & Cost Optimization', category: 'Cloud', importance: 'High', minScore: 75 },
+    ],
+    recommendedProjects: [
+      {
+        title: 'Multi-Region High-Availability Infrastructure with Terraform',
+        description: 'Automated Terraform module provisioning VPC peering, auto-scaling groups, ALB, and CloudWatch alert triggers.',
+        techStack: ['Terraform', 'AWS', 'Docker', 'Nginx', 'GitHub Actions'],
+        difficulty: 'Advanced',
+      },
+    ],
+    certifications: [
+      { name: 'AWS Certified Solutions Architect - Associate', issuer: 'Amazon Web Services', priority: 'High' },
+      { name: 'Google Cloud Associate Cloud Engineer', issuer: 'Google Cloud', priority: 'High' },
+    ],
+    industryAvgScore: 72,
+    topStudentsScore: 86,
+    avgMonthsToReady: 5,
+  },
+
+  'DevOps': {
+    role: 'DevOps',
+    requiredSkills: [
+      { name: 'CI/CD Pipelines (GitHub Actions / GitLab CI)', category: 'DevOps', importance: 'Core', minScore: 85 },
+      { name: 'Docker Containerization & Multi-stage Builds', category: 'DevOps', importance: 'Core', minScore: 85 },
+      { name: 'Kubernetes (Deployments, Services, Helm)', category: 'DevOps', importance: 'Core', minScore: 82 },
+      { name: 'Monitoring & Observability (Prometheus / Grafana / Loki)', category: 'Cloud', importance: 'High', minScore: 80 },
+      { name: 'Linux Kernel & Shell Automation', category: 'Programming', importance: 'High', minScore: 80 },
+    ],
+    recommendedProjects: [
+      {
+        title: 'Zero-Downtime Blue/Green Deployment Pipeline with Canary Monitoring',
+        description: 'ArgoCD GitOps pipeline with automated rollback triggers on Prometheus error-budget spikes.',
+        techStack: ['Kubernetes', 'Helm', 'ArgoCD', 'Prometheus', 'GitHub Actions'],
+        difficulty: 'Advanced',
+      },
+    ],
+    certifications: [
+      { name: 'Certified Kubernetes Administrator (CKA)', issuer: 'CNCF / Linux Foundation', priority: 'High' },
+      { name: 'HashiCorp Certified: Terraform Associate', issuer: 'HashiCorp', priority: 'High' },
+    ],
+    industryAvgScore: 73,
+    topStudentsScore: 88,
+    avgMonthsToReady: 5,
+  },
+
+  'Product Management': {
+    role: 'Product Management',
+    requiredSkills: [
+      { name: 'Product Discovery, Personas & User Interviews', category: 'Soft Skills', importance: 'Core', minScore: 85 },
+      { name: 'PRD Writing & Acceptance Criteria', category: 'Soft Skills', importance: 'Core', minScore: 85 },
+      { name: 'Product Analytics & SQL (Funnel Analysis)', category: 'Database', importance: 'Core', minScore: 80 },
+      { name: 'Wireframing & Prototype Validation (Figma)', category: 'Soft Skills', importance: 'High', minScore: 78 },
+      { name: 'A/B Experimentation & Statistical Significance', category: 'AI & ML', importance: 'High', minScore: 75 },
+    ],
+    recommendedProjects: [
+      {
+        title: 'Comprehensive 0-to-1 SaaS PRD & Interactive Figma Prototype',
+        description: 'User problem breakdown, competitive tear-downs, metrics hierarchy (North Star), and launch roadmap.',
+        techStack: ['Figma', 'Notion', 'SQL', 'Mixpanel'],
+        difficulty: 'Intermediate',
+      },
+    ],
+    certifications: [
+      { name: 'Product School Product Manager Certificate (PMC)', issuer: 'Product School', priority: 'High' },
+    ],
+    industryAvgScore: 70,
+    topStudentsScore: 85,
+    avgMonthsToReady: 4,
+  },
+
+  'UI/UX Design': {
+    role: 'UI/UX Design',
+    requiredSkills: [
+      { name: 'Figma Auto-Layout & Design Systems Tokens', category: 'Soft Skills', importance: 'Core', minScore: 88 },
+      { name: 'User Research & Information Architecture', category: 'Soft Skills', importance: 'Core', minScore: 85 },
+      { name: 'Interactive Prototyping & Micro-interactions', category: 'Soft Skills', importance: 'Core', minScore: 82 },
+      { name: 'Accessibility (WCAG 2.1 AA Standards)', category: 'Programming', importance: 'High', minScore: 80 },
+      { name: 'HTML5 & Modern CSS / Tailwind Hand-off', category: 'Programming', importance: 'High', minScore: 75 },
+    ],
+    recommendedProjects: [
+      {
+        title: 'Multi-Platform Design System with 40+ Tokenized Components',
+        description: 'Complete Figma system with WCAG contrast audit, light/dark parity, and responsive variants.',
+        techStack: ['Figma', 'Design Tokens', 'Storybook', 'HTML/CSS'],
+        difficulty: 'Intermediate',
+      },
+    ],
+    certifications: [
+      { name: 'Google UX Design Professional Certificate', issuer: 'Google / Coursera', priority: 'High' },
+    ],
+    industryAvgScore: 71,
+    topStudentsScore: 86,
+    avgMonthsToReady: 4,
+  },
+
+  'Entrepreneurship': {
+    role: 'Entrepreneurship',
+    requiredSkills: [
+      { name: 'Full-Stack Rapid MVP Prototyping', category: 'Programming', importance: 'Core', minScore: 85 },
+      { name: 'Customer Validation & Lean Canvas', category: 'Soft Skills', importance: 'Core', minScore: 85 },
+      { name: 'GTM Strategy & Growth Analytics', category: 'Soft Skills', importance: 'Core', minScore: 80 },
+      { name: 'Pitch Deck & Financial Modeling', category: 'Soft Skills', importance: 'High', minScore: 78 },
+      { name: 'Payment Integrations (Stripe/Razorpay)', category: 'Programming', importance: 'High', minScore: 80 },
+    ],
+    recommendedProjects: [
+      {
+        title: 'Runnable Micro-SaaS Product with Stripe Billing and Auth',
+        description: 'End-to-end deployed software product with landing page, user onboarding, database, and webhook monetization.',
+        techStack: ['Next.js', 'PostgreSQL', 'Stripe API', 'Tailwind', 'Vercel'],
+        difficulty: 'Advanced',
+      },
+    ],
+    certifications: [
+      { name: 'Y Combinator Startup School Certificate', issuer: 'Y Combinator', priority: 'High' },
+    ],
+    industryAvgScore: 72,
+    topStudentsScore: 88,
+    avgMonthsToReady: 5,
+  },
+
+  'Other': {
+    role: 'Engineering Specialist',
+    requiredSkills: [
+      { name: 'Core Programming & Data Structures', category: 'Programming', importance: 'Core', minScore: 80 },
+      { name: 'Database Fundamentals & SQL', category: 'Database', importance: 'Core', minScore: 75 },
+      { name: 'Version Control (Git & GitHub Workflows)', category: 'DevOps', importance: 'Core', minScore: 75 },
+    ],
+    recommendedProjects: [
+      {
+        title: 'Domain-Specific Evidence Portfolio Repository',
+        description: 'Modular repository demonstrating applied engineering concepts and documentation.',
+        techStack: ['Python', 'SQL', 'Git'],
+        difficulty: 'Intermediate',
+      },
+    ],
+    certifications: [
+      { name: 'CS50: Introduction to Computer Science', issuer: 'Harvard University / edX', priority: 'High' },
+    ],
+    industryAvgScore: 70,
+    topStudentsScore: 84,
+    avgMonthsToReady: 4,
+  },
 };
 
 export function getRoleBenchmark(targetRole: string): TargetRoleBenchmark {
-  const normalized = targetRole.trim();
+  const normalized = (targetRole || 'Software Development').trim();
   const matchedKey = Object.keys(ROLE_BENCHMARKS).find(
-    (k) => k.toLowerCase() === normalized.toLowerCase() || normalized.toLowerCase().includes(k.toLowerCase())
+    (k) => k.toLowerCase() === normalized.toLowerCase() || normalized.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(normalized.toLowerCase())
   );
-  return ROLE_BENCHMARKS[matchedKey || 'AI Engineer'];
+  return ROLE_BENCHMARKS[matchedKey || 'Software Development'];
 }
 
 /**
  * Calculates Student Context, Readiness Score, Gaps, GPS, Missions, and Velocity
  */
 export function analyzeStudentCareerContext(profile: StudentProfile, targetRoleInput?: string) {
-  const targetRole = targetRoleInput || profile.targetRole || 'AI Engineer';
+  const targetRole = targetRoleInput || profile.careerPath || profile.targetRole || 'Software Development';
   const benchmark = getRoleBenchmark(targetRole);
 
   const studentSkills = profile.verifiedSkills || [];
   const studentSkillMap = new Map<string, number>();
   studentSkills.forEach((s) => {
     studentSkillMap.set(s.name.toLowerCase(), s.score);
+  });
+
+  // Also factor knownSkills from onboarding
+  const knownSkills = profile.knownSkills || profile.professional?.knownSkills || [];
+  knownSkills.forEach((ks) => {
+    if (!studentSkillMap.has(ks.toLowerCase())) {
+      studentSkillMap.set(ks.toLowerCase(), 75);
+    }
   });
 
   const missingSkills: string[] = [];
@@ -232,7 +352,6 @@ export function analyzeStudentCareerContext(profile: StudentProfile, targetRoleI
     const weight = req.importance === 'Core' ? 3 : req.importance === 'High' ? 2 : 1;
     totalWeight += weight;
 
-    // Check if student has skill
     const lowerName = req.name.toLowerCase();
     let foundScore = 0;
 
@@ -255,32 +374,37 @@ export function analyzeStudentCareerContext(profile: StudentProfile, targetRoleI
 
   // Calculate readiness score
   const skillRatio = totalWeight > 0 ? earnedWeight / totalWeight : 0.6;
-  const projectFactor = Math.min(1.0, (profile.professional.totalProjects || 3) / 8);
-  const cgpaFactor = Math.min(1.0, (profile.academic.cgpa || 7.5) / 10);
-  const builderFactor = Math.min(1.0, (profile.builderScores.overall || 600) / 1000);
+  const totalProj = profile.professional?.totalProjects ?? (profile.projectCount === '5+' ? 6 : profile.projectCount === '3–5' ? 4 : 2);
+  const projectFactor = Math.min(1.0, totalProj / 6);
+  const cgpaFactor = Math.min(1.0, (profile.academic?.cgpa || 8.0) / 10);
+  const builderFactor = Math.min(1.0, (profile.builderScores?.overall || 500) / 1000);
 
   const calculatedReadiness = Math.round(
-    skillRatio * 50 + projectFactor * 25 + cgpaFactor * 10 + builderFactor * 15
+    skillRatio * 45 + projectFactor * 25 + cgpaFactor * 15 + builderFactor * 15
   );
 
-  const readinessScore = Math.max(35, Math.min(96, calculatedReadiness));
+  const readinessScore = Math.max(40, Math.min(96, profile.careerReadinessScore || calculatedReadiness));
 
   // Career GPS
   const distanceSkillsCount = missingSkills.length + weakSkills.length;
-  const estimatedMonths = Math.max(2, Math.round(distanceSkillsCount * 1.1));
-  const successProbability = Math.min(95, Math.max(55, Math.round(readinessScore * 0.95 + 8)));
+  const estimatedMonths = Math.max(2, Math.round(distanceSkillsCount * 1.0));
+  const successProbability = Math.min(95, Math.max(55, Math.round(readinessScore * 0.95 + 6)));
+
+  const collegeName = profile.academic?.college || profile.college || 'University';
+  const semesterStr = profile.academic?.semester || 'Semester 6';
+  const branchStr = profile.academic?.department || profile.branch || 'CSE';
 
   const careerGps: CareerGPS = {
-    currentPosition: `${profile.academic.year} ${profile.academic.department} (${profile.academic.semester || 'Semester 6'})`,
+    currentPosition: `${branchStr} (${semesterStr}) • ${collegeName}`,
     targetPosition: targetRole,
     distanceSkillsCount,
     estimatedMonths,
     successProbability,
     criticalMilestones: [
-      `Master ${missingSkills[0] || 'Cloud Infrastructure'} with hands-on labs`,
-      `Deploy ${benchmark.recommendedProjects[0]?.title.split(' ')[0] || 'Capstone'} to Production`,
-      `Pass verified platform assessment with >85% score`,
-      `Complete ${benchmark.certifications[0]?.name || 'Professional Certification'}`,
+      `Bridge skill gap: Master ${missingSkills[0] || benchmark.requiredSkills[0]?.name || 'Core Fundamentals'}`,
+      `Deploy ${benchmark.recommendedProjects[0]?.title.split(' ')[0] || 'Flagship'} Capstone to Production`,
+      `Pass verified SkillBridge verification assessment with >=80% score`,
+      `Target verified ${profile.careerGoal || 'Internship'} applications`,
     ],
   };
 
@@ -288,8 +412,8 @@ export function analyzeStudentCareerContext(profile: StudentProfile, targetRoleI
   const weeklyMissions: WeeklyMission[] = [
     {
       id: 'm-1',
-      title: `Complete ${missingSkills[0] || 'Distributed Systems'} Skill Assessment`,
-      description: `Validate foundational concepts in ${missingSkills[0] || 'Distributed Architecture'} to unlock verified badge.`,
+      title: `Complete ${missingSkills[0] || 'Core Architecture'} Diagnostic Assessment`,
+      description: `Validate foundational concepts in ${missingSkills[0] || 'Systems Engineering'} to elevate your Builder Score.`,
       category: 'Assessment',
       estimatedMinutes: 45,
       completed: false,
@@ -298,8 +422,8 @@ export function analyzeStudentCareerContext(profile: StudentProfile, targetRoleI
     },
     {
       id: 'm-2',
-      title: `Implement ${benchmark.recommendedProjects[0]?.title.slice(0, 32) || 'Core API Project'}`,
-      description: benchmark.recommendedProjects[0]?.description || 'Build production-grade repository with clean docs and tests.',
+      title: `Build ${benchmark.recommendedProjects[0]?.title.slice(0, 32) || 'Target Capstone'}`,
+      description: benchmark.recommendedProjects[0]?.description || 'Build production-grade repository with clean architecture and docs.',
       category: 'Project',
       estimatedMinutes: 180,
       completed: false,
@@ -308,20 +432,20 @@ export function analyzeStudentCareerContext(profile: StudentProfile, targetRoleI
     },
     {
       id: 'm-3',
-      title: 'Optimize GitHub Profile & Pin Evidence Repositories',
-      description: 'Add architecture diagrams and live demo links to top repositories for recruiter visibility.',
+      title: 'Audit GitHub Repositories & Pin Verified Evidence',
+      description: 'Add architecture diagrams, README badges, and live demo links for recruiter verification.',
       category: 'Profile',
       estimatedMinutes: 30,
-      completed: true,
+      completed: Boolean(profile.professional?.githubUrl),
       xpReward: 80,
-      dueDate: 'Completed',
+      dueDate: 'In 2 days',
     },
     {
       id: 'm-4',
-      title: 'Solve 15 DSA Problems on Graphs & Dynamic Programming',
-      description: 'Sharpen problem-solving velocity for tier-1 technical coding screening rounds.',
+      title: `Target 5 Interview Practice Problems for ${targetRole}`,
+      description: 'Sharpen technical problem-solving velocity for tier-1 recruiter technical rounds.',
       category: 'DSA',
-      estimatedMinutes: 90,
+      estimatedMinutes: 60,
       completed: false,
       xpReward: 150,
       dueDate: 'In 5 days',
@@ -330,58 +454,58 @@ export function analyzeStudentCareerContext(profile: StudentProfile, targetRoleI
 
   // Learning Velocity
   const learningVelocity: LearningVelocity = {
-    velocityScore: Math.min(99, Math.round(profile.builderScores.overall / 10 + 6)),
-    percentileRank: 'Top 8% Growth Velocity',
-    skillsGainedLast30Days: Math.max(2, studentSkills.length > 3 ? 3 : 1),
-    projectsCompletedCount: profile.professional.totalProjects || 8,
-    assessmentsPassedCount: studentSkills.length || 6,
-    githubGrowthRate: '+38% Commits MoM',
+    velocityScore: Math.min(99, Math.round((profile.builderScores?.overall || 500) / 10 + 6)),
+    percentileRank: 'Top 10% Growth Velocity',
+    skillsGainedLast30Days: Math.max(2, studentSkills.length > 2 ? studentSkills.length : 2),
+    projectsCompletedCount: totalProj,
+    assessmentsPassedCount: Math.max(1, studentSkills.length),
+    githubGrowthRate: '+34% Commits MoM',
   };
 
   // Opportunity Matching
   const opportunityMatches: OpportunityMatch[] = [
     {
       id: 'opp-1',
-      title: `${targetRole} Intern`,
-      company: 'Anthropic AI Labs',
+      title: `${targetRole} Builder Intern`,
+      company: 'Anthropic / Scale AI Labs',
       type: 'Internship',
-      matchScore: Math.min(96, readinessScore + 8),
+      matchScore: Math.min(96, readinessScore + 6),
       matchReasons: [
-        'Strong verified foundation in Python & Transformers',
-        'Builder score in top 10th percentile',
-        '3 Hackathon podium finishes demonstrated leadership',
+        `Strong match with ${profile.degree || 'B.Tech'} background at ${collegeName}`,
+        `Verified Builder Score in top tier (${profile.builderScores?.overall || 650}/1000)`,
+        `Target goal aligns with ${profile.careerGoal || 'Internship'}`,
       ],
-      requiredSkills: [benchmark.requiredSkills[0]?.name, benchmark.requiredSkills[1]?.name, 'Docker'],
+      requiredSkills: [benchmark.requiredSkills[0]?.name || 'TypeScript', benchmark.requiredSkills[1]?.name || 'Python'],
       missingSkills: missingSkills.slice(0, 2),
-      deadline: 'Apply within 4 days',
+      deadline: 'Apply within 5 days',
     },
     {
       id: 'opp-2',
-      title: `Junior ${targetRole}`,
-      company: 'Stripe Engineering',
+      title: `Junior ${targetRole} Engineer`,
+      company: 'Stripe / Linear Platform',
       type: 'Job',
-      matchScore: Math.min(92, readinessScore + 4),
+      matchScore: Math.min(92, readinessScore + 2),
       matchReasons: [
-        'Excellent PostgreSQL and data modeling competency',
-        'Demonstrated GitHub evidence for API design',
+        'Demonstrated verifiable code evidence and repository cadence',
+        'Academic standing and builder competency index meet threshold',
       ],
-      requiredSkills: ['Distributed Systems', 'TypeScript', 'PostgreSQL'],
+      requiredSkills: [benchmark.requiredSkills[0]?.name || 'Backend Systems', 'PostgreSQL'],
       missingSkills: missingSkills.slice(0, 1),
-      deadline: 'Active hiring',
+      deadline: 'Rolling applications',
     },
     {
       id: 'opp-3',
-      title: 'Global AI Systems Hackathon 2026',
-      company: 'Google DeepMind & Devpost',
+      title: 'National Collegiate Builder Hackathon 2026',
+      company: 'SkillBridge & Devpost',
       type: 'Hackathon',
       matchScore: 98,
       matchReasons: [
-        'Ideal fit for student builder portfolio',
-        '$50,000 prize pool and direct recruiter fast-track',
+        'High ROI for expanding verified evidence portfolio',
+        'Direct recruiter fast-track for top 10 finalists',
       ],
-      requiredSkills: ['Multi-modal AI', 'FastAPI', 'Next.js'],
+      requiredSkills: [targetRole, 'Full-Stack MVP'],
       missingSkills: [],
-      deadline: 'Starts in 12 days',
+      deadline: 'Starts in 10 days',
     },
   ];
 
@@ -391,36 +515,36 @@ export function analyzeStudentCareerContext(profile: StudentProfile, targetRoleI
       id: 'rp-1',
       phaseNumber: 1,
       title: 'Foundation',
-      description: 'Solidify core CS fundamentals, algorithms, and clean code principles.',
+      description: `Solidify core programming, algorithms, and system fundamentals for ${targetRole}.`,
       status: 'completed',
       progressPercentage: 100,
       courses: [
-        { title: 'Advanced Data Structures & Graph Algorithms', provider: 'SkillBridge Labs', duration: '3 Weeks', completed: true },
-        { title: 'Modern Database Schema & Query Optimization', provider: 'Apex University', duration: '2 Weeks', completed: true },
+        { title: 'Advanced Data Structures & Engineering Clean Code', provider: 'SkillBridge Labs', duration: '3 Weeks', completed: true },
+        { title: 'Database Schema & High-Concurrency Modeling', provider: collegeName, duration: '2 Weeks', completed: true },
       ],
       projects: [
-        { title: 'High-Throughput Memory Cache in C++/Go', description: 'LRU/LFU cache with mutex lock concurrency.', techStack: ['Go', 'Docker'], completed: true },
+        { title: 'Memory-Efficient Cache Architecture', description: 'LRU/LFU cache with mutex locks and tests.', techStack: ['TypeScript/Go', 'Docker'], completed: true },
       ],
       assessments: [
-        { title: 'DSA Diagnostic Assessment', category: 'Programming', completed: true },
+        { title: 'CS Core Diagnostic Assessment', category: 'Programming', completed: true },
       ],
     },
     {
       id: 'rp-2',
       phaseNumber: 2,
       title: 'Core',
-      description: `Bridge critical skill deltas for ${targetRole}: ${missingSkills.slice(0, 2).join(', ')}.`,
+      description: `Bridge critical skill deltas: ${missingSkills.slice(0, 2).join(', ') || 'Framework Deep Dive'}.`,
       status: 'in_progress',
-      progressPercentage: 65,
+      progressPercentage: 60,
       courses: [
-        { title: `${benchmark.requiredSkills[1]?.name || 'PyTorch & Transformers'} Deep Dive`, provider: 'SkillBridge AI Academy', duration: '4 Weeks', completed: false },
-        { title: 'Production Containerization with Docker & Kubernetes', provider: 'Linux Foundation', duration: '2 Weeks', completed: true },
+        { title: `${benchmark.requiredSkills[0]?.name || 'Framework'} Deep Dive`, provider: 'SkillBridge Academy', duration: '4 Weeks', completed: false },
+        { title: 'Production Containerization & DevOps Pipeline', provider: 'Cloud Native Labs', duration: '2 Weeks', completed: true },
       ],
       projects: [
         { title: benchmark.recommendedProjects[0]?.title || 'Core Engine', description: benchmark.recommendedProjects[0]?.description || '', techStack: benchmark.recommendedProjects[0]?.techStack || [], completed: false },
       ],
       assessments: [
-        { title: `${missingSkills[0] || 'Core'} Competency Exam`, category: 'Programming', completed: false },
+        { title: `${missingSkills[0] || 'Core'} Verification Exam`, category: 'Programming', completed: false },
       ],
     },
     {
@@ -429,15 +553,15 @@ export function analyzeStudentCareerContext(profile: StudentProfile, targetRoleI
       title: 'Advanced',
       description: 'Build enterprise-grade capstones and open-source contributions.',
       status: 'in_progress',
-      progressPercentage: 30,
+      progressPercentage: 25,
       courses: [
-        { title: 'Distributed Systems & Consensus Algorithms (Raft)', provider: 'MIT OpenCourseWare', duration: '3 Weeks', completed: false },
+        { title: 'Distributed Systems & High-Throughput Architecture', provider: 'Industry Masterclass', duration: '3 Weeks', completed: false },
       ],
       projects: [
         { title: benchmark.recommendedProjects[1]?.title || 'Multi-Agent System', description: benchmark.recommendedProjects[1]?.description || '', techStack: benchmark.recommendedProjects[1]?.techStack || [], completed: false },
       ],
       assessments: [
-        { title: 'System Design Architecture Challenge', category: 'Cloud', completed: false },
+        { title: 'System Design Benchmark Challenge', category: 'Cloud', completed: false },
       ],
     },
     {
@@ -448,10 +572,10 @@ export function analyzeStudentCareerContext(profile: StudentProfile, targetRoleI
       status: 'locked',
       progressPercentage: 0,
       courses: [
-        { title: 'FAANG / Tier-1 Technical Interview Mastery', provider: 'SkillBridge Career Wing', duration: '2 Weeks', completed: false },
+        { title: 'Tier-1 Technical Interview & Live Coding Defense', provider: 'SkillBridge Career Wing', duration: '2 Weeks', completed: false },
       ],
       projects: [
-        { title: 'End-to-End Production Capstone with CI/CD & Monitoring', description: 'Full live deployment with 99.9% uptime SLA.', techStack: ['Docker', 'Kubernetes', 'Prometheus', 'AWS'], completed: false },
+        { title: 'End-to-End Production Capstone with CI/CD & Monitoring', description: 'Full live deployment with 99.9% uptime SLA.', techStack: ['Docker', 'PostgreSQL', 'Prometheus'], completed: false },
       ],
       assessments: [
         { title: 'Comprehensive Placement Readiness Simulation', category: 'Aptitude', completed: false },
@@ -478,6 +602,7 @@ export function analyzeStudentCareerContext(profile: StudentProfile, targetRoleI
 
 /**
  * Generates an intelligent, context-aware Copilot answer based on real student DB data
+ * Supports all 10 Copilot abilities + missing data follow-up checks.
  */
 export async function generateSmartCopilotResponse(
   userQuery: string,
@@ -489,74 +614,133 @@ export async function generateSmartCopilotResponse(
   const context = analyzeStudentCareerContext(profile, targetRole);
   const q = userQuery.toLowerCase().trim();
 
-  // 1. Structured query triggers for instant rich responses
-  if (q.includes('roadmap') || q.includes('phases') || q.includes('4 phase') || q.includes('milestone')) {
+  // Check if essential profile information is missing and request follow-up
+  const isProfileEmpty =
+    !profile.name ||
+    profile.name === 'New Student' ||
+    profile.name === 'New Builder' ||
+    (!profile.college && !profile.academic?.college);
+
+  if (isProfileEmpty && (q.includes('recommend') || q.includes('plan') || q.includes('where do i start'))) {
     return {
-      text: `Here is your customized **4-Phase Career Roadmap** to become a top-tier **${targetRole}**. It bridges your current skill deltas in **${context.missingSkills.slice(0, 2).join(' and ')}** over an estimated timeline of **${context.careerGps.estimatedMonths} months**.`,
-      structuredType: 'roadmap',
-      structuredPayload: context.roadmapPhases,
+      text: `Welcome to **SkillBridge AI Career Copilot**. To give you precise, data-driven career advice, could you share a bit more context about your current profile?\n\n1. **What college/university and semester are you currently in?**\n2. **Which 3 technologies do you feel most comfortable building with?**\n3. **Are you preparing for an immediate Internship, Campus Placement, or Startup?**\n\nOnce you tell me, I'll generate a calibrated readiness index and personalized roadmap!`,
     };
   }
 
-  if (q.includes('gps') || q.includes('eta') || q.includes('distance') || q.includes('how long') || q.includes('timeline')) {
+  // 1. Ability: Analyze Skill Gaps (Trigger: 'gap', 'missing', 'weak', 'skills needed')
+  if (q.includes('gap') || q.includes('missing') || q.includes('weak') || q.includes('analyze skill')) {
     return {
-      text: `### 🧭 Career GPS Trajectory for ${profile.name}\n\n- **Starting Point:** ${context.careerGps.currentPosition}\n- **Destination:** ${context.careerGps.targetPosition}\n- **Skill Distance:** **${context.careerGps.distanceSkillsCount} verified skills needed**\n- **Estimated ETA:** **${context.careerGps.estimatedMonths} Months** to job-readiness\n- **Success Probability:** **${context.careerGps.successProbability}%** based on your current CGPA (${profile.academic.cgpa}) and Builder Score (${profile.builderScores.overall}/1000).`,
-      structuredType: 'gps',
-      structuredPayload: context.careerGps,
-    };
-  }
-
-  if (q.includes('mission') || q.includes('this week') || q.includes('tasks') || q.includes('weekly')) {
-    return {
-      text: `### 🎯 Your Active Weekly Missions\n\nI have generated high-yield tasks targeted directly at your weakest areas for **${targetRole}**. Completing these will boost your readiness score by approximately **+8%**.`,
-      structuredType: 'missions',
-      structuredPayload: context.weeklyMissions,
-    };
-  }
-
-  if (q.includes('project') || q.includes('what should i build') || q.includes('portfolio')) {
-    return {
-      text: `### 🛠️ High-Impact Project Recommendations for ${targetRole}\n\nRecruiters value production architecture over boilerplate tutorials. Based on your current verified skills (${context.masteredSkills.map(s => s.skill).slice(0, 3).join(', ')}), here are the highest ROI projects to build this semester:`,
-      structuredType: 'projects',
-      structuredPayload: context.benchmark.recommendedProjects,
-    };
-  }
-
-  if (q.includes('missing') || q.includes('skill') || q.includes('gap') || q.includes('weak')) {
-    return {
-      text: `### 🔍 Skill Gap Diagnosis for ${targetRole}\n\n- **Overall Readiness:** **${context.readinessScore}%** (Industry Benchmark: ${context.industryAvg}%)\n- **Critical Missing Skills:** ${context.missingSkills.join(', ') || 'None! You have high baseline coverage.'}\n- **Skills Requiring Deepening:** ${context.weakSkills.map(w => `${w.skill} (${w.currentScore}% score, target: ${w.requiredScore}%)`).join(', ') || 'None'}\n\nFocusing on these top 2 missing items will immediately unlock tier-1 company match thresholds.`,
+      text: `### 🔍 Skill Gap Analysis for ${targetRole}\n\n**Candidate:** ${profile.name} (${profile.academic?.department || profile.branch || 'CSE'}, ${profile.academic?.college || profile.college || 'University'})\n**Current Readiness:** **${context.readinessScore}%** (Industry Benchmark: ${context.industryAvg}%)\n\n#### 🔴 Critical Skill Gaps to Close:\n${
+        context.missingSkills.length > 0
+          ? context.missingSkills.map((s, i) => `${i + 1}. **${s}** — *High impact (+15% readiness boost)*`).join('\n')
+          : '✅ No critical skill gaps identified! You meet baseline requirements.'
+      }\n\n#### 🟡 Skills Needing Deepening:\n${
+        context.weakSkills.length > 0
+          ? context.weakSkills.map((w) => `- **${w.skill}**: Current score **${w.currentScore}%** (Target: ${w.requiredScore}%)`).join('\n')
+          : '- None currently below threshold.'
+      }\n\n#### 🟢 Verified Mastered Skills:\n${
+        context.masteredSkills.length > 0
+          ? context.masteredSkills.map((m) => `- **${m.skill}** (${m.score}% verified)`).join('\n')
+          : '- Complete your first assessment to record verified evidence.'
+      }\n\n**Recommended Next Action:** Complete the **${context.missingSkills[0] || 'Core Architecture'}** verification challenge to raise your score.`,
       structuredType: 'gaps',
       structuredPayload: { missing: context.missingSkills, weak: context.weakSkills, mastered: context.masteredSkills },
     };
   }
 
-  if (q.includes('internship') || q.includes('job') || q.includes('opportunity') || q.includes('placements') || q.includes('match')) {
+  // 2. Ability: Recommend Next Skills to Learn (Trigger: 'what to learn', 'next skill', 'learn next')
+  if (q.includes('next skill') || q.includes('what should i learn') || q.includes('learn next') || q.includes('what to learn')) {
+    const topGap = context.missingSkills[0] || context.weakSkills[0]?.skill || 'Distributed Systems';
+    const secondaryGap = context.missingSkills[1] || 'Containerization (Docker)';
     return {
-      text: `### 💼 Matched Opportunities for Your Builder Profile\n\nI scanned current openings against your **${context.readinessScore}% readiness** and verified credentials. Here are your highest probability matches:`,
+      text: `### 🚀 Recommended Next Skills for ${targetRole}\n\nBased on your verified profile and your career goal (**${profile.careerGoal || 'Internship'}**), here is the highest ROI learning order:\n\n1. **#1 Priority: ${topGap}**\n   - **Why:** Essential core competency in ${targetRole} technical screening rounds.\n   - **Target Benchmark:** Reach >= 80% on the SkillBridge assessment.\n   - **Estimated Time:** 10–14 days of focused labs.\n\n2. **#2 Priority: ${secondaryGap}**\n   - **Why:** Required for production deployments and cloud interoperability.\n   - **Target Benchmark:** Deploy a working project with container specs.\n\n3. **#3 Priority: System Design & API Optimization**\n   - **Why:** Differentiates top 5% candidates from junior applicants.`,
+      structuredType: 'next_skills',
+      structuredPayload: { topGap, secondaryGap },
+    };
+  }
+
+  // 3. Ability: Suggest Projects Based on Career Path (Trigger: 'project', 'build', 'portfolio')
+  if (q.includes('project') || q.includes('build') || q.includes('portfolio') || q.includes('what to build')) {
+    return {
+      text: `### 🛠️ High-Impact Project Recommendations for ${targetRole}\n\nRecruiters value production architecture with verified evidence over generic tutorial apps. Based on your current skill level (**${profile.skillLevel || 'Intermediate'}**), here are the recommended capstones:`,
+      structuredType: 'projects',
+      structuredPayload: context.benchmark.recommendedProjects,
+    };
+  }
+
+  // 4. Ability: Generate Weekly Learning Plans (Trigger: 'weekly', 'learning plan', 'this week', 'mission', 'schedule')
+  if (q.includes('weekly') || q.includes('learning plan') || q.includes('this week') || q.includes('mission') || q.includes('schedule')) {
+    return {
+      text: `### 📅 Your Personalized Weekly Learning Plan\n\n**Focus Area:** Closing skill gap in **${context.missingSkills[0] || 'Core Architecture'}**\n\n| Day | Target Objective | Estimated Time | XP Reward |\n| :--- | :--- | :--- | :--- |\n| **Mon–Tue** | Theory & Core Concepts of ${context.missingSkills[0] || 'Architecture'} | 2 Hours | +50 XP |\n| **Wed–Thu** | Hands-on Implementation of Lab Module | 2.5 Hours | +80 XP |\n| **Friday** | Take SkillBridge Diagnostic Assessment | 45 Mins | +120 XP |\n| **Weekend** | Push working repository commit to GitHub with README docs | 3 Hours | +150 XP |\n\n*Completing this week's missions will increase your Career Readiness by ~+8%.*`,
+      structuredType: 'missions',
+      structuredPayload: context.weeklyMissions,
+    };
+  }
+
+  // 5. Ability: Recommend Internships & Hackathons (Trigger: 'internship', 'hackathon', 'job', 'opportunities', 'placements')
+  if (q.includes('internship') || q.includes('hackathon') || q.includes('job') || q.includes('opportunity') || q.includes('placement')) {
+    return {
+      text: `### 💼 Matched Opportunities & Hackathons for ${profile.name}\n\nI scanned current openings against your **${context.readinessScore}% readiness score**, university background (**${profile.academic?.college || profile.college || 'HITAM'}**), and target goal (**${profile.careerGoal || 'Internship'}**):`,
       structuredType: 'opportunities',
       structuredPayload: context.opportunityMatches,
     };
   }
 
-  // 2. Call live AI provider (Gemini / OpenAI / Claude) with deep student context
-  const systemPrompt = `You are "SkillBridge AI Career Copilot 3.0", an elite, personalized workforce intelligence mentor and career strategist for engineering university students.
-You have access to the complete student academic and builder database record. NEVER give generic boilerplate advice. ALWAYS ground your answers in their real CGPA, verified skills, builder score, projects, and target role delta.
+  // 6. Ability: Review GitHub Profile & Repositories (Trigger: 'github', 'repo', 'commits', 'code review')
+  if (q.includes('github') || q.includes('repo') || q.includes('commit') || q.includes('review my code') || q.includes('review github')) {
+    const ghUrl = profile.professional?.githubUrl || 'https://github.com/aarav-builder';
+    return {
+      text: `### 🐙 GitHub Builder Audit for ${ghUrl.replace('https://github.com/', '@')}\n\n- **Connected Profile:** [${ghUrl}](${ghUrl})\n- **Commit Cadence:** Verified active contributor (${profile.builderScores?.consistency || 82}% consistency index)\n- **Open Source Contributions:** ${profile.professional?.openSourceContributions || 12} merged PRs\n\n#### 💡 3 Actionable GitHub Improvements to Impress Recruiters:\n1. **Pin High-Signal Repositories:** Pin your flagship ${targetRole} project to your profile top.\n2. **Include Architecture Diagrams in README:** Add ASCII or Mermaid charts explaining request lifecycle and schema design.\n3. **Add Live Demo Links & CI Badges:** Ensure each repository has runnable links and automated test pass indicators.`,
+    };
+  }
 
-Student Profile:
-- Name: ${profile.name}
-- Academic: ${profile.academic.year} ${profile.academic.department}, Semester: ${profile.academic.semester}, CGPA: ${profile.academic.cgpa}
-- Builder Score: ${profile.builderScores.overall}/1000 (Execution: ${profile.builderScores.execution}, Innovation: ${profile.builderScores.innovation})
-- Verified Skills: ${profile.verifiedSkills.map(s => `${s.name} (${s.score}%)`).join(', ')}
-- Projects Built: ${profile.professional.totalProjects}, Hackathon Wins: ${profile.professional.hackathonWins}
-- Target Role: ${targetRole}
-- Current Career Readiness: ${context.readinessScore}% (Industry Avg: ${context.industryAvg}%, Top Students: ${context.topStudentsScore}%)
-- Critical Missing Skills: ${context.missingSkills.join(', ')}
-- Weak Skills: ${context.weakSkills.map(w => w.skill).join(', ')}
+  // 7. Ability: Explain Why a Skill is Important (Trigger: 'why is', 'importance of', 'why learn', 'why should i')
+  if (q.includes('why is') || q.includes('importance of') || q.includes('why learn') || q.includes('why should i')) {
+    const mentionedSkill = context.benchmark.requiredSkills.find((s) => q.includes(s.name.toLowerCase()))?.name || context.missingSkills[0] || 'System Design';
+    return {
+      text: `### 💡 Why **${mentionedSkill}** is Critical for ${targetRole}\n\n1. **Industry Hiring Filter:** Over **85%** of tier-1 engineering interviews evaluate competency in ${mentionedSkill} during architecture screening.\n2. **Scalability & Reliability:** It directly impacts system availability, latency reduction, and production SLA compliance.\n3. **Compensation & Leveling:** Demonstrating verified evidence in ${mentionedSkill} elevates entry-level candidates into higher salary bands (+25–35% average offer uplift).\n\n*You can verify this skill by completing our proctored benchmark challenge.*`,
+    };
+  }
 
-Instructions:
-1. Provide concise, high-impact, actionable guidance.
-2. Use markdown formatting with clear bullet points and bold highlights.
-3. Be empowering yet strictly rigorous about technical standards.`;
+  // 8. Ability: Generate Interview Preparation Plans (Trigger: 'interview', 'prep', 'mock', 'questions')
+  if (q.includes('interview') || q.includes('prep') || q.includes('mock') || q.includes('technical round')) {
+    return {
+      text: `### 🎯 Targeted Interview Preparation Plan for ${targetRole}\n\n#### 📌 Phase 1: Core Coding & DSA (Days 1–7)\n- High-frequency topics: Hash Maps, Trees, Dynamic Programming, Graph Traversals.\n- Target velocity: 2–3 problems daily under 25-minute timed constraints.\n\n#### 📌 Phase 2: Domain Deep-Dive & Architecture (Days 8–14)\n- Top interview question patterns for ${targetRole}:\n  1. *How would you optimize database read/write throughput under 10k RPS?*\n  2. *Explain concurrency control, idempotency, and distributed locking algorithms.*\n  3. *Walk through the architecture and failure modes of your primary project.*\n\n#### 📌 Phase 3: Behavioral & Portfolio Defense (Days 15–20)\n- Practice STAR framework responses for hackathons and project leadership.\n- Conduct a mock interview on SkillBridge to receive automated speech & clarity feedback.`,
+    };
+  }
+
+  // 9. Ability: Track Progress Against Career Goals (Trigger: 'progress', 'gps', 'eta', 'how am i doing', 'score')
+  if (q.includes('progress') || q.includes('gps') || q.includes('eta') || q.includes('how am i doing') || q.includes('track') || q.includes('roadmap')) {
+    return {
+      text: `### 🧭 Career GPS Trajectory for ${profile.name}\n\n- **Starting Point:** ${context.careerGps.currentPosition}\n- **Target Goal:** **${targetRole}** (${profile.careerGoal || 'Internship'})\n- **Builder Score:** **${profile.builderScores?.overall || 650} / 1000** (Level: ${profile.builderLevel || 'Explorer'})\n- **Career Readiness Index:** **${context.readinessScore}%**\n- **Skill Delta:** **${context.careerGps.distanceSkillsCount} skills needed**\n- **Estimated ETA:** **${context.careerGps.estimatedMonths} Months** to job readiness\n- **Success Probability:** **${context.careerGps.successProbability}%**`,
+      structuredType: 'roadmap',
+      structuredPayload: context.roadmapPhases,
+    };
+  }
+
+  // 10. Live AI Generation with Deep Profile Context & Mentor Persona
+  const systemPrompt = `You are "SkillBridge AI Career Copilot 3.0", an elite, personalized career mentor and technical strategist for university engineering students.
+You have access to the complete student academic and builder record.
+CRITICAL RULES:
+1. NEVER provide generic boilerplate answers. Always ground your recommendations in their exact data:
+   - Student Name: ${profile.name}
+   - University/College: ${profile.academic?.college || profile.college || 'HITAM'}
+   - Degree & Branch: ${profile.degree || profile.academic?.degree || 'B.Tech'} in ${profile.academic?.department || profile.branch || 'CSE'}
+   - Graduation Year: Class of ${profile.graduationYear || profile.academic?.graduationYear || '2026'} (Semester: ${profile.academic?.semester || '6th'})
+   - Country & City: ${profile.city || profile.academic?.city || 'Hyderabad'}, ${profile.country || profile.academic?.country || 'India'}
+   - Target Career Path: ${targetRole}
+   - Current Skill Level: ${profile.skillLevel || 'Intermediate'}
+   - Primary Goal: ${profile.careerGoal || 'Internship'}
+   - Builder Score: ${profile.builderScores?.overall || 500}/1000 (Level: ${profile.builderLevel || 'Explorer'}, Starter XP: ${profile.xp || 100} XP)
+   - Career Readiness Score: ${context.readinessScore}%
+   - Known / Verified Skills: ${profile.verifiedSkills?.map((s) => `${s.name} (${s.score}%)`).join(', ') || profile.knownSkills?.join(', ') || 'Python, React'}
+   - Total Projects Built: ${profile.professional?.totalProjects || profile.projectCount || '1–2'}
+   - Hackathon Experience: ${profile.hackathonExperience || (profile.professional?.hackathonWins ? 'Yes' : 'No')}
+   - GitHub Profile: ${profile.professional?.githubUrl || 'Connected'}
+   - LinkedIn: ${profile.professional?.linkedinUrl || 'Connected'}
+   - Critical Missing Skills: ${context.missingSkills.join(', ') || 'Advanced Architecture'}
+2. If profile data is missing or ambiguous, ask concise follow-up questions before finalizing advice.
+3. Be inspiring, data-driven, and rigorous. Use markdown bolding and bullet lists.`;
 
   try {
     const res = await fetch('/api/ai/generate', {
@@ -577,11 +761,11 @@ Instructions:
       }
     }
   } catch (err) {
-    console.warn('Live AI inference unavailable, falling back to calibrated heuristic mentor:', err);
+    console.warn('Live AI inference unavailable, falling back to calibrated mentor response:', err);
   }
 
-  // Calibrated Domain Mentor Fallback
+  // Domain Mentor Heuristic Fallback
   return {
-    text: `Based on your profile as a **${profile.academic.year} ${profile.academic.department}** student with a **${profile.academic.cgpa} CGPA** and **${profile.builderScores.overall}/1000 Builder Score**, your readiness for **${targetRole}** is currently **${context.readinessScore}%** (compared to the industry median of ${context.industryAvg}%).\n\n### 🚀 Immediate Recommended Action Plan:\n1. **Bridge Missing Skill:** Focus on **${context.missingSkills[0] || 'System Architecture'}** this week.\n2. **Build Portfolio Project:** Start **${context.benchmark.recommendedProjects[0]?.title || 'Production API'}** to demonstrate applied mastery.\n3. **Weekly Mission:** Complete your 15 DSA problem set to prepare for interview screening rounds.\n\nType **"Show Roadmap"** or **"My Missions"** to view your interactive execution panels!`,
+    text: `Based on your profile as a **${profile.academic?.department || profile.branch || 'CSE'}** builder at **${profile.academic?.college || profile.college || 'HITAM'}** (Builder Score: **${profile.builderScores?.overall || 500}/1000**):\n\nYour current readiness for **${targetRole}** is **${context.readinessScore}%**.\n\n### 🚀 Immediate Recommended Action:\n1. **Bridge Missing Skill:** Master **${context.missingSkills[0] || 'Distributed Systems'}** to unlock tier-1 company match thresholds.\n2. **Build Portfolio Project:** Start **${context.benchmark.recommendedProjects[0]?.title || 'Flagship Capstone'}** to create verifiable code proof.\n3. **Weekly Mission:** Complete your 15 technical interview problem set this week.\n\nType any query or click a prompt above to explore skill gaps, project ideas, or interview prep!`,
   };
 }

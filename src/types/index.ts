@@ -70,22 +70,34 @@ export interface BuilderEvidence {
 
 export interface AcademicDetails {
   college: string;
-  department: 'CSE' | 'IT' | 'ECE' | 'AIML' | 'Mechanical' | 'Civil';
-  year: '1st Year' | '2nd Year' | '3rd Year' | '4th Year';
+  department: 'CSE' | 'IT' | 'ECE' | 'AIML' | 'Mechanical' | 'Civil' | string;
+  year: '1st Year' | '2nd Year' | '3rd Year' | '4th Year' | string;
   semester: string;
   cgpa: number;
   studentId: string;
+  degree?: string;
+  branch?: string;
+  graduationYear?: string;
+  country?: string;
+  city?: string;
 }
 
 export interface ProfessionalDetails {
   githubUrl: string;
   linkedinUrl: string;
   portfolioUrl?: string;
+  resumeUrl?: string;
   bio: string;
   totalProjects: number;
   hackathonWins: number;
   researchPapers: number;
   openSourceContributions: number;
+  careerPath?: string;
+  skillLevel?: 'Beginner' | 'Intermediate' | 'Advanced' | string;
+  careerGoal?: 'Internship' | 'Job Placement' | 'Freelancing' | 'Startup Building' | 'Higher Studies' | string;
+  knownSkills?: string[];
+  projectCountRange?: string;
+  hasHackathonExperience?: boolean;
 }
 
 export interface GitHubPinnedRepo {
@@ -210,13 +222,27 @@ export interface StudentProfile {
   professional: ProfessionalDetails;
   builderScores: BuilderScores;
   employabilityScore: number; // 0 - 100
+  careerReadinessScore?: number; // 0 - 100
   verifiedSkills: VerifiedSkill[];
   evidences: BuilderEvidence[];
   targetRole: string;
+  onboardingCompleted?: boolean;
   // Aliases for Builder OS V5 & V7
   college?: string;
   department?: string;
   branch?: string;
+  degree?: string;
+  graduationYear?: string;
+  country?: string;
+  city?: string;
+  careerPath?: string;
+  skillLevel?: string;
+  careerGoal?: string;
+  knownSkills?: string[];
+  projectCount?: string;
+  hackathonExperience?: string;
+  builderLevel?: string;
+  xp?: number;
   skills?: { name: string; score: number; level: string; category: string; verified: boolean }[];
   projects?: { id: string; title: string; description: string; techStack: string[]; verified: boolean; githubUrl?: string }[];
 }

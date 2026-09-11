@@ -75,7 +75,12 @@ export default function LoginPage() {
     try {
       await loginUser(email, role, password);
       setLoading(false);
-      router.push(`/${role}`);
+      const state = useAppStore.getState();
+      if (role === 'student' && !state.studentProfile?.onboardingCompleted) {
+        router.push('/onboarding');
+      } else {
+        router.push(`/${role}`);
+      }
     } catch (err: any) {
       setLoading(false);
       setErrorMessage(err.message || 'Invalid credentials. Please verify your email and password.');
@@ -89,7 +94,12 @@ export default function LoginPage() {
       const googleEmail = email.trim() || 'aarav.sharma@gmail.com';
       await loginWithGoogle(googleEmail, 'Aarav Sharma');
       setOauthLoading(null);
-      router.push('/student');
+      const state = useAppStore.getState();
+      if (!state.studentProfile?.onboardingCompleted) {
+        router.push('/onboarding');
+      } else {
+        router.push('/student');
+      }
     } catch (err: any) {
       setOauthLoading(null);
       setErrorMessage(err.message || 'Authentication failed. Please try again.');
@@ -102,7 +112,12 @@ export default function LoginPage() {
     try {
       await loginWithGitHub('aarav-builder');
       setOauthLoading(null);
-      router.push('/student');
+      const state = useAppStore.getState();
+      if (!state.studentProfile?.onboardingCompleted) {
+        router.push('/onboarding');
+      } else {
+        router.push('/student');
+      }
     } catch (err: any) {
       setOauthLoading(null);
       setErrorMessage(err.message || 'Unable to connect GitHub account. Please retry.');

@@ -85,7 +85,7 @@
     "pratik.badiger@gmail.com": {
       "id": "usr-1789123646558",
       "email": "pratik.badiger@gmail.com",
-      "name": "pratik",
+      "name": "Pratik",
       "role": "student",
       "passwordHash": "$2b$12$6ubja9iUVafwtbahPnBQVOmGtgHFnZx81yNNn0nSCatq.YsRM9Y7m",
       "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
@@ -93,7 +93,8 @@
       "isEmailVerified": false,
       "emailVerificationToken": "vt_1789123646558_c2c0v4b",
       "createdAt": "2026-09-11T10:47:26.558Z",
-      "updatedAt": "2026-09-11T19:08:18.244Z"
+      "updatedAt": "2026-09-11T21:10:03.673Z",
+      "googleName": "New Builder"
     },
     "manu18reddy@gmail.com": {
       "id": "usr-1789124286176",
@@ -577,7 +578,7 @@
     },
     "pratik.badiger@gmail.com": {
       "id": "std-1789123646559-hcjt9",
-      "name": "pratik",
+      "name": "Pratik",
       "email": "pratik.badiger@gmail.com",
       "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
       "headline": "Software Engineer & Distributed Systems Builder",
@@ -631,7 +632,8 @@
           "verified": true,
           "date": "Sep 11, 2026"
         }
-      ]
+      ],
+      "googleName": "New Builder"
     },
     "manu18reddy@gmail.com": {
       "id": "std-1789124286176-zv0tc",
@@ -1256,6 +1258,78 @@
     ]
   },
   "auditLogs": [
+    {
+      "id": "log-1789160992146",
+      "timestamp": "2026-09-11T21:09:52.146Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789160966273",
+      "timestamp": "2026-09-11T21:09:26.273Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789160845574",
+      "timestamp": "2026-09-11T21:07:25.574Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789160731500",
+      "timestamp": "2026-09-11T21:05:31.500Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789157437362",
+      "timestamp": "2026-09-11T20:10:37.362Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789157331556",
+      "timestamp": "2026-09-11T20:08:51.556Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789157108143",
+      "timestamp": "2026-09-11T20:05:08.143Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148818117_r151md3",
+      "role": "INDUSTRY",
+      "details": "Successful authenticated login for: pranitha12@gmail.com"
+    },
+    {
+      "id": "log-1789156821798",
+      "timestamp": "2026-09-11T20:00:21.798Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789156544578",
+      "timestamp": "2026-09-11T19:55:44.578Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
     {
       "id": "log-1789154800948",
       "timestamp": "2026-09-11T19:26:40.948Z",
