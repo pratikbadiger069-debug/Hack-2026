@@ -142,13 +142,27 @@ export interface QuestQuestion {
 export interface LearningQuest {
   id: string;
   title: string;
-  category: 'Backend' | 'Frontend' | 'DevOps' | 'AI & ML' | 'Database' | 'Systems';
-  difficulty: 'Easy' | 'Medium' | 'Advanced' | 'Expert';
+  category:
+    | 'Backend'
+    | 'Frontend'
+    | 'AI & ML'
+    | 'Data Science'
+    | 'Cloud'
+    | 'Cybersecurity'
+    | 'Communication'
+    | 'Aptitude'
+    | 'Problem Solving'
+    | 'Database'
+    | 'DevOps'
+    | 'Systems';
+  difficulty: 'Easy' | 'Medium' | 'Advanced' | 'Expert' | 'Boss';
   xpReward: number;
   estimatedMinutes: number;
   description: string;
   skillsGained: string[];
   completed: boolean;
+  isBossChallenge?: boolean;
+  portfolioImpact?: string;
   questions?: QuestQuestion[];
 }
 

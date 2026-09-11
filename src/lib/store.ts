@@ -31,6 +31,7 @@ import {
   mockLearningPaths,
   mockGitHubData,
 } from './mock-data';
+import { getLevelInfo } from './xp-engine';
 
 export const CLEAN_SCRATCH_STUDENT_PROFILE: StudentProfile = {
   id: 'std-scratch',
@@ -246,9 +247,23 @@ export const useAppStore = create<AppState>()(
 
       addXP: (amount, reason) =>
         set((state) => {
-          const newXP = state.xp + amount;
-          const newLevel = Math.floor(newXP / 150) + 1;
-          return { xp: newXP, level: Math.max(state.level, newLevel) };
+          const newXP = Math.max(0, state.xp + amount);
+          const levelInfo = getLevelInfo(newXP);
+
+          // Auto-unlock XP milestone achievements
+          const updatedAchievements = state.achievements.map((ach) => {
+            if (ach.unlocked) return ach;
+            if (ach.title.includes('100 XP') && newXP >= 100) return { ...ach, unlocked: true, unlockedAt: 'Today' };
+            if (ach.title.includes('500 XP') && newXP >= 500) return { ...ach, unlocked: true, unlockedAt: 'Today' };
+            if (ach.title.includes('1000 XP') && newXP >= 1000) return { ...ach, unlocked: true, unlockedAt: 'Today' };
+            return ach;
+          });
+
+          return {
+            xp: newXP,
+            level: levelInfo.level,
+            achievements: updatedAchievements,
+          };
         }),
 
       connectGitHub: (username = 'aarav-builder') =>
@@ -280,9 +295,18 @@ export const useAppStore = create<AppState>()(
 
           const updatedSkills = [...newDetectedSkills, ...state.studentProfile.verifiedSkills];
           const newOverall = Math.min(1000, state.studentProfile.builderScores.overall + 50);
+          const newXP = state.xp + 25;
+          const levelInfo = getLevelInfo(newXP);
+
+          // Unlock GitHub Pro achievement
+          const updatedAchievements = state.achievements.map((ach) =>
+            ach.title.includes('GitHub') ? { ...ach, unlocked: true, unlockedAt: 'Today' } : ach
+          );
 
           return {
-            xp: state.xp + 50,
+            xp: newXP,
+            level: levelInfo.level,
+            achievements: updatedAchievements,
             githubData: {
               ...state.githubData,
               connected: true,
@@ -307,11 +331,56 @@ export const useAppStore = create<AppState>()(
             q.id === questId ? { ...q, completed: true } : q
           );
           const newXP = state.xp + reward;
-          const newLevel = Math.floor(newXP / 150) + 1;
+          const levelInfo = getLevelInfo(newXP);
+
+          // Add verified skill if challenge is advanced/expert/boss
+          let updatedSkills = [...state.studentProfile.verifiedSkills];
+          if (targetQuest && targetQuest.skillsGained.length > 0) {
+            const primarySkill = targetQuest.skillsGained[0];
+            const alreadyExists = updatedSkills.some((s) => s.name.toLowerCase().includes(primarySkill.toLowerCase()));
+            if (!alreadyExists) {
+              updatedSkills.push({
+                id: `vs-quest-${Date.now()}`,
+                name: primarySkill,
+                category: 'Programming',
+                level: targetQuest.difficulty === 'Boss' || targetQuest.difficulty === 'Expert' ? 'Expert' : 'Advanced',
+                score: targetQuest.difficulty === 'Boss' ? 98 : targetQuest.difficulty === 'Expert' ? 94 : 88,
+                verificationSources: ['Assessment'],
+                verifiedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+                verificationCode: `SB-${primarySkill.substring(0, 3).toUpperCase()}-${Math.floor(10000 + Math.random() * 90000)}`,
+                evidenceCount: 1,
+              });
+            }
+          }
+
+          // Unlock achievements
+          const updatedAchievements = state.achievements.map((ach) => {
+            if (ach.unlocked) return ach;
+            if (ach.title.includes('First') || ach.title.includes('Commit') || ach.title.includes('Assessment')) {
+              return { ...ach, unlocked: true, unlockedAt: 'Today' };
+            }
+            if (targetQuest?.category === 'Backend' && ach.title.includes('Backend')) {
+              return { ...ach, unlocked: true, unlockedAt: 'Today' };
+            }
+            if (targetQuest?.category === 'AI & ML' && ach.title.includes('AI')) {
+              return { ...ach, unlocked: true, unlockedAt: 'Today' };
+            }
+            return ach;
+          });
+
           return {
             quests: updatedQuests,
             xp: newXP,
-            level: Math.max(state.level, newLevel),
+            level: levelInfo.level,
+            achievements: updatedAchievements,
+            studentProfile: {
+              ...state.studentProfile,
+              verifiedSkills: updatedSkills,
+              builderScores: {
+                ...state.studentProfile.builderScores,
+                overall: Math.min(1000, state.studentProfile.builderScores.overall + 5),
+              },
+            },
           };
         }),
 
@@ -334,10 +403,11 @@ export const useAppStore = create<AppState>()(
               : a
           );
           const newXP = state.xp + target.xpReward;
+          const levelInfo = getLevelInfo(newXP);
           return {
             achievements: updated,
             xp: newXP,
-            level: Math.max(state.level, Math.floor(newXP / 150) + 1),
+            level: levelInfo.level,
           };
         }),
 
