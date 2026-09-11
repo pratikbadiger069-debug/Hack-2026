@@ -276,6 +276,8 @@ interface AppState {
 
   // Student Portal State
   studentProfile: StudentProfile;
+  updateStudentProfile: (updates: Partial<StudentProfile>) => void;
+  setUserAvatar: (avatarUrl: string) => void;
   updateStudentTargetRole: (role: string) => void;
   updateStudentAcademic: (academic: Partial<StudentProfile['academic']>) => void;
   updateStudentSocials: (socials: Partial<StudentProfile['professional']>) => void;
@@ -956,7 +958,42 @@ export const useAppStore = create<AppState>()(
 
       studentProfile: CLEAN_SCRATCH_STUDENT_PROFILE,
 
+      updateStudentProfile: (updates) =>
+        set((state) => {
+          const updated = {
+            ...state.studentProfile,
+            ...updates,
+          };
+          const email = state.studentProfile.email?.toLowerCase().trim();
+          return {
+            studentProfile: updated,
+            currentUser: state.currentUser
+              ? { ...state.currentUser, avatar: updates.avatar || state.currentUser.avatar, name: updates.name || state.currentUser.name }
+              : state.currentUser,
+            userProfilesByEmail: email
+              ? { ...state.userProfilesByEmail, [email]: updated }
+              : state.userProfilesByEmail,
+          };
+        }),
+
+      setUserAvatar: (avatarUrl) =>
+        set((state) => {
+          const updated = {
+            ...state.studentProfile,
+            avatar: avatarUrl,
+          };
+          const email = state.studentProfile.email?.toLowerCase().trim();
+          return {
+            studentProfile: updated,
+            currentUser: state.currentUser ? { ...state.currentUser, avatar: avatarUrl } : state.currentUser,
+            userProfilesByEmail: email
+              ? { ...state.userProfilesByEmail, [email]: updated }
+              : state.userProfilesByEmail,
+          };
+        }),
+
       updateStudentTargetRole: (role) =>
+
         set((state) => {
           const updated = {
             ...state.studentProfile,

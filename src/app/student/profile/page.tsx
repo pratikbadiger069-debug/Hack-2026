@@ -7,31 +7,10 @@ import { motion } from 'framer-motion';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
 import { getLevelInfo, calculateTransparentBuilderScore } from '@/lib/xp-engine';
-import {
-  User,
-  ShieldCheck,
-  Building,
-  Target,
-  MapPin,
-  Trophy,
-  CheckCircle2,
-  ExternalLink,
-  Flame,
-  Award,
-  BookOpen,
-  ArrowRight,
-  Settings,
-  RefreshCw,
-  GitPullRequest,
-  Star,
-  Sparkles,
-  LogOut,
-  Key,
-  Trash2,
-  Check,
-  AlertCircle,
-  Unlink,
-} from 'lucide-react';
+import { User, ShieldCheck, Building, Target, MapPin, Trophy, CheckCircle2, ExternalLink, Flame, Award, BookOpen, ArrowRight, Settings, RefreshCw, GitPullRequest, Star, Sparkles, LogOut, Key, Trash2, Check, AlertCircle, Unlink } from 'lucide-react';
+import { UserAvatar } from '@/components/avatar/UserAvatar';
+import { AvatarModal } from '@/components/avatar/AvatarModal';
+
 
 function GithubIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
@@ -94,6 +73,7 @@ export default function StudentProfilePage() {
     updateStudentSocials,
   } = useAppStore();
 
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
   const [isSyncingGitHub, setIsSyncingGitHub] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordMsg, setPasswordMsg] = useState<string | null>(null);
@@ -121,7 +101,7 @@ export default function StudentProfilePage() {
     setTimeout(() => {
       syncGitHub();
       setIsSyncingGitHub(false);
-    }, 600);
+    }, 800);
   };
 
   const handleBadgeClick = (badgeId: string, unlocked: boolean) => {
@@ -135,15 +115,17 @@ export default function StudentProfilePage() {
     router.push('/login');
   };
 
-  const handleSaveLinkedIn = () => {
+  const handleSaveLinkedIn = (e: React.FormEvent) => {
+    e.preventDefault();
     updateStudentSocials({ linkedinUrl: linkedInUrl });
     setShowLinkedInInput(false);
   };
 
-  const handleChangePassword = (e: React.FormEvent) => {
+
+  const handleUpdatePassword = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newPassword.length < 8) {
-      setPasswordMsg('Password must be at least 8 characters long.');
+    if (!newPassword || !confirmPassword) {
+      setPasswordMsg('Please fill all password fields.');
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -168,19 +150,24 @@ export default function StudentProfilePage() {
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2 }}
-          className="p-8 rounded-2xl bg-white border border-[#E8E5DD] shadow-none"
+          className="p-8 rounded-3xl bg-white border border-[#E8E5DD] shadow-xs"
         >
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-              <div className="relative">
-                <img
-                  src={studentProfile.avatar || currentUser?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
-                  alt={studentProfile.name}
-                  className="w-24 h-24 rounded-2xl object-cover border border-[#E8E5DD]"
+              <div
+                onClick={() => setIsAvatarModalOpen(true)}
+                className="relative group cursor-pointer"
+                title="Click to customize AI avatar"
+              >
+                <UserAvatar
+                  src={studentProfile.avatar || currentUser?.avatar}
+                  name={studentProfile.name || currentUser?.name || 'Aarav Sharma'}
+                  size="2xl"
+                  interactive
                 />
-                <span className="absolute -bottom-1 -right-1 px-2.5 py-0.5 rounded-full bg-[#1B1B1B] text-white text-[11px] font-bold">
-                  Lvl {levelInfo.level}
-                </span>
+                <div className="absolute inset-0 rounded-3xl bg-black/40 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center text-[10px] font-bold transition-opacity">
+                  <span>Edit Avatar</span>
+                </div>
               </div>
 
               <div className="space-y-1.5">
@@ -189,7 +176,7 @@ export default function StudentProfilePage() {
                     {studentProfile.name || currentUser?.name || 'Aarav Sharma'}
                   </h1>
                   <span className="px-2.5 py-0.5 rounded-full bg-[#C76A2A]/10 text-[#C76A2A] text-xs font-semibold">
-                    {levelInfo.title}
+                    Level {levelInfo.level} {levelInfo.title}
                   </span>
                   <span className="px-2 py-0.5 rounded-full bg-[#2F7A45]/10 text-[#2F7A45] text-xs font-semibold flex items-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5" />
@@ -214,13 +201,20 @@ export default function StudentProfilePage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="flex items-center gap-2 self-start">
+            <div className="flex items-center gap-2 self-start flex-wrap">
+              <button
+                onClick={() => setIsAvatarModalOpen(true)}
+                className="px-3.5 py-2 bg-[#F6F4EE] hover:bg-[#E8E5DD] text-[#1B1B1B] rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#C76A2A]" />
+                <span>Change Avatar</span>
+              </button>
               <Link
                 href="/student/settings"
-                className="px-4 py-2 bg-[#F6F4EE] hover:bg-[#E8E5DD] text-[#1B1B1B] rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5"
+                className="px-4 py-2 bg-[#1B1B1B] text-white hover:bg-[#C76A2A] rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5"
               >
-                <Settings className="w-3.5 h-3.5 text-[#6F6A60]" />
-                <span>Edit Profile</span>
+                <Settings className="w-3.5 h-3.5" />
+                <span>Settings</span>
               </Link>
             </div>
           </div>
@@ -677,7 +671,7 @@ export default function StudentProfilePage() {
                 </div>
               )}
 
-              <form onSubmit={handleChangePassword} className="space-y-3 text-xs">
+              <form onSubmit={handleUpdatePassword} className="space-y-3 text-xs">
                 <div>
                   <label className="font-semibold text-[#1B1B1B] block mb-1">New Password</label>
                   <input
@@ -721,7 +715,15 @@ export default function StudentProfilePage() {
           </div>
         )}
 
+        {/* Avatar Selector / Generator Modal */}
+        <AvatarModal
+          isOpen={isAvatarModalOpen}
+          onClose={() => setIsAvatarModalOpen(false)}
+        />
+
       </div>
     </PortalLayout>
   );
 }
+
+

@@ -19,10 +19,13 @@ import {
   Award
 } from 'lucide-react';
 
+import { UserAvatar } from '@/components/avatar/UserAvatar';
+
 export default function StudentLeaderboardPage() {
   const { studentProfile, tierRankings, xp, streakDays } = useAppStore();
   const [scopeTab, setScopeTab] = useState<'department' | 'campus' | 'state' | 'national'>('department');
   const [timeframe, setTimeframe] = useState<'weekly' | 'monthly' | 'allTime'>('weekly');
+
 
   const myLevelInfo = getLevelInfo(xp);
   const myOverallScore = calculateBuilderScore({
@@ -474,10 +477,10 @@ export default function StudentLeaderboardPage() {
                 </div>
 
                 <div className="flex items-center gap-3 mb-3">
-                  <img
+                  <UserAvatar
                     src={podiumUser.avatar}
-                    alt={podiumUser.studentName}
-                    className="w-10 h-10 rounded-full object-cover border border-[#E8E5DD]"
+                    name={podiumUser.studentName}
+                    size="md"
                   />
                   <div>
                     <h3 className="text-xs font-bold text-[#1B1B1B]">{podiumUser.studentName}</h3>
@@ -539,23 +542,23 @@ export default function StudentLeaderboardPage() {
 
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2.5">
-                        <img
+                        <UserAvatar
                           src={row.avatar}
-                          alt={row.studentName}
-                          className="w-8 h-8 rounded-full object-cover border border-[#E8E5DD]"
+                          name={row.studentName}
+                          size="sm"
                         />
                         <div>
                           <div className="font-semibold text-xs text-[#1B1B1B] flex items-center gap-1.5">
                             {row.studentName}
                             {isUser && (
-                              <span className="px-1.5 py-0.2 rounded bg-[#2F7A45]/15 text-[#2F7A45] text-[9px] font-mono font-bold">
-                                YOU
+                              <span className="px-1.5 py-0.2 rounded text-[9px] bg-[#2F7A45]/10 text-[#2F7A45] font-bold">
+                                You
                               </span>
                             )}
                           </div>
-                          <span className="text-[10px] text-[#7A766E]">
+                          <div className="text-[10px] text-[#7A766E]">
                             {row.college} • {row.department}
-                          </span>
+                          </div>
                         </div>
                       </div>
                     </td>

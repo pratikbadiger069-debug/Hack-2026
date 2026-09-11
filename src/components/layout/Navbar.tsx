@@ -102,56 +102,22 @@ export function Navbar() {
           </div>
 
           {/* Right Controls */}
-          <div className="flex items-center gap-2.5 sm:gap-3">
-            {/* Level & XP Capsule */}
-            <Link
-              href="/student/journey"
-              className="flex items-center gap-2 px-3 py-1 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD] text-xs font-semibold text-[#1B1B1B] hover:border-[#C76A2A] transition-all shadow-xs"
-            >
-              <span>Lvl {levelInfo.level} {levelInfo.title}</span>
-              <span className="text-[#C76A2A] font-mono text-[11px]">
-                {xp} XP
-              </span>
-            </Link>
-
-            {/* Daily Streak */}
-            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD] text-xs font-medium text-[#1B1B1B]">
-              <Flame className="w-3.5 h-3.5 text-[#C76A2A]" />
-              <span className="font-mono text-[11px]">{streakDays}d streak</span>
-            </div>
-
-            {/* GitHub Sync Status */}
-            {githubData.connected ? (
-              <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD] text-xs text-[#1B1B1B]">
-                <GithubIcon className="w-3.5 h-3.5 text-[#1B1B1B]" />
-                <span className="font-mono text-[11px]">@{githubData.username}</span>
-                <CheckCircle2 className="w-3.5 h-3.5 text-[#2F7A45]" />
-              </div>
-            ) : (
-              <Link
-                href="/student/journey#github"
-                className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white border border-[#E8E5DD] text-xs text-[#6F6A60] hover:text-[#1B1B1B] hover:border-[#C76A2A] transition-colors"
-              >
-                <GithubIcon className="w-3.5 h-3.5 text-[#6F6A60]" />
-                <span className="text-[11px]">Connect GitHub</span>
-              </Link>
-            )}
-
+          <div className="flex items-center gap-3">
             {/* AI Provider Status */}
             <button
               onClick={() => setIsAiModalOpen(true)}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium border transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors ${
                 hasKey
-                  ? 'bg-white border-[#E8E5DD] text-[#1B1B1B] hover:border-[#C76A2A]'
+                  ? 'bg-[#F6F4EE] border-[#E8E5DD] text-[#1B1B1B] hover:border-[#C76A2A]'
                   : 'bg-[#C76A2A]/10 border-[#C76A2A]/30 text-[#C76A2A] hover:bg-[#C76A2A]/20'
               }`}
             >
               <Sparkles className="w-3.5 h-3.5 text-[#C76A2A]" />
-              <span className="hidden sm:inline capitalize">{activeProvider}</span>
+              <span className="hidden sm:inline capitalize font-semibold">{activeProvider}</span>
             </button>
 
             {/* User Profile Dropdown Menu */}
-            <div className="pl-2 border-l border-[#E8E5DD]">
+            <div className="pl-1 border-l border-[#E8E5DD]">
               <ProfileDropdown />
             </div>
           </div>

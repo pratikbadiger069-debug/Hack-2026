@@ -1067,15 +1067,29 @@
         "hasHackathonExperience": true
       },
       "builderScores": {
-        "overall": 600,
+        "overall": 620,
         "execution": 60,
         "leadership": 70,
         "innovation": 85,
         "problemSolving": 78,
         "consistency": 75
       },
-      "employabilityScore": 72,
+      "employabilityScore": 75,
       "verifiedSkills": [
+        {
+          "id": "vs-1789163106853",
+          "name": "Java",
+          "category": "Programming",
+          "level": "Advanced",
+          "score": 85,
+          "verificationSources": [
+            "Assessment",
+            "Code Validation"
+          ],
+          "verifiedDate": "Sep 12, 2026",
+          "verificationCode": "SB-JA-32697",
+          "evidenceCount": 1
+        },
         {
           "id": "vs-onboard-1789161834998-0",
           "name": "Python",

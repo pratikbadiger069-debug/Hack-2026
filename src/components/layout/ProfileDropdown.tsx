@@ -38,6 +38,8 @@ function GithubIcon({ className = 'w-4 h-4' }: { className?: string }) {
   );
 }
 
+import { UserAvatar } from '@/components/avatar/UserAvatar';
+
 export function ProfileDropdown() {
   const router = useRouter();
   const {
@@ -108,13 +110,11 @@ export function ProfileDropdown() {
         className="flex items-center gap-2.5 p-1 pl-1.5 pr-2.5 rounded-xl hover:bg-black/5 transition-all text-[#1B1B1B] cursor-pointer"
         aria-expanded={isOpen}
       >
-        <div className="w-7 h-7 rounded-xl bg-[#1B1B1B] text-white flex items-center justify-center font-bold text-xs shadow-none overflow-hidden">
-          {studentProfile?.avatar ? (
-            <img src={studentProfile.avatar} alt={displayName} className="w-full h-full object-cover" />
-          ) : (
-            displayName.charAt(0).toUpperCase()
-          )}
-        </div>
+        <UserAvatar
+          src={studentProfile?.avatar || currentUser?.avatar}
+          name={displayName}
+          size="sm"
+        />
         <div className="hidden sm:flex flex-col text-left">
           <div className="flex items-center gap-1.5">
             <span className="text-xs font-semibold leading-none text-[#1B1B1B]">{displayName}</span>
@@ -138,18 +138,17 @@ export function ProfileDropdown() {
             className="hidden sm:block absolute right-0 mt-2 w-72 rounded-2xl bg-white border border-[#E8E5DD] shadow-xl z-40 p-4 space-y-3 pointer-events-none"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#1B1B1B] text-white flex items-center justify-center font-bold text-sm overflow-hidden shrink-0">
-                {studentProfile?.avatar ? (
-                  <img src={studentProfile.avatar} alt={displayName} className="w-full h-full object-cover" />
-                ) : (
-                  displayName.charAt(0).toUpperCase()
-                )}
-              </div>
+              <UserAvatar
+                src={studentProfile?.avatar || currentUser?.avatar}
+                name={displayName}
+                size="md"
+              />
               <div className="min-w-0">
                 <h4 className="text-xs font-bold text-[#1B1B1B] truncate">{displayName}</h4>
                 <p className="text-[10px] text-[#6F6A60] truncate">{studentProfile?.academic?.college || 'HITAM'}</p>
               </div>
             </div>
+
 
             <div className="grid grid-cols-3 gap-2 p-2.5 bg-[#FAF9F5] rounded-xl border border-[#E8E5DD] text-center text-xs">
               <div>
