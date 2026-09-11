@@ -93,7 +93,7 @@
       "isEmailVerified": false,
       "emailVerificationToken": "vt_1789123646558_c2c0v4b",
       "createdAt": "2026-09-11T10:47:26.558Z",
-      "updatedAt": "2026-09-11T21:10:03.673Z",
+      "updatedAt": "2026-09-11T22:39:17.917Z",
       "googleName": "New Builder"
     },
     "manu18reddy@gmail.com": {
@@ -133,7 +133,7 @@
       "isEmailVerified": false,
       "emailVerificationToken": "vt_1789148818117_n5snm7u",
       "createdAt": "2026-09-11T17:46:58.117Z",
-      "updatedAt": "2026-09-11T19:25:10.289Z",
+      "updatedAt": "2026-09-11T22:35:54.064Z",
       "googleName": "Aarav Sharma"
     },
     "aarav-builder@github.user": {
@@ -594,36 +594,96 @@
       "name": "Pratik",
       "email": "pratik.badiger@gmail.com",
       "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
-      "headline": "Software Engineer & Distributed Systems Builder",
-      "targetRole": "Software Engineer",
+      "headline": "Software Development Candidate | Stanford University '26",
+      "targetRole": "Software Development",
       "academic": {
         "college": "Stanford University",
         "department": "CSE",
         "year": "1st Year",
         "semester": "1st Semester",
-        "cgpa": 9,
-        "studentId": ""
+        "cgpa": 8.5,
+        "studentId": "STU-2026-3912",
+        "degree": "B.Tech",
+        "branch": "CSE",
+        "graduationYear": "2026",
+        "country": "India",
+        "state": "Telangana",
+        "city": "Hyderabad"
       },
       "professional": {
         "githubUrl": "https://github.com/pratikbadiger069-debug",
-        "linkedinUrl": "",
+        "linkedinUrl": "https://www.linkedin.com/public-profile/settings/?trk=d_flagship3_profile_self_view_public_profile&lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base%3Bsn21OQftQKKshSBim%2BUZBg%3D%3D",
         "portfolioUrl": "",
-        "bio": "",
-        "totalProjects": 0,
-        "hackathonWins": 0,
+        "bio": "Intermediate builder focused on Software Development with a target goal of Internship.",
+        "totalProjects": 2,
+        "hackathonWins": 1,
         "researchPapers": 0,
-        "openSourceContributions": 0
+        "openSourceContributions": 12,
+        "resumeUrl": "",
+        "careerPath": "Software Development",
+        "skillLevel": "Intermediate",
+        "careerGoal": "Internship",
+        "knownSkills": [
+          "Python",
+          "JavaScript",
+          "React"
+        ],
+        "projectCountRange": "1–2",
+        "hasHackathonExperience": true
       },
       "builderScores": {
-        "overall": 70,
-        "execution": 10,
-        "leadership": 0,
-        "innovation": 0,
-        "problemSolving": 0,
-        "consistency": 0
+        "overall": 580,
+        "execution": 58,
+        "leadership": 70,
+        "innovation": 85,
+        "problemSolving": 78,
+        "consistency": 75
       },
-      "employabilityScore": 8,
-      "verifiedSkills": [],
+      "employabilityScore": 70,
+      "verifiedSkills": [
+        {
+          "id": "vs-onboard-1789166357916-0",
+          "name": "Python",
+          "category": "AI & ML",
+          "level": "Intermediate",
+          "score": 80,
+          "verificationSources": [
+            "Assessment",
+            "Project"
+          ],
+          "verifiedDate": "Sep 12, 2026",
+          "verificationCode": "SB-PYT-30526",
+          "evidenceCount": 1
+        },
+        {
+          "id": "vs-onboard-1789166357917-1",
+          "name": "JavaScript",
+          "category": "Programming",
+          "level": "Intermediate",
+          "score": 82,
+          "verificationSources": [
+            "Assessment",
+            "Project"
+          ],
+          "verifiedDate": "Sep 12, 2026",
+          "verificationCode": "SB-JAV-70992",
+          "evidenceCount": 1
+        },
+        {
+          "id": "vs-onboard-1789166357917-2",
+          "name": "React",
+          "category": "Programming",
+          "level": "Intermediate",
+          "score": 84,
+          "verificationSources": [
+            "Assessment",
+            "Project"
+          ],
+          "verifiedDate": "Sep 12, 2026",
+          "verificationCode": "SB-REA-48989",
+          "evidenceCount": 1
+        }
+      ],
       "evidences": [
         {
           "id": "ev-1789123652871",
@@ -646,7 +706,27 @@
           "date": "Sep 11, 2026"
         }
       ],
-      "googleName": "New Builder"
+      "googleName": "New Builder",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "country": "India",
+      "careerReadinessScore": 70,
+      "onboardingCompleted": true,
+      "college": "Stanford University",
+      "department": "CSE",
+      "branch": "CSE",
+      "degree": "B.Tech",
+      "graduationYear": "2026",
+      "careerPath": "Software Development",
+      "skillLevel": "Intermediate",
+      "careerGoal": "Internship",
+      "knownSkills": [
+        "Python",
+        "JavaScript",
+        "React"
+      ],
+      "projectCount": "1–2",
+      "hackathonExperience": "Yes"
     },
     "manu18reddy@gmail.com": {
       "id": "std-1789124286176-zv0tc",
@@ -1067,15 +1147,29 @@
         "hasHackathonExperience": true
       },
       "builderScores": {
-        "overall": 620,
+        "overall": 640,
         "execution": 60,
         "leadership": 70,
         "innovation": 85,
         "problemSolving": 78,
         "consistency": 75
       },
-      "employabilityScore": 75,
+      "employabilityScore": 78,
       "verifiedSkills": [
+        {
+          "id": "vs-1789166478026",
+          "name": "web development",
+          "category": "AI & ML",
+          "level": "Advanced",
+          "score": 85,
+          "verificationSources": [
+            "Assessment",
+            "Code Validation"
+          ],
+          "verifiedDate": "Sep 12, 2026",
+          "verificationCode": "SB-WE-19086",
+          "evidenceCount": 1
+        },
         {
           "id": "vs-1789163106853",
           "name": "Java",
@@ -1416,6 +1510,38 @@
     ]
   },
   "auditLogs": [
+    {
+      "id": "log-1789166393162",
+      "timestamp": "2026-09-11T22:39:53.162Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789161544074_trgl0y0",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badige12r@gmail.com"
+    },
+    {
+      "id": "log-1789166272707",
+      "timestamp": "2026-09-11T22:37:52.707Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789166181978",
+      "timestamp": "2026-09-11T22:36:21.978Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789166169490",
+      "timestamp": "2026-09-11T22:36:09.490Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
     {
       "id": "log-1789165860346",
       "timestamp": "2026-09-11T22:31:00.346Z",
