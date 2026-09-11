@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
 import { LearningQuest } from '@/types';
+import { mockQuests, mockLearningPaths } from '@/lib/mock-data';
 import {
   getLevelInfo,
   DIFFICULTY_RULES,
@@ -18,26 +19,22 @@ import {
   Play,
   X,
   ArrowRight,
-  Sparkles,
-  ShieldAlert,
-  ShieldCheck,
-  Flame,
   Award,
-  ChevronRight,
-  TrendingUp,
-  RotateCcw,
   Clock,
-  BookOpen,
-  Target,
-  FileCheck,
   AlertTriangle,
+  RotateCcw,
+  Search,
 } from 'lucide-react';
 
 export default function StudentAssessmentsPage() {
-  const { quests, learningPaths, completeQuest, xp, studentProfile } = useAppStore();
+  const { quests, learningPaths, completeQuest, xp } = useAppStore();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('All');
   const [activeTab, setActiveTab] = useState<'tracks' | 'challenges' | 'certifications'>('tracks');
+
+  // Effective Quests & Paths (Auto-seed fallback so page is NEVER empty or broken)
+  const effectiveQuests: LearningQuest[] = quests && quests.length > 0 ? quests : (mockQuests as LearningQuest[]);
+  const effectivePaths = learningPaths && learningPaths.length > 0 ? learningPaths : mockLearningPaths;
 
   // Test Runner State
   const [activeQuest, setActiveQuest] = useState<LearningQuest | null>(null);
@@ -72,7 +69,7 @@ export default function StudentAssessmentsPage() {
     { id: 'Boss', label: 'Boss Final (80% Pass • 250+ XP)' },
   ];
 
-  const filteredQuests = quests.filter((q) => {
+  const filteredQuests = effectiveQuests.filter((q) => {
     const matchCategory =
       selectedCategory === 'All' ||
       q.category.toLowerCase().includes(selectedCategory.toLowerCase()) ||
@@ -135,7 +132,7 @@ export default function StudentAssessmentsPage() {
 
     const updatedLog = [
       ...answersLog,
-      { isCorrect, timeTakenMs: timeSpent, topic: currentQ.topic || activeQuest.skillCategory },
+      { isCorrect, timeTakenMs: timeSpent, topic: currentQ.topic || activeQuest.skillCategory || activeQuest.category },
     ];
     setAnswersLog(updatedLog);
 
@@ -196,7 +193,7 @@ export default function StudentAssessmentsPage() {
                 : 'bg-white text-[#6F6A60] hover:text-[#1B1B1B] border border-[#E8E5DD]'
             }`}
           >
-            Progression Paths ({learningPaths.length})
+            Progression Paths ({effectivePaths.length})
           </button>
           <button
             onClick={() => setActiveTab('challenges')}
@@ -206,7 +203,7 @@ export default function StudentAssessmentsPage() {
                 : 'bg-white text-[#6F6A60] hover:text-[#1B1B1B] border border-[#E8E5DD]'
             }`}
           >
-            All Challenges ({quests.length})
+            All Challenges ({effectiveQuests.length})
           </button>
           <button
             onClick={() => setActiveTab('certifications')}
@@ -224,7 +221,7 @@ export default function StudentAssessmentsPage() {
         {activeTab === 'tracks' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {learningPaths.map((path) => {
+              {effectivePaths.map((path: any) => {
                 const stepsList = path.milestones || path.steps || [];
                 const totalInPath = Math.max(1, stepsList.length);
                 const completedInPath = stepsList.filter((m: any) => m.status === 'completed').length;
@@ -286,7 +283,7 @@ export default function StudentAssessmentsPage() {
 
                     <button
                       onClick={() => {
-                        const targetQuest = quests.find(q => q.pathId === path.id && q.status !== 'locked') || quests.find(q => q.pathId === path.id);
+                        const targetQuest = effectiveQuests.find(q => q.pathId === path.id && q.status !== 'locked') || effectiveQuests.find(q => q.pathId === path.id) || effectiveQuests[0];
                         if (targetQuest) handleStartChallenge(targetQuest);
                       }}
                       className="w-full py-2.5 bg-[#1B1B1B] text-white rounded-xl text-xs font-semibold hover:bg-[#C76A2A] transition-colors flex items-center justify-center gap-2 mt-auto"
@@ -335,95 +332,116 @@ export default function StudentAssessmentsPage() {
               </select>
             </div>
 
-            {/* Quests Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filteredQuests.map((quest) => {
-                const diffRules = DIFFICULTY_RULES[quest.difficulty] || DIFFICULTY_RULES.Medium;
-                const isCompleted = quest.status === 'completed';
-                const isLocked = quest.status === 'locked';
+            {/* Quests Grid or Empty State */}
+            {filteredQuests.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {filteredQuests.map((quest) => {
+                  const diffRules = DIFFICULTY_RULES[quest.difficulty] || DIFFICULTY_RULES.Medium;
+                  const isCompleted = quest.completed || quest.status === 'completed';
+                  const isLocked = quest.status === 'locked';
 
-                return (
-                  <motion.div
-                    key={quest.id}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className={`p-6 rounded-2xl border shadow-xs flex flex-col justify-between space-y-4 transition-all ${
-                      isCompleted
-                        ? 'bg-white border-[#2F7A45]/40'
-                        : isLocked
-                        ? 'bg-[#F6F4EE]/50 border-[#E8E5DD] opacity-60'
-                        : 'bg-white border-[#E8E5DD] hover:border-[#C76A2A]'
-                    }`}
-                  >
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-mono font-semibold text-[#C76A2A] bg-[#C76A2A]/10 px-2.5 py-0.5 rounded-full">
-                          {quest.category}
-                        </span>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-semibold text-[#1B1B1B]">
-                            {quest.difficulty}
-                          </span>
-                          <span className="text-[11px] font-mono text-[#C76A2A] font-bold">
-                            +{quest.xpReward} XP
-                          </span>
-                        </div>
-                      </div>
-
-                      <div>
-                        <h3 className="text-base font-bold text-[#1B1B1B]">{quest.title}</h3>
-                        <p className="text-xs text-[#6F6A60] mt-1 line-clamp-2">{quest.description}</p>
-                      </div>
-
-                      <div className="p-3 bg-[#F6F4EE] rounded-xl text-[11px] space-y-1 text-[#6F6A60]">
-                        <div className="flex justify-between">
-                          <span>Pass Threshold:</span>
-                          <strong className="text-[#1B1B1B]">{diffRules.passPercent}%</strong>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Attempt Limit:</span>
-                          <strong className="text-[#1B1B1B]">{diffRules.attemptLimit === Infinity ? 'Unlimited' : `${diffRules.attemptLimit} Attempts`}</strong>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Anti-Cheat:</span>
-                          <strong className="text-[#2F7A45]">Active Verification</strong>
-                        </div>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => handleStartChallenge(quest)}
-                      disabled={isLocked}
-                      className={`w-full py-2.5 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-2 ${
+                  return (
+                    <motion.div
+                      key={quest.id}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className={`p-6 rounded-2xl border shadow-xs flex flex-col justify-between space-y-4 transition-all ${
                         isCompleted
-                          ? 'bg-[#F6F4EE] text-[#2F7A45] hover:bg-[#E8E5DD]'
+                          ? 'bg-white border-[#2F7A45]/40'
                           : isLocked
-                          ? 'bg-[#E8E5DD] text-[#6F6A60] cursor-not-allowed'
-                          : 'bg-[#1B1B1B] text-white hover:bg-[#C76A2A]'
+                          ? 'bg-[#F6F4EE]/50 border-[#E8E5DD] opacity-60'
+                          : 'bg-white border-[#E8E5DD] hover:border-[#C76A2A]'
                       }`}
                     >
-                      {isCompleted ? (
-                        <>
-                          <CheckCircle2 className="w-4 h-4" />
-                          <span>Passed • Retake Assessment</span>
-                        </>
-                      ) : isLocked ? (
-                        <>
-                          <Lock className="w-3.5 h-3.5" />
-                          <span>Locked Track</span>
-                        </>
-                      ) : (
-                        <>
-                          <Play className="w-3.5 h-3.5 fill-current" />
-                          <span>Start Assessment</span>
-                        </>
-                      )}
-                    </button>
-                  </motion.div>
-                );
-              })}
-            </div>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-mono font-semibold text-[#C76A2A] bg-[#C76A2A]/10 px-2.5 py-0.5 rounded-full">
+                            {quest.category}
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-semibold text-[#1B1B1B]">
+                              {quest.difficulty}
+                            </span>
+                            <span className="text-[11px] font-mono text-[#C76A2A] font-bold">
+                              +{quest.xpReward} XP
+                            </span>
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-base font-bold text-[#1B1B1B]">{quest.title}</h3>
+                          <p className="text-xs text-[#6F6A60] mt-1 line-clamp-2">{quest.description}</p>
+                        </div>
+
+                        <div className="p-3 bg-[#F6F4EE] rounded-xl text-[11px] space-y-1 text-[#6F6A60]">
+                          <div className="flex justify-between">
+                            <span>Pass Threshold:</span>
+                            <strong className="text-[#1B1B1B]">{diffRules.passPercent}%</strong>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Attempt Limit:</span>
+                            <strong className="text-[#1B1B1B]">{diffRules.attemptLimit === Infinity ? 'Unlimited' : `${diffRules.attemptLimit} Attempts`}</strong>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Anti-Cheat:</span>
+                            <strong className="text-[#2F7A45]">Active Verification</strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => handleStartChallenge(quest)}
+                        disabled={isLocked}
+                        className={`w-full py-2.5 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-2 ${
+                          isCompleted
+                            ? 'bg-[#F6F4EE] text-[#2F7A45] hover:bg-[#E8E5DD]'
+                            : isLocked
+                            ? 'bg-[#E8E5DD] text-[#6F6A60] cursor-not-allowed'
+                            : 'bg-[#1B1B1B] text-white hover:bg-[#C76A2A]'
+                        }`}
+                      >
+                        {isCompleted ? (
+                          <>
+                            <CheckCircle2 className="w-4 h-4" />
+                            <span>Passed • Retake Challenge</span>
+                          </>
+                        ) : isLocked ? (
+                          <>
+                            <Lock className="w-3.5 h-3.5" />
+                            <span>Locked Track</span>
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-3.5 h-3.5 fill-current" />
+                            <span>Start Challenge</span>
+                          </>
+                        )}
+                      </button>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            ) : (
+              /* EMPTY STATE */
+              <div className="p-12 text-center rounded-2xl bg-white border border-[#E8E5DD] space-y-3 shadow-xs">
+                <Search className="w-8 h-8 text-[#6F6A60] mx-auto" />
+                <h3 className="text-base font-bold text-[#1B1B1B]">No Assessments Found</h3>
+                <p className="text-xs text-[#6F6A60] max-w-md mx-auto">
+                  No assessments match the selected category ({selectedCategory}) and difficulty ({selectedDifficulty}).
+                </p>
+                <button
+                  onClick={() => {
+                    setSelectedCategory('All');
+                    setSelectedDifficulty('All');
+                  }}
+                  className="px-4 py-2 bg-[#1B1B1B] text-white rounded-xl text-xs font-semibold hover:bg-[#C76A2A] transition-colors inline-flex items-center gap-1.5"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Reset Filters</span>
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -438,7 +456,7 @@ export default function StudentAssessmentsPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {quests.filter(q => q.difficulty === 'Boss' || q.difficulty === 'Expert').map((cert) => (
+              {effectiveQuests.filter(q => q.difficulty === 'Boss' || q.difficulty === 'Expert').map((cert) => (
                 <div
                   key={cert.id}
                   className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-4 hover:border-[#C76A2A] transition-all flex flex-col justify-between"

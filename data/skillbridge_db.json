@@ -897,6 +897,46 @@
   },
   "auditLogs": [
     {
+      "id": "log-1789147972408",
+      "timestamp": "2026-09-11T17:32:52.408Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789147865052",
+      "timestamp": "2026-09-11T17:31:05.052Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789147858016",
+      "timestamp": "2026-09-11T17:30:58.016Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789147832148",
+      "timestamp": "2026-09-11T17:30:32.148Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789147812351",
+      "timestamp": "2026-09-11T17:30:12.351Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
       "id": "log-1789135333668",
       "timestamp": "2026-09-11T14:02:13.668Z",
       "action": "USER_LOGIN_SUCCESS",

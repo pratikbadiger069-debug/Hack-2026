@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { AIProviderModal } from '@/components/ai/AIProviderModal';
+import { ProfileDropdown } from './ProfileDropdown';
 import { getUserDisplayName } from '@/lib/user-utils';
 import { getLevelInfo } from '@/lib/xp-engine';
 import {
@@ -149,19 +150,9 @@ export function Navbar() {
               <span className="hidden sm:inline capitalize">{activeProvider}</span>
             </button>
 
-            {/* User Avatar & Logout */}
-            <div className="flex items-center gap-2 pl-2 border-l border-[#E8E5DD]">
-              <div className="w-7 h-7 rounded-xl bg-[#1B1B1B] text-white flex items-center justify-center font-bold text-xs">
-                {displayName.charAt(0).toUpperCase()}
-              </div>
-              <button
-                onClick={handleLogout}
-                disabled={isLoggingOut}
-                title="Sign Out"
-                className="p-1.5 text-[#6F6A60] hover:text-[#C76A2A] rounded-xl hover:bg-black/5 transition-colors"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-              </button>
+            {/* User Profile Dropdown Menu */}
+            <div className="pl-2 border-l border-[#E8E5DD]">
+              <ProfileDropdown />
             </div>
           </div>
         </div>

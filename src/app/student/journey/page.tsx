@@ -40,11 +40,15 @@ export default function MyJourneyPage() {
     quests,
     githubData,
     connectGitHub,
+    disconnectGitHub,
+    syncGitHub,
     achievements,
     unlockAchievement,
   } = useAppStore();
 
   const [isConnectingGitHub, setIsConnectingGitHub] = useState(false);
+  const [isSyncingGitHub, setIsSyncingGitHub] = useState(false);
+  const [syncSuccessMsg, setSyncSuccessMsg] = useState('');
   const [isAddEvidenceOpen, setIsAddEvidenceOpen] = useState(false);
   const [isAddSkillOpen, setIsAddSkillOpen] = useState(false);
 
@@ -64,8 +68,8 @@ export default function MyJourneyPage() {
   const builderScoreData = calculateTransparentBuilderScore({
     verifiedSkillsCount: (studentProfile.verifiedSkills || []).length,
     projectsCount: (studentProfile.evidences || []).length,
-    githubConnected: githubData.connected,
-    githubReposCount: (githubData.pinnedRepos || []).length,
+    githubConnected: githubData?.connected,
+    githubReposCount: (githubData?.pinnedRepos || []).length,
     consistencyStreakDays: streakDays,
     completedChallengesCount: completedChallenges,
   });
@@ -76,6 +80,23 @@ export default function MyJourneyPage() {
       connectGitHub('aarav-builder');
       setIsConnectingGitHub(false);
     }, 700);
+  };
+
+  const handleSync = () => {
+    setIsSyncingGitHub(true);
+    setSyncSuccessMsg('');
+    setTimeout(() => {
+      syncGitHub();
+      setIsSyncingGitHub(false);
+      setSyncSuccessMsg('Synced 12 new commits & updated skill graph (+10 XP)');
+      setTimeout(() => setSyncSuccessMsg(''), 4000);
+    }, 800);
+  };
+
+  const handleDisconnect = () => {
+    if (confirm('Disconnect GitHub integration? Your verified proof of work badges will remain saved.')) {
+      disconnectGitHub();
+    }
   };
 
   const handleBadgeClick = (badgeId: string, unlocked: boolean) => {
@@ -325,14 +346,14 @@ export default function MyJourneyPage() {
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, delay: 0.15 }}
-          className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-5"
+          className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-6"
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
                 <GithubIcon className="w-5 h-5 text-[#1B1B1B]" />
                 <h2 className="text-lg font-bold text-[#1B1B1B]">GitHub Proof of Work</h2>
-                {githubData.connected && (
+                {githubData?.connected && (
                   <span className="px-2 py-0.5 rounded-full bg-[#2F7A45]/10 text-[#2F7A45] text-xs font-semibold flex items-center gap-1">
                     <CheckCircle2 className="w-3 h-3" /> OAuth Connected
                   </span>
@@ -343,7 +364,7 @@ export default function MyJourneyPage() {
               </p>
             </div>
 
-            {!githubData.connected ? (
+            {!githubData?.connected ? (
               <button
                 onClick={handleOAuthConnect}
                 disabled={isConnectingGitHub}
@@ -353,63 +374,197 @@ export default function MyJourneyPage() {
                 <span>{isConnectingGitHub ? 'Authenticating...' : 'Connect GitHub OAuth'}</span>
               </button>
             ) : (
-              <div className="flex items-center gap-3 text-xs font-mono">
-                <span className="text-[#6F6A60]">@{githubData.username}</span>
-                <span className="text-[#1B1B1B] font-semibold">{githubData.totalStars} ★</span>
-                <span className="text-[#1B1B1B] font-semibold">{githubData.followers} followers</span>
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  onClick={handleSync}
+                  disabled={isSyncingGitHub}
+                  className="px-3 py-1.5 bg-[#F6F4EE] hover:bg-[#E8E5DD] text-[#1B1B1B] rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5"
+                >
+                  <Sparkles className={`w-3.5 h-3.5 text-[#C76A2A] ${isSyncingGitHub ? 'animate-spin' : ''}`} />
+                  <span>{isSyncingGitHub ? 'Syncing...' : 'Sync GitHub'}</span>
+                </button>
+                <button
+                  onClick={handleDisconnect}
+                  className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl text-xs font-semibold transition-colors"
+                >
+                  Disconnect
+                </button>
               </div>
             )}
           </div>
 
-          {githubData.connected ? (
-            <div className="space-y-4 pt-2">
-              {/* Inferred Skills Banner */}
-              <div className="p-3.5 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD] text-xs space-y-1.5">
-                <div className="flex items-center gap-1.5 font-semibold text-[#1B1B1B]">
-                  <Sparkles className="w-3.5 h-3.5 text-[#C76A2A]" />
-                  <span>Inferred Verified Skills from Repositories:</span>
+          {syncSuccessMsg && (
+            <div className="p-3 bg-[#2F7A45]/10 border border-[#2F7A45]/20 rounded-xl text-xs font-semibold text-[#2F7A45] flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4" />
+              <span>{syncSuccessMsg}</span>
+            </div>
+          )}
+
+          {githubData?.connected ? (
+            <div className="space-y-6 pt-2">
+              {/* GitHub Profile Stat Badges */}
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 p-4 bg-[#F6F4EE] rounded-xl border border-[#E8E5DD] text-center">
+                <div>
+                  <span className="text-[11px] text-[#6F6A60] block">Handle</span>
+                  <span className="text-xs font-bold font-mono text-[#1B1B1B]">@{githubData.username || 'aarav-builder'}</span>
                 </div>
-                <div className="flex flex-wrap gap-2 pt-0.5">
-                  {(githubData.detectedSkills || ['FastAPI', 'Docker', 'PostgreSQL']).map((skill) => (
-                    <span
-                      key={skill}
-                      className="px-2.5 py-1 rounded-lg bg-white border border-[#E8E5DD] text-xs text-[#1B1B1B] font-medium"
-                    >
-                      <strong className="text-[#C76A2A]">{skill}</strong>{' '}
-                      <span className="text-[#6F6A60] text-[11px]">(90% confidence from repo commits)</span>
-                    </span>
-                  ))}
+                <div>
+                  <span className="text-[11px] text-[#6F6A60] block">Repositories</span>
+                  <span className="text-xs font-bold font-mono text-[#1B1B1B]">{githubData.publicRepos || 18}</span>
+                </div>
+                <div>
+                  <span className="text-[11px] text-[#6F6A60] block">Total Stars</span>
+                  <span className="text-xs font-bold font-mono text-[#C76A2A]">{githubData.totalStars || 142} ★</span>
+                </div>
+                <div>
+                  <span className="text-[11px] text-[#6F6A60] block">Followers</span>
+                  <span className="text-xs font-bold font-mono text-[#1B1B1B]">{githubData.followers || 89}</span>
+                </div>
+                <div>
+                  <span className="text-[11px] text-[#6F6A60] block">Following</span>
+                  <span className="text-xs font-bold font-mono text-[#1B1B1B]">{githubData.following || 42}</span>
+                </div>
+              </div>
+
+              {/* Contribution Heatmap Matrix */}
+              <div className="p-4 rounded-xl bg-white border border-[#E8E5DD] space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-[#1B1B1B]">Contribution Heatmap</span>
+                    <span className="text-[11px] text-[#6F6A60]">({githubData.recentCommitsCount || 348} commits this year)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[10px] text-[#6F6A60]">
+                    <span>Less</span>
+                    <div className="w-2.5 h-2.5 rounded-xs bg-[#E8E5DD]" />
+                    <div className="w-2.5 h-2.5 rounded-xs bg-[#86EFAC]" />
+                    <div className="w-2.5 h-2.5 rounded-xs bg-[#22C55E]" />
+                    <div className="w-2.5 h-2.5 rounded-xs bg-[#15803D]" />
+                    <span>More</span>
+                  </div>
+                </div>
+
+                {/* Heatmap Grid: 28 weeks x 4 rows */}
+                <div className="overflow-x-auto pb-1">
+                  <div className="grid grid-flow-col grid-rows-4 gap-1 min-w-[580px]">
+                    {Array.from({ length: 112 }).map((_, i) => {
+                      const level = (i * 7 + 3) % 5;
+                      const bgClass =
+                        level === 0 ? 'bg-[#E8E5DD]/70' :
+                        level === 1 ? 'bg-[#BBF7D0]' :
+                        level === 2 ? 'bg-[#86EFAC]' :
+                        level === 3 ? 'bg-[#22C55E]' : 'bg-[#15803D]';
+                      return (
+                        <div
+                          key={i}
+                          title={`Day ${i + 1}: ${level * 3} contributions`}
+                          className={`w-3 h-3 rounded-xs ${bgClass} transition-transform hover:scale-125 cursor-pointer`}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Languages Breakdown */}
+              <div className="p-4 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD] space-y-2">
+                <span className="text-xs font-bold text-[#1B1B1B] block">Language Distribution</span>
+                <div className="w-full h-2.5 bg-white rounded-full overflow-hidden flex border border-[#E8E5DD]">
+                  <div style={{ width: '48%' }} className="bg-[#3B82F6]" title="Python 48%" />
+                  <div style={{ width: '32%' }} className="bg-[#60A5FA]" title="TypeScript 32%" />
+                  <div style={{ width: '12%' }} className="bg-[#F97316]" title="C++ 12%" />
+                  <div style={{ width: '8%' }} className="bg-[#22C55E]" title="SQL & Others 8%" />
+                </div>
+                <div className="flex items-center gap-4 text-[11px] text-[#6F6A60] flex-wrap pt-1 font-mono">
+                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#3B82F6]" /> Python (48%)</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#60A5FA]" /> TypeScript (32%)</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#F97316]" /> C++ (12%)</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#22C55E]" /> SQL & Others (8%)</span>
+                </div>
+              </div>
+
+              {/* Automatic Skill Extraction Matrix */}
+              <div className="p-4 rounded-xl bg-white border border-[#E8E5DD] text-xs space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 font-bold text-[#1B1B1B]">
+                    <Sparkles className="w-4 h-4 text-[#C76A2A]" />
+                    <span>Automatic Repository Skill Extraction</span>
+                  </div>
+                  <span className="text-[11px] font-mono text-[#2F7A45] font-semibold bg-[#2F7A45]/10 px-2 py-0.5 rounded-full">
+                    Auto-Inferred
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="p-3 bg-[#F6F4EE] rounded-xl border border-[#E8E5DD] space-y-1">
+                    <span className="text-[11px] font-semibold text-[#6F6A60] block">Spring Boot / Java Repo</span>
+                    <span className="text-xs font-bold text-[#1B1B1B] block">→ Backend Development</span>
+                    <span className="text-[10px] text-[#2F7A45] font-semibold">96% Confidence (REST APIs, JPA)</span>
+                  </div>
+                  <div className="p-3 bg-[#F6F4EE] rounded-xl border border-[#E8E5DD] space-y-1">
+                    <span className="text-[11px] font-semibold text-[#6F6A60] block">React / Next.js Repo</span>
+                    <span className="text-xs font-bold text-[#1B1B1B] block">→ Frontend Engineering</span>
+                    <span className="text-[10px] text-[#2F7A45] font-semibold">94% Confidence (TS, Tailwind)</span>
+                  </div>
+                  <div className="p-3 bg-[#F6F4EE] rounded-xl border border-[#E8E5DD] space-y-1">
+                    <span className="text-[11px] font-semibold text-[#6F6A60] block">Docker / Compose Repo</span>
+                    <span className="text-xs font-bold text-[#1B1B1B] block">→ DevOps &amp; Containers</span>
+                    <span className="text-[10px] text-[#2F7A45] font-semibold">91% Confidence (Multi-stage CI)</span>
+                  </div>
                 </div>
               </div>
 
               {/* Repositories Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {(githubData.pinnedRepos || []).map((repo) => (
-                  <div
-                    key={repo.name}
-                    className="p-4 rounded-xl bg-white border border-[#E8E5DD] hover:border-[#C76A2A] transition-all space-y-2"
-                  >
-                    <div className="flex items-center justify-between">
-                      <a
-                        href={repo.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="font-bold text-sm text-[#1B1B1B] hover:text-[#C76A2A] flex items-center gap-1.5"
-                      >
-                        <span>{repo.name}</span>
-                        <ExternalLink className="w-3 h-3 text-[#6F6A60]" />
-                      </a>
-                      <span className="text-xs font-mono text-[#6F6A60] flex items-center gap-1">
-                        <Star className="w-3 h-3 text-[#C76A2A]" /> {repo.stars}
-                      </span>
+              <div className="space-y-3">
+                <span className="text-xs font-bold text-[#1B1B1B] block uppercase tracking-wider">
+                  Pinned Repositories
+                </span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {(githubData.pinnedRepos || []).map((repo) => (
+                    <div
+                      key={repo.name}
+                      className="p-4 rounded-xl bg-white border border-[#E8E5DD] hover:border-[#C76A2A] transition-all space-y-2"
+                    >
+                      <div className="flex items-center justify-between">
+                        <a
+                          href={repo.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="font-bold text-sm text-[#1B1B1B] hover:text-[#C76A2A] flex items-center gap-1.5"
+                        >
+                          <span>{repo.name}</span>
+                          <ExternalLink className="w-3 h-3 text-[#6F6A60]" />
+                        </a>
+                        <span className="text-xs font-mono text-[#6F6A60] flex items-center gap-1">
+                          <Star className="w-3 h-3 text-[#C76A2A]" /> {repo.stars}
+                        </span>
+                      </div>
+                      <p className="text-xs text-[#6F6A60] line-clamp-2">{repo.description}</p>
+                      <div className="flex items-center justify-between pt-1 text-[11px]">
+                        <span className="font-mono text-[#C76A2A] font-medium">{repo.language}</span>
+                        <span className="text-[#6F6A60]">{repo.forks} forks</span>
+                      </div>
                     </div>
-                    <p className="text-xs text-[#6F6A60] line-clamp-2">{repo.description}</p>
-                    <div className="flex items-center justify-between pt-1 text-[11px]">
-                      <span className="font-mono text-[#C76A2A] font-medium">{repo.language}</span>
-                      <span className="text-[#6F6A60]">{repo.forks} forks</span>
-                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Recent Activity */}
+              <div className="p-4 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD] space-y-2">
+                <span className="text-xs font-bold text-[#1B1B1B] block">Recent GitHub Activity</span>
+                <div className="space-y-1.5 text-xs text-[#6F6A60]">
+                  <div className="flex items-center justify-between py-1 border-b border-[#E8E5DD]">
+                    <span>Merged PR #14 in <strong className="text-[#1B1B1B]">vectormind-core</strong> (HNSW index optimization)</span>
+                    <span className="text-[11px] font-mono">2h ago</span>
                   </div>
-                ))}
+                  <div className="flex items-center justify-between py-1 border-b border-[#E8E5DD]">
+                    <span>Pushed 4 commits to <strong className="text-[#1B1B1B]">smartcampus-edge-guardian</strong></span>
+                    <span className="text-[11px] font-mono">Yesterday</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1">
+                    <span>Created release <strong className="text-[#1B1B1B]">v1.2.0</strong> in distributed-token-bucket</span>
+                    <span className="text-[11px] font-mono">3 days ago</span>
+                  </div>
+                </div>
               </div>
             </div>
           ) : (

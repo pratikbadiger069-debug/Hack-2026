@@ -180,6 +180,8 @@ interface AppState {
   // Gamification Actions
   addXP: (amount: number, reason?: string) => void;
   connectGitHub: (username?: string) => void;
+  disconnectGitHub: () => void;
+  syncGitHub: () => void;
   completeQuest: (questId: string) => void;
   unlockAchievement: (id: string) => void;
 
@@ -323,6 +325,30 @@ export const useAppStore = create<AppState>()(
           };
         }),
 
+      disconnectGitHub: () =>
+        set((state) => ({
+          githubData: {
+            ...state.githubData,
+            connected: false,
+          },
+        })),
+
+      syncGitHub: () =>
+        set((state) => {
+          const syncedXP = state.xp + 10;
+          const levelInfo = getLevelInfo(syncedXP);
+          return {
+            xp: syncedXP,
+            level: levelInfo.level,
+            githubData: {
+              ...state.githubData,
+              connected: true,
+              recentCommitsCount: (state.githubData?.recentCommitsCount || 348) + 12,
+              streakDays: Math.max(state.streakDays, 7),
+            },
+          };
+        }),
+
       completeQuest: (questId) =>
         set((state) => {
           const targetQuest = state.quests.find((q) => q.id === questId);
@@ -332,6 +358,7 @@ export const useAppStore = create<AppState>()(
           );
           const newXP = state.xp + reward;
           const levelInfo = getLevelInfo(newXP);
+          const completedCount = updatedQuests.filter((q) => q.completed).length;
 
           // Add verified skill if challenge is advanced/expert/boss
           let updatedSkills = [...state.studentProfile.verifiedSkills];
@@ -356,13 +383,22 @@ export const useAppStore = create<AppState>()(
           // Unlock achievements
           const updatedAchievements = state.achievements.map((ach) => {
             if (ach.unlocked) return ach;
-            if (ach.title.includes('First') || ach.title.includes('Commit') || ach.title.includes('Assessment')) {
+            if (ach.id === 'ach-first-assessment' || ach.title.includes('First Assessment')) {
               return { ...ach, unlocked: true, unlockedAt: 'Today' };
             }
-            if (targetQuest?.category === 'Backend' && ach.title.includes('Backend')) {
+            if ((ach.id === 'ach-100-xp' || ach.title.includes('100 XP')) && newXP >= 100) {
               return { ...ach, unlocked: true, unlockedAt: 'Today' };
             }
-            if (targetQuest?.category === 'AI & ML' && ach.title.includes('AI')) {
+            if ((ach.id === 'ach-500-xp' || ach.title.includes('500 XP')) && newXP >= 500) {
+              return { ...ach, unlocked: true, unlockedAt: 'Today' };
+            }
+            if ((ach.id === 'ach-assessment-master' || ach.title.includes('Assessment Master')) && completedCount >= 5) {
+              return { ...ach, unlocked: true, unlockedAt: 'Today' };
+            }
+            if (targetQuest?.category === 'Backend' && (ach.id === 'ach-backend-specialist' || ach.title.includes('Backend'))) {
+              return { ...ach, unlocked: true, unlockedAt: 'Today' };
+            }
+            if (targetQuest?.category === 'AI & ML' && (ach.id === 'ach-ai-explorer' || ach.title.includes('AI'))) {
               return { ...ach, unlocked: true, unlockedAt: 'Today' };
             }
             return ach;
