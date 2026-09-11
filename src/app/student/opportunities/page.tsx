@@ -1,49 +1,35 @@
 'use client';
 
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
 import {
-  Compass,
-  Briefcase,
-  Trophy,
-  Award,
-  ExternalLink,
-  Calendar,
-  Users,
-  DollarSign,
-  ArrowUpRight,
-  Filter,
-  CheckCircle2,
-  AlertCircle,
   Sparkles,
-  Zap,
-  Clock,
+  ArrowUpRight,
   Search,
   Check,
-  Building,
-  GraduationCap,
-  Code,
+  Building2,
+  MapPin,
+  Clock,
+  Briefcase,
 } from 'lucide-react';
 
-interface FullOpportunity {
+interface Opportunity {
   id: string;
   title: string;
-  organization: string;
+  company: string;
   logo: string;
-  category: 'Internships' | 'Jobs' | 'Hackathons' | 'Scholarships' | 'Challenges' | 'Research Programs';
+  category: 'Internships' | 'Jobs' | 'Hackathons' | 'Research';
   matchScore: number;
   location: string;
-  type: 'Remote' | 'Hybrid' | 'On-site';
-  stipendOrPrize: string;
+  type: string;
+  compensation: string;
   deadline: string;
-  skillsRequired: string[];
+  whyItMatches: string;
   matchedSkills: string[];
   missingSkills: string[];
-  recommendedImprovement: string;
-  description: string;
   link: string;
-  applied?: boolean;
 }
 
 export default function StudentOpportunitiesPage() {
@@ -52,174 +38,121 @@ export default function StudentOpportunitiesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [appliedIds, setAppliedIds] = useState<Record<string, boolean>>({});
 
-  const opportunitiesList: FullOpportunity[] = [
+  const opportunities: Opportunity[] = [
     {
       id: 'opp-1',
       title: 'AI Systems & LLM Platform Intern',
-      organization: 'Anthropic AI Labs',
+      company: 'Anthropic AI Labs',
       logo: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=80',
       category: 'Internships',
       matchScore: 94,
       location: 'San Francisco, CA (Hybrid)',
       type: 'Hybrid',
-      stipendOrPrize: '$8,500 / month',
+      compensation: '$8,500 / mo',
       deadline: 'In 4 days',
-      skillsRequired: ['Python & FastAPI', 'PyTorch & Transformers', 'Docker & Kubernetes'],
-      matchedSkills: ['Python & FastAPI', 'PyTorch & Transformers'],
-      missingSkills: ['CUDA Optimization'],
-      recommendedImprovement: 'Complete 1 CUDA/GPU memory optimization project to reach 99% match score.',
-      description: 'Work alongside research scientists building scalable model serving infrastructure and automated evaluation pipelines.',
+      whyItMatches: 'Your verified skills in Python, FastAPI, and PyTorch align directly with their model inference serving stack.',
+      matchedSkills: ['Python', 'FastAPI', 'PyTorch'],
+      missingSkills: ['CUDA Optimization', 'Triton'],
       link: 'https://anthropic.com/careers',
     },
     {
       id: 'opp-2',
       title: 'Distributed Backend Infrastructure Engineer',
-      organization: 'Stripe Engineering',
+      company: 'Stripe Engineering',
       logo: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=100&auto=format&fit=crop&q=80',
       category: 'Jobs',
       matchScore: 91,
-      location: 'Seattle, WA (Remote Eligible)',
+      location: 'Seattle, WA (Remote)',
       type: 'Remote',
-      stipendOrPrize: '$145,000 - $175,000 / yr',
+      compensation: '$145k – $175k / yr',
       deadline: 'Rolling 2026',
-      skillsRequired: ['PostgreSQL & pgvector', 'TypeScript & Next.js', 'Distributed Systems & RPC'],
-      matchedSkills: ['PostgreSQL & pgvector', 'TypeScript & Next.js'],
+      whyItMatches: 'Your Builder Passport highlights extensive PostgreSQL vector indexing and distributed RPC pipelines.',
+      matchedSkills: ['PostgreSQL', 'TypeScript', 'Next.js'],
       missingSkills: ['Kafka Event Streaming'],
-      recommendedImprovement: 'Add a Kafka-backed event queue project to your Builder Passport.',
-      description: 'Design and operate high-availability transactional ledgers and developer APIs with 99.999% uptime guarantees.',
       link: 'https://stripe.com/jobs',
     },
     {
       id: 'opp-3',
-      title: 'Global Multi-Agent AI Systems Hackathon 2026',
-      organization: 'OpenAI & Devpost',
+      title: 'Global Multi-Agent AI Hackathon',
+      company: 'OpenAI & Devpost',
       logo: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=100&auto=format&fit=crop&q=80',
       category: 'Hackathons',
       matchScore: 98,
       location: 'Global Virtual',
       type: 'Remote',
-      stipendOrPrize: '$50,000 Prize Pool',
+      compensation: '$50,000 Prize Pool',
       deadline: 'Apr 18, 2026',
-      skillsRequired: ['FastAPI', 'Multi-Agent Frameworks', 'Next.js'],
-      matchedSkills: ['FastAPI', 'Next.js', 'PyTorch & Transformers'],
+      whyItMatches: 'Top 1% candidate match based on your recent LangChain and autonomous agent capstone repositories.',
+      matchedSkills: ['FastAPI', 'Next.js', 'PyTorch'],
       missingSkills: [],
-      recommendedImprovement: 'Your builder profile is in top 1% fit. Form a 3-person squad to maximize prize winning chances.',
-      description: 'Compete against university builders globally to architect enterprise multi-agent workflows with tool calling.',
       link: 'https://devpost.com',
     },
     {
       id: 'opp-4',
-      title: 'Undergraduate AI & Systems Research Fellowship',
-      organization: 'DeepLearning.AI & Stanford',
+      title: 'AI Systems Research Fellowship',
+      company: 'DeepLearning.AI',
       logo: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=100&auto=format&fit=crop&q=80',
-      category: 'Research Programs',
+      category: 'Research',
       matchScore: 89,
-      location: 'Stanford, CA / Remote',
+      location: 'Stanford / Remote',
       type: 'Remote',
-      stipendOrPrize: '$12,000 Fellowship Grant',
+      compensation: '$12,000 Grant',
       deadline: 'May 01, 2026',
-      skillsRequired: ['PyTorch', 'Model Quantization', 'Academic Writing'],
-      matchedSkills: ['PyTorch', 'Research Papers (1 Published)'],
-      missingSkills: ['ONNX Runtime Edge Deployment'],
-      recommendedImprovement: 'Publish your HNSW vector retrieval experiment benchmarks.',
-      description: 'Fully funded 3-month faculty-guided research fellowship investigating speculative decoding on low-power edge GPUs.',
+      whyItMatches: 'Direct match for your published academic paper and speculative decoding benchmark models.',
+      matchedSkills: ['PyTorch', 'Research Papers'],
+      missingSkills: ['ONNX Runtime'],
       link: 'https://deeplearning.ai',
-    },
-    {
-      id: 'opp-5',
-      title: 'NextGen Engineering Diversity & Excellence Scholarship',
-      organization: 'Google Cloud Foundation',
-      logo: 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?w=100&auto=format&fit=crop&q=80',
-      category: 'Scholarships',
-      matchScore: 92,
-      location: 'Pan-University',
-      type: 'Remote',
-      stipendOrPrize: '$10,000 Merit Award + Mentorship',
-      deadline: 'May 15, 2026',
-      skillsRequired: ['CGPA > 8.5', 'Verified Builder Score > 800', 'Faculty Recommendation'],
-      matchedSkills: ['CGPA 9.14', 'Builder Score 885', 'Faculty Validated'],
-      missingSkills: [],
-      recommendedImprovement: 'You satisfy all eligibility criteria! Complete your statement of intent before deadline.',
-      description: 'Prestigious merit scholarship providing tuition grants, dedicated Google engineering mentors, and placement fast-tracking.',
-      link: 'https://buildyourfuture.withgoogle.com',
-    },
-    {
-      id: 'opp-6',
-      title: 'Distributed Token Bucket Rate Limiter RFP Challenge',
-      organization: 'Cloudflare Engineering',
-      logo: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=100&auto=format&fit=crop&q=80',
-      category: 'Challenges',
-      matchScore: 88,
-      location: 'Async Online',
-      type: 'Remote',
-      stipendOrPrize: '$5,000 Bounty + Interview Fast-Track',
-      deadline: 'Rolling 2026',
-      skillsRequired: ['Distributed Systems', 'Redis Sliding Log', 'gRPC'],
-      matchedSkills: ['Distributed Systems & RPC', 'TypeScript'],
-      missingSkills: ['Redis Cluster Sharding'],
-      recommendedImprovement: 'Implement sliding window log algorithm with tests to qualify for immediate review.',
-      description: 'Solve a real-world edge traffic challenge: design a distributed rate limiter resilient to network partitions.',
-      link: 'https://cloudflare.com/careers',
     },
   ];
 
-  const categories = ['All', 'Internships', 'Jobs', 'Hackathons', 'Scholarships', 'Challenges', 'Research Programs'];
+  const categories = ['All', 'Internships', 'Jobs', 'Hackathons', 'Research'];
 
-  const filtered = opportunitiesList.filter((opp) => {
+  const filtered = opportunities.filter((opp) => {
     const matchesCat = selectedCategory === 'All' || opp.category === selectedCategory;
     const matchesSearch =
       opp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      opp.organization.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      opp.skillsRequired.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()));
+      opp.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      opp.matchedSkills.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesCat && matchesSearch;
   });
 
-  const handleApply = (id: string, e: React.MouseEvent) => {
-    e.preventDefault();
+  const handleApply = (id: string) => {
     setAppliedIds((prev) => ({ ...prev, [id]: true }));
   };
 
   return (
     <PortalLayout>
-      <div className="space-y-6">
-        {/* Header Bar */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-xs">
+      <div className="space-y-8 max-w-[1300px] mx-auto pb-16">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 pb-4 border-b border-[#ECEAE4]">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center gap-1">
-                <Compass className="w-3.5 h-3.5" />
-                Workforce Intel &amp; Matching Engine
-              </span>
-              <span className="text-xs text-slate-400">•</span>
-              <span className="text-xs text-slate-500">6 High-Probability Matches</span>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#D97706]" />
+              <h1 className="text-2xl font-serif font-normal text-[#1F1F1F] tracking-tight">
+                Opportunities
+              </h1>
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Opportunities &amp; Placements</h1>
-            <p className="text-xs text-slate-500 mt-1">
-              Curated internships, placements, hackathons, bounties, and research grants matched directly to your verified Builder Score.
+            <p className="text-sm text-[#6B6B6B] mt-0.5 font-sans">
+              Handpicked roles matched to your verified skills and Builder Score.
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-              <div>
-                <strong>Top Match Quality:</strong> 94% Avg Fit with Verified Skills
-              </div>
-            </div>
+          <div className="text-xs text-[#6B6B6B] font-mono">
+            {filtered.length} curated matches
           </div>
         </div>
 
-        {/* Filter Bar & Search */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar w-full sm:w-auto pb-1 sm:pb-0">
+        {/* Filter bar & Search */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar w-full sm:w-auto">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all ${
                   selectedCategory === cat
-                    ? 'bg-indigo-600 text-white shadow-2xs'
-                    : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200'
+                    ? 'bg-[#1F1F1F] text-[#FAF9F5]'
+                    : 'bg-white text-[#6B6B6B] hover:text-[#1F1F1F] border border-[#ECEAE4]'
                 }`}
               >
                 {cat}
@@ -227,84 +160,80 @@ export default function StudentOpportunitiesPage() {
             ))}
           </div>
 
-          <div className="relative w-full sm:w-64">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+          <div className="relative w-full sm:w-72">
+            <Search className="w-3.5 h-3.5 text-[#6B6B6B] absolute left-3.5 top-3" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by role, company, or skill..."
-              className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-600 text-slate-900"
+              className="w-full pl-9 pr-4 py-2 text-xs bg-white border border-[#ECEAE4] rounded-full focus:outline-none focus:border-[#D97706] text-[#1F1F1F] placeholder:text-[#6B6B6B] transition-all"
             />
           </div>
         </div>
 
-        {/* Opportunities List */}
+        {/* Opportunities Minimalist Cards */}
         <div className="space-y-4">
-          {filtered.map((opp) => {
+          {filtered.map((opp, idx) => {
             const isApplied = appliedIds[opp.id];
             return (
-              <div
+              <motion.div
                 key={opp.id}
-                className="saas-card p-6 border border-slate-200 hover:border-indigo-300 transition-all space-y-4"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: idx * 0.05 }}
+                whileHover={{ scale: 1.005 }}
+                className="bg-white p-6 sm:p-7 rounded-2xl border border-[#ECEAE4] shadow-xs hover:border-[#D97706]/40 transition-all space-y-5"
               >
                 {/* Main Row */}
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div className="flex items-start gap-4">
                     <img
                       src={opp.logo}
-                      alt={opp.organization}
-                      className="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0 shadow-2xs"
+                      alt={opp.company}
+                      className="w-12 h-12 rounded-xl object-cover border border-[#ECEAE4] shrink-0"
                     />
                     <div className="space-y-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase">
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <h2 className="text-base font-serif text-[#1F1F1F]">{opp.title}</h2>
+                        <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-[#FAF9F5] border border-[#ECEAE4] text-[#6B6B6B]">
                           {opp.category}
                         </span>
-                        <h2 className="text-base font-bold text-slate-900">{opp.title}</h2>
                       </div>
-                      <div className="flex items-center gap-3 text-xs text-slate-600 font-medium">
-                        <span className="font-semibold text-slate-900">{opp.organization}</span>
+                      <div className="flex items-center gap-3 text-xs text-[#6B6B6B] font-sans">
+                        <span className="font-medium text-[#1F1F1F]">{opp.company}</span>
                         <span>•</span>
                         <span>{opp.location}</span>
                         <span>•</span>
-                        <span className="text-emerald-700 font-semibold">{opp.stipendOrPrize}</span>
+                        <span className="text-[#1F1F1F] font-mono">{opp.compensation}</span>
                       </div>
-                      <p className="text-xs text-slate-600 leading-relaxed max-w-2xl pt-1">
-                        {opp.description}
-                      </p>
                     </div>
                   </div>
 
-                  {/* Match Pill & CTA Button */}
-                  <div className="flex flex-row lg:flex-col items-center lg:items-end justify-between gap-3 shrink-0 border-t lg:border-t-0 pt-3 lg:pt-0 border-slate-100">
-                    <div className="text-left lg:text-right">
-                      <span className="text-xs font-bold text-emerald-800 bg-emerald-100 border border-emerald-200 px-2.5 py-1 rounded-full inline-flex items-center gap-1">
-                        <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                        {opp.matchScore}% Match Score
-                      </span>
-                      <span className="text-[10px] text-slate-400 block mt-1">
-                        Deadline: {opp.deadline}
-                      </span>
+                  {/* Match & Apply CTA */}
+                  <div className="flex items-center sm:flex-col sm:items-end justify-between sm:justify-start gap-2.5 pt-2 sm:pt-0">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#16A34A]/10 text-[#16A34A] text-xs font-mono">
+                      <Sparkles className="w-3 h-3 text-[#16A34A]" />
+                      <span>{opp.matchScore}% Match</span>
                     </div>
 
                     <button
-                      onClick={(e) => handleApply(opp.id, e)}
+                      onClick={() => handleApply(opp.id)}
                       disabled={isApplied}
-                      className={`px-5 py-2 text-xs font-semibold rounded-lg transition-all shadow-2xs flex items-center gap-1.5 ${
+                      className={`px-4 py-2 text-xs font-medium rounded-xl transition-all flex items-center gap-1.5 ${
                         isApplied
-                          ? 'bg-emerald-600 text-white cursor-default'
-                          : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                          ? 'bg-[#FAF9F5] border border-[#ECEAE4] text-[#16A34A] cursor-default'
+                          : 'bg-[#1F1F1F] hover:bg-black text-[#FAF9F5]'
                       }`}
                     >
                       {isApplied ? (
                         <>
-                          <Check className="w-3.5 h-3.5" />
-                          <span>Application Sent!</span>
+                          <Check className="w-3.5 h-3.5 text-[#16A34A]" />
+                          <span>Applied</span>
                         </>
                       ) : (
                         <>
-                          <span>Apply with 1-Click Passport</span>
+                          <span>Apply</span>
                           <ArrowUpRight className="w-3.5 h-3.5" />
                         </>
                       )}
@@ -312,26 +241,25 @@ export default function StudentOpportunitiesPage() {
                   </div>
                 </div>
 
-                {/* "Why This Matches You" Breakdown */}
-                <div className="p-3.5 bg-slate-50/80 rounded-xl border border-slate-100 space-y-2 text-xs">
-                  <div className="flex items-center justify-between font-bold text-slate-800">
-                    <span className="flex items-center gap-1 text-[11px] uppercase tracking-wider text-slate-500">
-                      <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                      Why This Matches You:
+                {/* Why it matches & Missing Skills Narrative */}
+                <div className="p-4 bg-[#FAF9F5] rounded-xl border border-[#ECEAE4] space-y-3 text-xs">
+                  <div>
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#6B6B6B] block mb-1">
+                      Why this matches you
                     </span>
+                    <p className="text-xs text-[#1F1F1F] leading-relaxed">
+                      {opp.whyItMatches}
+                    </p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
-                    {/* Matched Skills */}
-                    <div>
-                      <span className="text-[10px] font-bold text-emerald-700 uppercase block mb-1">
-                        ✓ Verified Matched Skills ({opp.matchedSkills.length})
-                      </span>
+                  <div className="flex flex-wrap items-center gap-4 pt-1 text-xs border-t border-[#ECEAE4]">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-mono text-[#6B6B6B]">Matched:</span>
                       <div className="flex flex-wrap gap-1">
-                        {opp.matchedSkills.map((s, idx) => (
+                        {opp.matchedSkills.map((s) => (
                           <span
-                            key={idx}
-                            className="text-[10px] font-medium px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200"
+                            key={s}
+                            className="text-[11px] px-2 py-0.5 rounded bg-white border border-[#ECEAE4] text-[#1F1F1F]"
                           >
                             {s}
                           </span>
@@ -339,39 +267,24 @@ export default function StudentOpportunitiesPage() {
                       </div>
                     </div>
 
-                    {/* Missing Skills */}
-                    <div>
-                      <span className="text-[10px] font-bold text-amber-700 uppercase block mb-1">
-                        ⚡ Skill Deltas ({opp.missingSkills.length})
-                      </span>
-                      <div className="flex flex-wrap gap-1">
-                        {opp.missingSkills.length > 0 ? (
-                          opp.missingSkills.map((s, idx) => (
+                    {opp.missingSkills.length > 0 && (
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] font-mono text-[#D97706]">Missing skills:</span>
+                        <div className="flex flex-wrap gap-1">
+                          {opp.missingSkills.map((s) => (
                             <span
-                              key={idx}
-                              className="text-[10px] font-medium px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200"
+                              key={s}
+                              className="text-[11px] px-2 py-0.5 rounded bg-white border border-[#D97706]/30 text-[#D97706]"
                             >
                               {s}
                             </span>
-                          ))
-                        ) : (
-                          <span className="text-[10px] text-emerald-600 font-semibold">100% Skill Coverage!</span>
-                        )}
+                          ))}
+                        </div>
                       </div>
-                    </div>
-
-                    {/* Recommended Improvement */}
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
-                        💡 Fast-Track Recommendation
-                      </span>
-                      <p className="text-[11px] text-slate-600 leading-snug">
-                        {opp.recommendedImprovement}
-                      </p>
-                    </div>
+                    )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>

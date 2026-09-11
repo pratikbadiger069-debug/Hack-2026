@@ -6,17 +6,8 @@ import { usePathname } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import {
   LayoutDashboard,
-  User,
-  Award,
-  ShieldCheck,
-  CheckSquare,
+  Compass,
   Bot,
-  GitPullRequest,
-  Map,
-  BookOpen,
-  Briefcase,
-  Sparkles,
-  Bell,
   Settings,
   Users,
   Building,
@@ -24,10 +15,12 @@ import {
   LineChart,
   UserCheck,
   TrendingUp,
-  Compass,
+  Briefcase,
   FileCheck,
   Code,
   Layers,
+  Sparkles,
+  Award,
 } from 'lucide-react';
 
 interface NavItem {
@@ -48,42 +41,41 @@ export function Sidebar() {
       name: 'My Journey',
       href: '/student/journey',
       icon: Award,
-      badge: isDemoMode ? 'Score 885' : studentProfile.builderScores.overall > 0 ? `Score ${studentProfile.builderScores.overall}` : undefined,
+      badge: studentProfile.builderScores.overall > 0 ? `${studentProfile.builderScores.overall}` : undefined,
     },
     { name: 'Career Copilot', href: '/student/career-copilot', icon: Bot, highlight: true },
     {
       name: 'Opportunities',
       href: '/student/opportunities',
       icon: Compass,
-      badge: '6 Matched',
+      badge: '6',
     },
     { name: 'Settings', href: '/student/settings', icon: Settings },
   ];
 
   const instituteLinks: NavItem[] = [
     { name: 'Dashboard', href: '/institute', icon: LayoutDashboard },
-    { name: 'Students Roster', href: '/institute/students', icon: Users, badge: isDemoMode ? '320' : undefined },
+    { name: 'Students Roster', href: '/institute/students', icon: Users },
     { name: 'Departments', href: '/institute/departments', icon: Building },
     { name: 'Curriculum Analysis', href: '/institute/curriculum', icon: FileSpreadsheet, highlight: true },
     { name: 'Placement Cell', href: '/institute/placement', icon: UserCheck },
-    { name: 'Assessments', href: '/institute/assessments', icon: CheckSquare },
     { name: 'Reports', href: '/institute/reports', icon: LineChart },
     { name: 'Settings', href: '/institute/settings', icon: Settings },
   ];
 
   const industryLinks: NavItem[] = [
     { name: 'Dashboard', href: '/industry', icon: LayoutDashboard },
-    { name: 'Job Requirements', href: '/industry/jobs', icon: Briefcase, badge: isDemoMode ? '3 Active' : jobs.length > 0 ? `${jobs.length} Active` : undefined },
+    { name: 'Job Requirements', href: '/industry/jobs', icon: Briefcase },
     { name: 'Talent Discovery', href: '/industry/talent', icon: Sparkles, highlight: true },
     { name: 'Assignments', href: '/industry/assignments', icon: Code },
-    { name: 'Pipeline', href: '/industry/pipeline', icon: Layers, badge: 'Kanban' },
+    { name: 'Pipeline', href: '/industry/pipeline', icon: Layers },
     { name: 'Reports', href: '/industry/reports', icon: LineChart },
     { name: 'Settings', href: '/industry/settings', icon: Settings },
   ];
 
   const adminLinks: NavItem[] = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-    { name: 'Skill Demand Intelligence', href: '/admin/demand', icon: TrendingUp, highlight: true },
+    { name: 'Skill Demand Intel', href: '/admin/demand', icon: TrendingUp, highlight: true },
     { name: 'User Management', href: '/admin/users', icon: Users },
     { name: 'Content Management', href: '/admin/content', icon: FileCheck },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
@@ -98,60 +90,42 @@ export function Sidebar() {
       ? industryLinks
       : adminLinks;
 
-  const roleTitle =
-    currentRole === 'student'
-      ? 'Student Hub'
-      : currentRole === 'institute'
-      ? 'Institute Administration'
-      : currentRole === 'industry'
-      ? 'Talent Intelligence'
-      : 'Global Platform Admin';
-
   return (
-    <aside className="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 min-h-[calc(100vh-4rem)]">
-      {/* Portal Header */}
-      <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-        <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-          {roleTitle}
-        </span>
-        <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">
-          Enterprise
-        </span>
-      </div>
-
-      {/* Navigation List */}
-      <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
+    <aside className="w-60 bg-[#FAF9F5] border-r border-[#ECEAE4] flex flex-col shrink-0 min-h-[calc(100vh-4rem)] p-3">
+      {/* Navigation Links */}
+      <nav className="flex-1 space-y-1">
         {links.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href;
+          const isActive = pathname === item.href || (item.href !== '/student' && pathname.startsWith(item.href));
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center justify-between px-3 py-2 text-xs rounded-lg font-medium transition-all group ${
+              className={`flex items-center justify-between px-3.5 py-2.5 text-xs rounded-xl font-medium transition-all group btn-anthropic ${
                 isActive
-                  ? 'bg-blue-50 text-blue-700 font-semibold shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-              } ${item.highlight && !isActive ? 'text-blue-600' : ''}`}
+                  ? 'bg-[#F0EEE6] text-[#1F1F1F] font-semibold shadow-2xs'
+                  : 'text-[#6B6B6B] hover:text-[#1F1F1F] hover:bg-[#F5F3EB]'
+              }`}
             >
               <div className="flex items-center gap-2.5">
                 <Icon
                   className={`w-4 h-4 transition-colors ${
                     isActive
-                      ? 'text-blue-600'
+                      ? 'text-[#D97706]'
                       : item.highlight
-                      ? 'text-blue-600'
-                      : 'text-slate-400 group-hover:text-slate-600'
+                      ? 'text-[#D97706]'
+                      : 'text-[#6B6B6B] group-hover:text-[#1F1F1F]'
                   }`}
                 />
                 <span>{item.name}</span>
               </div>
+
               {item.badge && (
                 <span
-                  className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                  className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
                     isActive
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'
+                      ? 'bg-[#E3E0D5] text-[#1F1F1F]'
+                      : 'bg-[#ECEAE4] text-[#6B6B6B] group-hover:bg-[#E3E0D5]'
                   }`}
                 >
                   {item.badge}
@@ -162,17 +136,14 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Footer Status */}
-      <div className="p-3 border-t border-slate-100 bg-slate-50/50 m-2 rounded-lg">
-        <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1">
-          <span>Engine Status</span>
-          <span className="flex items-center gap-1 text-emerald-700 font-medium">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            Connected
-          </span>
+      {/* Subtle Quote / Philosophy at Bottom */}
+      <div className="p-3 bg-[#FFFFFF] rounded-2xl border border-[#ECEAE4] text-[11px] text-[#6B6B6B] space-y-1 mt-auto shadow-2xs">
+        <div className="font-semibold text-[#1F1F1F] flex items-center gap-1">
+          <Sparkles className="w-3 h-3 text-[#D97706]" />
+          <span>SkillBridge V3</span>
         </div>
-        <p className="text-[10px] text-slate-400">
-          Academia–Industry Verification Pipeline Online
+        <p className="leading-snug text-[10px]">
+          Build proof. Not just profiles.
         </p>
       </div>
     </aside>

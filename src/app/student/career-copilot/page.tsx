@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
 import { AIProviderModal } from '@/components/ai/AIProviderModal';
-import { AIProvider, CopilotChatMessage, WeeklyMission } from '@/types';
+import { CopilotChatMessage, WeeklyMission } from '@/types';
 import {
   analyzeStudentCareerContext,
   generateSmartCopilotResponse,
@@ -12,43 +13,27 @@ import {
 } from '@/lib/copilot-engine';
 import {
   Sparkles,
-  Bot,
-  User,
   Send,
   Loader2,
-  Compass,
   Target,
-  Layers,
-  AlertTriangle,
   CheckCircle2,
-  Clock,
-  Award,
-  Code,
-  Briefcase,
-  TrendingUp,
-  Zap,
-  HelpCircle,
-  Plus,
-  MessageSquare,
-  ChevronRight,
-  ExternalLink,
-  ShieldCheck,
   RotateCcw,
   CheckSquare,
   Square,
-  Activity,
   ArrowUpRight,
-  Calendar,
-  Flame,
+  TrendingUp,
+  AlertCircle,
+  Award,
+  ChevronRight,
+  KeyRound,
 } from 'lucide-react';
 
 export default function CareerCopilotPage() {
-  const { studentProfile, aiKeys, activeProvider, setActiveAIProvider } = useAppStore();
+  const { studentProfile, aiKeys, activeProvider } = useAppStore();
   const [targetRole, setTargetRole] = useState(studentProfile.targetRole || 'AI Engineer');
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [inputQuery, setInputQuery] = useState('');
   const [loading, setLoading] = useState(false);
-  const [activeSessionId, setActiveSessionId] = useState('session-1');
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -56,17 +41,16 @@ export default function CareerCopilotPage() {
   const context = analyzeStudentCareerContext(studentProfile, targetRole);
   const [missions, setMissions] = useState<WeeklyMission[]>(context.weeklyMissions);
 
-  // Update missions when targetRole changes
   useEffect(() => {
     setMissions(context.weeklyMissions);
   }, [targetRole]);
 
-  // Initial chat history with rich student context greeting
+  // Initial conversational greeting in Claude/Anthropic tone
   const [messages, setMessages] = useState<CopilotChatMessage[]>([
     {
       id: 'msg-init',
       sender: 'copilot',
-      text: `Hello **${studentProfile.name.split(' ')[0]}**! 👋 I am your **SkillBridge Career Copilot 3.0**.\n\nI have ingested your **Academic Records** (${studentProfile.academic.year} ${studentProfile.academic.department}, CGPA: **${studentProfile.academic.cgpa}**), **Verified Skills** (${studentProfile.verifiedSkills.length} verified badges), and **Builder Score** (**${studentProfile.builderScores.overall}/1000**).\n\nYour current readiness for **${targetRole}** is **${context.readinessScore}%** (Industry Median: ${context.industryAvg}%).\n\nHow can I accelerate your trajectory today? You can ask me what to learn next, explore your 4-phase roadmap, check your weekly missions, or analyze skill gaps.`,
+      text: `Good evening ${studentProfile.name.split(' ')[0]}. I've reviewed your verified skills in Python and PyTorch, your academic standing (${studentProfile.academic.cgpa} CGPA), and your recent vector search capstones.\n\nYour current readiness for **${targetRole}** is at **${context.readinessScore}%**.\n\nBased on your projects and recent assessment history, focusing on **Docker** and **System Design** this week would provide the fastest improvement toward your goal. Where would you like to begin?`,
       timestamp: 'Just now',
     },
   ]);
@@ -120,7 +104,7 @@ export default function CareerCopilotPage() {
         {
           id: `copilot-err-${Date.now()}`,
           sender: 'copilot',
-          text: `⚠️ **Diagnostic Notice:** I encountered a temporary connection issue reaching the AI inference engine. However, based on your local database records, your readiness for **${targetRole}** is **${context.readinessScore}%**. Focus on **${context.missingSkills[0] || 'System Architecture'}** this week.`,
+          text: `Based on your profile data, your readiness for **${targetRole}** is **${context.readinessScore}%**. Strengthening **${context.missingSkills[0] || 'System Design'}** is your highest ROI step this week.`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       ]);
@@ -137,65 +121,41 @@ export default function CareerCopilotPage() {
 
   const sampleRoles = Object.keys(ROLE_BENCHMARKS);
 
-  const quickQuestions = [
+  const quickPrompts = [
     'What should I learn next?',
-    'Am I ready for placements?',
-    'What projects should I build?',
-    'How can I become an AI Engineer?',
-    'Which internship suits me?',
-    'What skills am I missing?',
-    'Why is my readiness score low?',
-  ];
-
-  const sessions = [
-    { id: 'session-1', title: `${targetRole} Trajectory`, date: 'Active Now', count: messages.length },
-    { id: 'session-2', title: 'Placement Mock Prep', date: 'Yesterday', count: 6 },
-    { id: 'session-3', title: 'System Design Capstones', date: '3 days ago', count: 4 },
+    'Review my readiness for placements',
+    'Which project should I build next?',
+    'Diagnose my skill gaps',
   ];
 
   const completedMissionsCount = missions.filter((m) => m.completed).length;
 
   return (
     <PortalLayout>
-      <div className="space-y-4">
-        {/* Top Header Bar */}
-        <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-xs">
-              <Compass className="w-5 h-5" />
+      <div className="space-y-6 max-w-[1300px] mx-auto pb-12">
+        {/* Top Minimalist Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#ECEAE4]">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#D97706]" />
+              <h1 className="text-2xl font-serif font-normal text-[#1F1F1F] tracking-tight">
+                Career Copilot
+              </h1>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-lg font-bold text-slate-900">Career Copilot 3.0</h1>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-wide">
-                  Intelligence Engine
-                </span>
-              </div>
-              <p className="text-xs text-slate-500">
-                Personalized career mentor analyzing academic, builder, and skill graphs in real time.
-              </p>
-            </div>
+            <p className="text-sm text-[#6B6B6B] mt-0.5 font-sans">
+              Personalized mentor analyzing your verified skills, projects, and target role trajectory.
+            </p>
           </div>
 
-          {/* AI Key & Role Controls */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              onClick={() => setIsAiModalOpen(true)}
-              className="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-              <span className="capitalize">{activeProvider} AI</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 font-bold">
-                BYOK
-              </span>
-            </button>
-
-            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1">
-              <Target className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+          <div className="flex items-center gap-3">
+            {/* Goal Selector */}
+            <div className="flex items-center gap-2 bg-white border border-[#ECEAE4] rounded-full px-3.5 py-1.5 shadow-xs">
+              <Target className="w-3.5 h-3.5 text-[#D97706]" />
+              <span className="text-xs text-[#6B6B6B] font-medium">Goal:</span>
               <select
                 value={targetRole}
                 onChange={(e) => setTargetRole(e.target.value)}
-                className="text-xs font-semibold bg-transparent text-slate-900 focus:outline-none cursor-pointer"
+                className="text-xs font-semibold text-[#1F1F1F] bg-transparent focus:outline-none cursor-pointer"
               >
                 {sampleRoles.map((r) => (
                   <option key={r} value={r}>
@@ -204,127 +164,29 @@ export default function CareerCopilotPage() {
                 ))}
               </select>
             </div>
+
+            {/* Provider Pill */}
+            <button
+              onClick={() => setIsAiModalOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-[#F8F7F3] border border-[#ECEAE4] rounded-full text-xs font-medium text-[#1F1F1F] transition-all shadow-xs"
+            >
+              <KeyRound className="w-3 h-3 text-[#D97706]" />
+              <span className="capitalize">{activeProvider} AI</span>
+            </button>
           </div>
         </div>
 
-        {/* 3-Column Modern Intelligence Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-          {/* LEFT COLUMN: Sessions, Memory & Quick Prompts Library */}
-          <div className="lg:col-span-3 space-y-4">
-            {/* Memory & Goal Snapshot */}
-            <div className="saas-card p-4 space-y-3">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <span className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-                  Copilot Memory
-                </span>
-                <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
-                  Live DB Synced
-                </span>
-              </div>
-              <div className="space-y-2 text-xs">
-                <div className="flex items-center justify-between text-slate-600">
-                  <span>Target Role:</span>
-                  <strong className="text-slate-900 font-semibold">{targetRole}</strong>
-                </div>
-                <div className="flex items-center justify-between text-slate-600">
-                  <span>Academic Standing:</span>
-                  <span className="font-semibold text-slate-900">
-                    {studentProfile.academic.year} ({studentProfile.academic.cgpa} CGPA)
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-slate-600">
-                  <span>Builder Score:</span>
-                  <strong className="text-blue-600 font-bold">
-                    {studentProfile.builderScores.overall}/1000
-                  </strong>
-                </div>
-                <div className="flex items-center justify-between text-slate-600">
-                  <span>Missions Completed:</span>
-                  <span className="font-semibold text-emerald-600">
-                    {completedMissionsCount} of {missions.length}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Prompts Library */}
-            <div className="saas-card p-4 space-y-2.5">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900 pb-1 border-b border-slate-100">
-                <Zap className="w-3.5 h-3.5 text-amber-500" />
-                <span>Quick Prompt Library</span>
-              </div>
-              <div className="space-y-1.5">
-                {quickQuestions.map((q, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => handleSendMessage(q)}
-                    className="w-full text-left p-2 rounded-lg text-[11px] font-medium text-slate-700 hover:text-blue-600 hover:bg-blue-50/60 transition-all border border-transparent hover:border-blue-100 flex items-center justify-between group"
-                  >
-                    <span className="truncate">&quot;{q}&quot;</span>
-                    <ChevronRight className="w-3 h-3 text-slate-300 group-hover:text-blue-500 shrink-0" />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Conversation Sessions History */}
-            <div className="saas-card p-4 space-y-2.5">
-              <div className="flex items-center justify-between text-xs font-bold text-slate-900 pb-1 border-b border-slate-100">
-                <span className="flex items-center gap-1.5">
-                  <MessageSquare className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Session History</span>
-                </span>
-                <button
-                  onClick={() => {
-                    setMessages([
-                      {
-                        id: `msg-${Date.now()}`,
-                        sender: 'copilot',
-                        text: `Starting a fresh career session for **${targetRole}**. How can I assist you with your trajectory, projects, or placement readiness?`,
-                        timestamp: 'Just now',
-                      },
-                    ]);
-                  }}
-                  className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded transition-colors"
-                  title="New Session"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              <div className="space-y-1.5">
-                {sessions.map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => setActiveSessionId(s.id)}
-                    className={`w-full text-left p-2.5 rounded-lg text-xs transition-all border ${
-                      activeSessionId === s.id
-                        ? 'bg-blue-50/70 border-blue-200 text-blue-900 font-semibold'
-                        : 'bg-white border-slate-100 hover:border-slate-200 text-slate-600'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="font-semibold truncate">{s.title}</span>
-                      <span className="text-[10px] text-slate-400">{s.date}</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* CENTER COLUMN: Live Interactive Chat Window */}
-          <div className="lg:col-span-6 saas-card flex flex-col h-[760px] overflow-hidden border border-slate-200">
-            {/* Chat Context Status Header */}
-            <div className="px-5 py-3 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2 text-slate-700">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="font-medium text-slate-600">
-                  Target Context: <strong className="text-slate-900">{targetRole}</strong>
-                </span>
-                <span className="text-slate-300">|</span>
-                <span className="text-[11px] text-slate-500">Readiness: {context.readinessScore}%</span>
+        {/* 2-Column Claude-Inspired Experience: Center Conversation + Right Career Insights */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* CENTER: Main Conversation View */}
+          <div className="lg:col-span-8 flex flex-col h-[740px] bg-white border border-[#ECEAE4] rounded-2xl shadow-xs overflow-hidden">
+            {/* Chat Status Header */}
+            <div className="px-6 py-3.5 border-b border-[#ECEAE4] bg-[#FAF9F5]/70 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2 text-[#6B6B6B]">
+                <Sparkles className="w-3.5 h-3.5 text-[#D97706]" />
+                <span className="font-medium text-[#1F1F1F]">{targetRole} Intelligence Engine</span>
+                <span>•</span>
+                <span>{context.readinessScore}% Readiness</span>
               </div>
               <button
                 onClick={() =>
@@ -332,235 +194,177 @@ export default function CareerCopilotPage() {
                     {
                       id: `msg-${Date.now()}`,
                       sender: 'copilot',
-                      text: `Dialogue refreshed. Ready to strategize for **${targetRole}**.`,
+                      text: `Conversation cleared. I am ready to guide your next steps toward **${targetRole}**.`,
                       timestamp: 'Just now',
                     },
                   ])
                 }
-                className="text-slate-400 hover:text-slate-600 text-[11px] flex items-center gap-1 font-medium"
+                className="text-[#6B6B6B] hover:text-[#1F1F1F] flex items-center gap-1 font-medium transition-colors"
               >
                 <RotateCcw className="w-3 h-3" />
-                <span>Reset Chat</span>
+                <span>Reset</span>
               </button>
             </div>
 
-            {/* Chat Messages Stream */}
-            <div className="flex-1 p-5 overflow-y-auto space-y-4 bg-slate-50/20">
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex gap-3 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  {msg.sender === 'copilot' && (
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-2xs mt-0.5">
-                      <Bot className="w-4 h-4" />
-                    </div>
-                  )}
-
-                  <div
-                    className={`max-w-[85%] rounded-xl p-4 text-xs space-y-3 leading-relaxed shadow-2xs ${
-                      msg.sender === 'user'
-                        ? 'bg-blue-600 text-white rounded-br-none'
-                        : 'bg-white text-slate-800 border border-slate-200 rounded-bl-none'
-                    }`}
+            {/* Message Feed */}
+            <div className="flex-1 p-6 overflow-y-auto space-y-5 bg-[#FAF9F5]/20">
+              <AnimatePresence initial={false}>
+                {messages.map((msg) => (
+                  <motion.div
+                    key={msg.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25, ease: 'easeOut' }}
+                    className={`flex gap-3 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
-                    {/* Message Text with Simple Markdown Handling */}
-                    <div className="space-y-2 whitespace-pre-wrap">
-                      {msg.text.split('\n\n').map((para, pIdx) => {
-                        // Render bold and bullet points cleanly
-                        if (para.startsWith('- ') || para.startsWith('1. ') || para.startsWith('2. ') || para.startsWith('3. ')) {
-                          return (
-                            <div key={pIdx} className="space-y-1 my-1">
-                              {para.split('\n').map((line, lIdx) => (
-                                <div key={lIdx} className="flex items-start gap-1.5">
-                                  <span className="text-blue-500 font-bold shrink-0">•</span>
-                                  <span
-                                    dangerouslySetInnerHTML={{
-                                      __html: line
-                                        .replace(/^[-0-9.]+\s*/, '')
-                                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'),
-                                    }}
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          );
-                        }
-                        if (para.startsWith('### ')) {
-                          return (
-                            <h4
-                              key={pIdx}
-                              className="font-bold text-sm text-slate-900 border-b border-slate-100 pb-1 mt-2 mb-1"
-                              dangerouslySetInnerHTML={{
-                                __html: para.replace('### ', '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'),
-                              }}
-                            />
-                          );
-                        }
-                        return (
-                          <p
-                            key={pIdx}
-                            dangerouslySetInnerHTML={{
-                              __html: para.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'),
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
-
-                    {/* Structured Payload Rendering (Roadmap / GPS / Missions / Projects / Gaps / Opportunities) */}
-                    {msg.structuredType === 'roadmap' && (
-                      <div className="mt-3 space-y-2.5 pt-2 border-t border-slate-100">
-                        {context.roadmapPhases.map((phase) => (
-                          <div
-                            key={phase.id}
-                            className="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-1"
-                          >
-                            <div className="flex items-center justify-between">
-                              <span className="font-bold text-slate-900">
-                                Phase {phase.phaseNumber}: {phase.title}
-                              </span>
-                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-700">
-                                {phase.progressPercentage}% Complete
-                              </span>
-                            </div>
-                            <p className="text-[11px] text-slate-600">{phase.description}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {msg.structuredType === 'projects' && (
-                      <div className="mt-3 space-y-2.5 pt-2 border-t border-slate-100">
-                        {context.benchmark.recommendedProjects.map((proj, idx) => (
-                          <div
-                            key={idx}
-                            className="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-1.5"
-                          >
-                            <div className="flex items-start justify-between gap-2">
-                              <span className="font-bold text-slate-900">{proj.title}</span>
-                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-blue-100 text-blue-800">
-                                {proj.difficulty}
-                              </span>
-                            </div>
-                            <p className="text-[11px] text-slate-600">{proj.description}</p>
-                            <div className="flex flex-wrap gap-1">
-                              {proj.techStack.map((tech) => (
-                                <span
-                                  key={tech}
-                                  className="text-[9px] px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-slate-700"
-                                >
-                                  {tech}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {msg.structuredType === 'missions' && (
-                      <div className="mt-3 space-y-2 pt-2 border-t border-slate-100">
-                        {missions.map((m) => (
-                          <div
-                            key={m.id}
-                            onClick={() => toggleMission(m.id)}
-                            className={`p-2.5 rounded-lg border cursor-pointer flex items-center justify-between transition-all ${
-                              m.completed
-                                ? 'bg-emerald-50/60 border-emerald-200 text-emerald-900'
-                                : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
-                            }`}
-                          >
-                            <div className="flex items-center gap-2">
-                              {m.completed ? (
-                                <CheckSquare className="w-4 h-4 text-emerald-600 shrink-0" />
-                              ) : (
-                                <Square className="w-4 h-4 text-slate-400 shrink-0" />
-                              )}
-                              <span
-                                className={`text-xs ${
-                                  m.completed ? 'line-through text-slate-500 font-normal' : 'font-semibold'
-                                }`}
-                              >
-                                {m.title}
-                              </span>
-                            </div>
-                            <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
-                              +{m.xpReward} XP
-                            </span>
-                          </div>
-                        ))}
+                    {msg.sender === 'copilot' && (
+                      <div className="w-7 h-7 rounded-full bg-[#1F1F1F] text-white flex items-center justify-center shrink-0 text-xs font-serif mt-1">
+                        C
                       </div>
                     )}
 
                     <div
-                      className={`text-[10px] ${
-                        msg.sender === 'user' ? 'text-blue-100' : 'text-slate-400'
-                      } text-right`}
+                      className={`max-w-[85%] rounded-2xl p-4 text-[13px] leading-relaxed ${
+                        msg.sender === 'user'
+                          ? 'bg-[#1F1F1F] text-[#FAF9F5] rounded-br-sm'
+                          : 'bg-white text-[#1F1F1F] border border-[#ECEAE4] rounded-bl-sm shadow-xs'
+                      }`}
                     >
-                      {msg.timestamp}
-                    </div>
-                  </div>
+                      <div className="space-y-2 whitespace-pre-wrap font-sans">
+                        {msg.text.split('\n\n').map((para, pIdx) => {
+                          if (para.startsWith('- ') || para.startsWith('1. ') || para.startsWith('2. ') || para.startsWith('3. ')) {
+                            return (
+                              <div key={pIdx} className="space-y-1.5 my-2 pl-1">
+                                {para.split('\n').map((line, lIdx) => (
+                                  <div key={lIdx} className="flex items-start gap-2">
+                                    <span className="text-[#D97706] font-bold text-xs mt-0.5">•</span>
+                                    <span
+                                      dangerouslySetInnerHTML={{
+                                        __html: line
+                                          .replace(/^[-0-9.]+\s*/, '')
+                                          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'),
+                                      }}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            );
+                          }
+                          return (
+                            <p
+                              key={pIdx}
+                              dangerouslySetInnerHTML={{
+                                __html: para.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'),
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
 
-                  {msg.sender === 'user' && (
-                    <div className="w-8 h-8 rounded-lg bg-slate-800 text-white flex items-center justify-center shrink-0 shadow-2xs mt-0.5">
-                      <User className="w-4 h-4" />
+                      {/* Structured Roadmap rendering */}
+                      {msg.structuredType === 'roadmap' && (
+                        <div className="mt-3 space-y-2 pt-3 border-t border-[#ECEAE4]">
+                          {context.roadmapPhases.map((phase) => (
+                            <div
+                              key={phase.id}
+                              className="p-3 bg-[#FAF9F5] border border-[#ECEAE4] rounded-xl space-y-1"
+                            >
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="font-semibold text-[#1F1F1F]">
+                                  Phase {phase.phaseNumber}: {phase.title}
+                                </span>
+                                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#D97706]/10 text-[#D97706]">
+                                  {phase.progressPercentage}%
+                                </span>
+                              </div>
+                              <p className="text-xs text-[#6B6B6B]">{phase.description}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Structured Projects rendering */}
+                      {msg.structuredType === 'projects' && (
+                        <div className="mt-3 space-y-2 pt-3 border-t border-[#ECEAE4]">
+                          {context.benchmark.recommendedProjects.map((proj, idx) => (
+                            <div
+                              key={idx}
+                              className="p-3 bg-[#FAF9F5] border border-[#ECEAE4] rounded-xl space-y-1.5"
+                            >
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="font-semibold text-[#1F1F1F]">{proj.title}</span>
+                                <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-white border border-[#ECEAE4] text-[#6B6B6B]">
+                                  {proj.difficulty}
+                                </span>
+                              </div>
+                              <p className="text-xs text-[#6B6B6B]">{proj.description}</p>
+                              <div className="flex flex-wrap gap-1 pt-1">
+                                {proj.techStack.map((tech) => (
+                                  <span
+                                    key={tech}
+                                    className="text-[10px] px-2 py-0.5 rounded bg-white border border-[#ECEAE4] text-[#1F1F1F] font-mono"
+                                  >
+                                    {tech}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <div
+                        className={`text-[10px] mt-2 font-mono ${
+                          msg.sender === 'user' ? 'text-[#FAF9F5]/60' : 'text-[#6B6B6B]'
+                        } text-right`}
+                      >
+                        {msg.timestamp}
+                      </div>
                     </div>
-                  )}
-                </div>
-              ))}
+
+                    {msg.sender === 'user' && (
+                      <div className="w-7 h-7 rounded-full bg-[#ECEAE4] text-[#1F1F1F] flex items-center justify-center shrink-0 text-xs font-medium mt-1">
+                        {studentProfile.name.charAt(0)}
+                      </div>
+                    )}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
 
               {loading && (
-                <div className="flex gap-3 justify-start">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
-                    <Bot className="w-4 h-4" />
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex gap-3 justify-start"
+                >
+                  <div className="w-7 h-7 rounded-full bg-[#1F1F1F] text-white flex items-center justify-center shrink-0 text-xs font-serif mt-1">
+                    C
                   </div>
-                  <div className="bg-white border border-slate-200 rounded-xl p-4 text-xs text-slate-600 rounded-bl-none flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-                    <span>Synthesizing student context &amp; skill graph...</span>
+                  <div className="bg-white border border-[#ECEAE4] rounded-2xl rounded-bl-sm p-4 text-xs text-[#6B6B6B] flex items-center gap-2 shadow-xs">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-[#D97706]" />
+                    <span>Analyzing your verified skills and generating guidance...</span>
                   </div>
-                </div>
+                </motion.div>
               )}
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Quick Action Suggestion Chips */}
-            <div className="px-5 py-2 bg-white border-t border-slate-100 flex items-center gap-2 overflow-x-auto no-scrollbar">
-              <span className="text-[10px] text-slate-400 shrink-0 font-medium">Quick Actions:</span>
-              <button
-                onClick={() => handleSendMessage('Show my 4-phase roadmap for this role')}
-                className="text-[11px] px-2.5 py-1 rounded-full bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 transition-colors shrink-0 font-medium border border-transparent hover:border-blue-200"
-              >
-                🗺️ 4-Phase Roadmap
-              </button>
-              <button
-                onClick={() => handleSendMessage('Calculate my Career GPS trajectory and ETA')}
-                className="text-[11px] px-2.5 py-1 rounded-full bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 transition-colors shrink-0 font-medium border border-transparent hover:border-blue-200"
-              >
-                🧭 Career GPS
-              </button>
-              <button
-                onClick={() => handleSendMessage('What projects should I build for high ROI?')}
-                className="text-[11px] px-2.5 py-1 rounded-full bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 transition-colors shrink-0 font-medium border border-transparent hover:border-blue-200"
-              >
-                🛠️ Project Blueprints
-              </button>
-              <button
-                onClick={() => handleSendMessage('Give me my weekly missions')}
-                className="text-[11px] px-2.5 py-1 rounded-full bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 transition-colors shrink-0 font-medium border border-transparent hover:border-blue-200"
-              >
-                🎯 Weekly Missions
-              </button>
-              <button
-                onClick={() => handleSendMessage('Which internships and jobs match my profile?')}
-                className="text-[11px] px-2.5 py-1 rounded-full bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 transition-colors shrink-0 font-medium border border-transparent hover:border-blue-200"
-              >
-                💼 Opportunity Match
-              </button>
+            {/* Quick Prompt Chips */}
+            <div className="px-6 py-2.5 bg-white border-t border-[#ECEAE4] flex items-center gap-2 overflow-x-auto no-scrollbar">
+              <span className="text-[11px] text-[#6B6B6B] shrink-0">Prompts:</span>
+              {quickPrompts.map((q, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleSendMessage(q)}
+                  className="text-xs px-3 py-1 rounded-full bg-[#FAF9F5] hover:bg-[#F8F7F3] text-[#1F1F1F] border border-[#ECEAE4] hover:border-[#D97706]/40 transition-all shrink-0"
+                >
+                  {q}
+                </button>
+              ))}
             </div>
 
-            {/* Input Box */}
-            <div className="p-4 bg-white border-t border-slate-200">
+            {/* Conversational Input Bar */}
+            <div className="p-4 bg-white border-t border-[#ECEAE4]">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -572,13 +376,13 @@ export default function CareerCopilotPage() {
                   type="text"
                   value={inputQuery}
                   onChange={(e) => setInputQuery(e.target.value)}
-                  placeholder={`Ask Copilot anything about becoming a top ${targetRole}...`}
-                  className="flex-1 px-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-600 text-slate-900"
+                  placeholder={`Ask anything about your path to ${targetRole}...`}
+                  className="flex-1 px-4 py-2.5 text-xs bg-[#FAF9F5] border border-[#ECEAE4] rounded-xl focus:outline-none focus:bg-white focus:border-[#D97706] text-[#1F1F1F] placeholder:text-[#6B6B6B] transition-all"
                 />
                 <button
                   type="submit"
                   disabled={loading || !inputQuery.trim()}
-                  className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50 shrink-0 shadow-2xs"
+                  className="px-4 py-2.5 bg-[#1F1F1F] hover:bg-black text-[#FAF9F5] rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all disabled:opacity-40 shrink-0"
                 >
                   {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
                   <span>Send</span>
@@ -587,140 +391,103 @@ export default function CareerCopilotPage() {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: Real-Time Career Insights & Live Telemetry Panel */}
-          <div className="lg:col-span-3 space-y-4">
-            {/* Career Readiness Score Card */}
-            <div className="saas-card p-4 space-y-3 bg-gradient-to-br from-slate-900 to-blue-950 text-white border-none shadow-md">
+          {/* RIGHT: Career Insights Panel (Anthropic Specification) */}
+          <div className="lg:col-span-4 space-y-4">
+            {/* 1. Readiness */}
+            <div className="bg-white p-5 rounded-2xl border border-[#ECEAE4] shadow-xs space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-blue-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <Flame className="w-3.5 h-3.5 text-amber-400" />
-                  Readiness Score
+                <span className="text-xs font-mono uppercase tracking-wider text-[#6B6B6B]">
+                  Career Readiness
                 </span>
-                <span className="text-[10px] font-semibold text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
-                  {context.readinessScore > context.industryAvg ? 'Above Average' : 'Target Growth'}
+                <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#16A34A]/10 text-[#16A34A]">
+                  Top 10%
                 </span>
               </div>
+              <div className="flex items-baseline justify-between">
+                <div className="text-3xl font-serif text-[#1F1F1F]">
+                  {context.readinessScore}%
+                </div>
+                <div className="text-xs text-[#6B6B6B]">
+                  Target: <strong className="text-[#1F1F1F]">{targetRole}</strong>
+                </div>
+              </div>
+              <div className="w-full bg-[#FAF9F5] rounded-full h-1.5 overflow-hidden border border-[#ECEAE4]">
+                <div
+                  className="bg-[#D97706] h-1.5 rounded-full transition-all duration-700"
+                  style={{ width: `${context.readinessScore}%` }}
+                />
+              </div>
+            </div>
 
-              <div className="flex items-center justify-between gap-4 pt-1">
+            {/* 2. Current Goal */}
+            <div className="bg-white p-5 rounded-2xl border border-[#ECEAE4] shadow-xs space-y-2">
+              <span className="text-xs font-mono uppercase tracking-wider text-[#6B6B6B]">
+                Current Goal
+              </span>
+              <div className="flex items-center justify-between pt-1">
                 <div>
-                  <div className="text-4xl font-black tracking-tight text-white">
-                    {context.readinessScore}%
-                  </div>
-                  <span className="text-[11px] text-slate-300 font-medium">
-                    {targetRole}
+                  <h3 className="text-base font-serif text-[#1F1F1F]">{targetRole}</h3>
+                  <p className="text-xs text-[#6B6B6B] mt-0.5">
+                    ETA: {context.careerGps.estimatedMonths} Months to full readiness
+                  </p>
+                </div>
+                <div className="p-2 rounded-xl bg-[#FAF9F5] border border-[#ECEAE4]">
+                  <Target className="w-4 h-4 text-[#D97706]" />
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Top Skills */}
+            <div className="bg-white p-5 rounded-2xl border border-[#ECEAE4] shadow-xs space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono uppercase tracking-wider text-[#6B6B6B]">
+                  Verified Top Skills
+                </span>
+                <span className="text-xs text-[#6B6B6B] font-mono">
+                  {studentProfile.verifiedSkills.length} Verified
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {studentProfile.verifiedSkills.slice(0, 5).map((skill, idx) => (
+                  <span
+                    key={idx}
+                    className="text-xs px-2.5 py-1 rounded-lg bg-[#FAF9F5] border border-[#ECEAE4] text-[#1F1F1F] font-medium"
+                  >
+                    {skill.name} <span className="text-[#6B6B6B] text-[10px]">({skill.score}%)</span>
                   </span>
-                </div>
-
-                <div className="text-right space-y-1 text-[11px] text-slate-300">
-                  <div>
-                    Industry Avg: <strong className="text-white">{context.industryAvg}%</strong>
-                  </div>
-                  <div>
-                    Top Students: <strong className="text-emerald-400">{context.topStudentsScore}%</strong>
-                  </div>
-                </div>
-              </div>
-
-              {/* Progress bar comparison */}
-              <div className="space-y-1.5 pt-1">
-                <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                  <div
-                    className="bg-gradient-to-r from-blue-500 to-emerald-400 h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${context.readinessScore}%` }}
-                  />
-                </div>
+                ))}
               </div>
             </div>
 
-            {/* Career GPS Trajectory */}
-            <div className="saas-card p-4 space-y-3">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <span className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <Compass className="w-3.5 h-3.5 text-blue-600" />
-                  Career GPS
+            {/* 4. Skill Gaps */}
+            <div className="bg-white p-5 rounded-2xl border border-[#ECEAE4] shadow-xs space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono uppercase tracking-wider text-[#6B6B6B]">
+                  Skill Gaps to Close
                 </span>
-                <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
-                  {context.careerGps.successProbability}% Success Prob
-                </span>
+                <span className="text-xs text-[#D97706] font-medium">High Impact</span>
               </div>
-
-              <div className="space-y-2.5 text-xs">
-                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-100 space-y-1">
-                  <div className="text-[10px] text-slate-400 font-semibold uppercase">Current Origin</div>
-                  <div className="font-bold text-slate-900">{context.careerGps.currentPosition}</div>
-                </div>
-
-                <div className="flex items-center justify-center">
-                  <div className="text-[10px] font-mono font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-                    Distance: {context.careerGps.distanceSkillsCount} Skills • ETA: {context.careerGps.estimatedMonths} Months
-                  </div>
-                </div>
-
-                <div className="p-2.5 bg-blue-50/50 rounded-lg border border-blue-100 space-y-1">
-                  <div className="text-[10px] text-blue-600 font-semibold uppercase">Destination Target</div>
-                  <div className="font-bold text-slate-900">{context.careerGps.targetPosition}</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Gap Analysis Summary */}
-            <div className="saas-card p-4 space-y-3">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <span className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
-                  Gap Diagnosis
-                </span>
-                <span className="text-[10px] text-slate-500">
-                  {context.missingSkills.length} Missing
-                </span>
-              </div>
-
               <div className="space-y-2">
-                <div>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
-                    Missing Skills
-                  </span>
-                  <div className="flex flex-wrap gap-1">
-                    {context.missingSkills.slice(0, 4).map((s, idx) => (
-                      <span
-                        key={idx}
-                        className="text-[10px] font-medium px-2 py-0.5 rounded bg-red-50 text-red-700 border border-red-200"
-                      >
-                        {s}
-                      </span>
-                    ))}
+                {context.missingSkills.slice(0, 3).map((skill, idx) => (
+                  <div
+                    key={idx}
+                    className="p-2.5 rounded-xl bg-[#FAF9F5] border border-[#ECEAE4] flex items-center justify-between text-xs"
+                  >
+                    <span className="font-medium text-[#1F1F1F]">{skill}</span>
+                    <span className="text-[10px] text-[#D97706] font-mono font-semibold">+18% readiness</span>
                   </div>
-                </div>
-
-                {context.weakSkills.length > 0 && (
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
-                      Needs Strengthening
-                    </span>
-                    <div className="flex flex-wrap gap-1">
-                      {context.weakSkills.slice(0, 3).map((w, idx) => (
-                        <span
-                          key={idx}
-                          className="text-[10px] font-medium px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200"
-                        >
-                          {w.skill} ({w.currentScore}%)
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                ))}
               </div>
             </div>
 
-            {/* Interactive Weekly Missions Checklist */}
-            <div className="saas-card p-4 space-y-3">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <span className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                  Weekly Missions
+            {/* 5. Weekly Progress */}
+            <div className="bg-white p-5 rounded-2xl border border-[#ECEAE4] shadow-xs space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono uppercase tracking-wider text-[#6B6B6B]">
+                  Weekly Progress
                 </span>
-                <span className="text-[10px] font-bold text-slate-600">
-                  {completedMissionsCount}/{missions.length}
+                <span className="text-xs font-mono text-[#1F1F1F]">
+                  {completedMissionsCount} of {missions.length} Done
                 </span>
               </div>
 
@@ -729,82 +496,20 @@ export default function CareerCopilotPage() {
                   <div
                     key={m.id}
                     onClick={() => toggleMission(m.id)}
-                    className={`p-2 rounded-lg border text-xs cursor-pointer flex items-start gap-2 transition-all ${
+                    className={`p-2.5 rounded-xl border text-xs cursor-pointer flex items-center gap-2.5 transition-all ${
                       m.completed
-                        ? 'bg-emerald-50/40 border-emerald-200 text-emerald-950'
-                        : 'bg-white border-slate-200 hover:border-slate-300'
+                        ? 'bg-[#FAF9F5] border-[#ECEAE4] text-[#6B6B6B]'
+                        : 'bg-white border-[#ECEAE4] hover:border-[#D97706]/40 text-[#1F1F1F]'
                     }`}
                   >
                     {m.completed ? (
-                      <CheckSquare className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-4 h-4 text-[#16A34A] shrink-0" />
                     ) : (
-                      <Square className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
+                      <div className="w-4 h-4 rounded-full border border-[#ECEAE4] shrink-0" />
                     )}
-                    <div className="flex-1 min-w-0">
-                      <div
-                        className={`text-[11px] font-semibold truncate ${
-                          m.completed ? 'line-through text-slate-400' : 'text-slate-800'
-                        }`}
-                      >
-                        {m.title}
-                      </div>
-                      <div className="text-[10px] text-slate-400 flex items-center justify-between mt-0.5">
-                        <span>{m.category}</span>
-                        <span className="font-semibold text-blue-600">+{m.xpReward} XP</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Learning Velocity Score */}
-            <div className="saas-card p-4 space-y-2">
-              <div className="flex items-center justify-between text-xs font-bold text-slate-900 pb-1 border-b border-slate-100">
-                <span className="flex items-center gap-1.5">
-                  <TrendingUp className="w-3.5 h-3.5 text-blue-600" />
-                  Learning Velocity
-                </span>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                  {context.learningVelocity.percentileRank}
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-[11px] pt-1">
-                <div className="p-2 bg-slate-50 rounded border border-slate-100">
-                  <span className="text-slate-500 block text-[10px]">GitHub Growth</span>
-                  <strong className="text-slate-900 font-bold">{context.learningVelocity.githubGrowthRate}</strong>
-                </div>
-                <div className="p-2 bg-slate-50 rounded border border-slate-100">
-                  <span className="text-slate-500 block text-[10px]">Projects Built</span>
-                  <strong className="text-slate-900 font-bold">{context.learningVelocity.projectsCompletedCount}</strong>
-                </div>
-              </div>
-            </div>
-
-            {/* Opportunity Match Preview */}
-            <div className="saas-card p-4 space-y-2.5">
-              <div className="flex items-center justify-between text-xs font-bold text-slate-900 pb-1 border-b border-slate-100">
-                <span className="flex items-center gap-1.5">
-                  <Briefcase className="w-3.5 h-3.5 text-indigo-600" />
-                  Matched Openings
-                </span>
-                <span className="text-[10px] text-blue-600 font-semibold">
-                  {context.opportunityMatches.length} Live
-                </span>
-              </div>
-              <div className="space-y-2">
-                {context.opportunityMatches.slice(0, 2).map((opp) => (
-                  <div
-                    key={opp.id}
-                    className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-1"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-slate-900">{opp.title}</span>
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                        {opp.matchScore}% Match
-                      </span>
-                    </div>
-                    <div className="text-[10px] text-slate-500">{opp.company} • {opp.type}</div>
+                    <span className={`text-xs flex-1 ${m.completed ? 'line-through text-[#6B6B6B]' : 'font-medium'}`}>
+                      {m.title}
+                    </span>
                   </div>
                 ))}
               </div>

@@ -1,35 +1,36 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
-import { AIProvider } from '@/types';
+import { AIProvider, AcademicDetails } from '@/types';
 import {
-  Settings,
-  Sparkles,
   Key,
   CheckCircle2,
-  ShieldCheck,
   ExternalLink,
   Activity,
   AlertCircle,
   Loader2,
   Terminal,
-  Zap,
   Clock,
-  HelpCircle,
-  RotateCw,
+  User,
+  Check,
+  Cpu,
 } from 'lucide-react';
 import { cleanApiKey, DiagnosticResult } from '@/lib/ai-diagnostics';
-import { maskApiKey } from '@/lib/user-utils';
 
 export default function StudentSettingsPage() {
-  const { aiKeys, setAIKey, activeProvider, setActiveAIProvider } = useAppStore();
+  const { studentProfile, updateStudentFullProfile, aiKeys, setAIKey, activeProvider, setActiveAIProvider } = useAppStore();
+  const [userName, setUserName] = useState(studentProfile.name || '');
+  const [department, setDepartment] = useState<AcademicDetails['department']>(studentProfile.academic.department || 'CSE');
+  const [cgpa, setCgpa] = useState(studentProfile.academic.cgpa?.toString() || '9.14');
+  const [targetRole, setTargetRole] = useState(studentProfile.targetRole || 'AI Engineer');
+
   const [geminiKey, setGeminiKey] = useState(aiKeys.gemini || '');
   const [openaiKey, setOpenaiKey] = useState(aiKeys.openai || '');
   const [claudeKey, setClaudeKey] = useState(aiKeys.claude || '');
   const [savedSuccess, setSavedSuccess] = useState(false);
-  const [testPrompt, setTestPrompt] = useState('SkillBridge live diagnostic probe. Output "OK".');
 
   const [testStates, setTestStates] = useState<
     Record<
@@ -44,22 +45,6 @@ export default function StudentSettingsPage() {
     openai: { testing: false, result: null },
     claude: { testing: false, result: null },
   });
-
-  // Load server-side configured keys if available
-  useEffect(() => {
-    async function loadConfig() {
-      try {
-        const res = await fetch('/api/settings');
-        if (res.ok) {
-          const data = await res.json();
-          // if local keys are empty, fill from existing configured masked state or values
-        }
-      } catch {
-        // use local storage defaults
-      }
-    }
-    loadConfig();
-  }, []);
 
   const runProviderTest = async (provider: AIProvider, rawKey: string) => {
     const cleaned = cleanApiKey(rawKey);
@@ -92,7 +77,7 @@ export default function StudentSettingsPage() {
         body: JSON.stringify({
           provider,
           apiKey: cleaned,
-          testPrompt: testPrompt.trim() || 'SkillBridge live ping. Output "OK".',
+          testPrompt: 'SkillBridge live ping. Output "OK".',
         }),
       });
 
@@ -121,7 +106,7 @@ export default function StudentSettingsPage() {
     }
   };
 
-  const handleSaveAI = async (e: React.FormEvent) => {
+  const handleSaveAll = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanGemini = cleanApiKey(geminiKey);
     const cleanOpenAI = cleanApiKey(openaiKey);
@@ -131,7 +116,15 @@ export default function StudentSettingsPage() {
     setAIKey('openai', cleanOpenAI);
     setAIKey('claude', cleanClaude);
 
-    // Save to server database
+    updateStudentFullProfile({
+      name: userName,
+      targetRole,
+      academic: {
+        department,
+        cgpa: parseFloat(cgpa) || 9.14,
+      },
+    });
+
     try {
       await fetch('/api/settings', {
         method: 'POST',
@@ -143,7 +136,7 @@ export default function StudentSettingsPage() {
         }),
       });
     } catch {
-      // offline/client store fallback
+      // offline fallback
     }
 
     setSavedSuccess(true);
@@ -154,44 +147,42 @@ export default function StudentSettingsPage() {
     if (!result) return null;
 
     const isSuccess = result.status === 'Connected';
-    const isInvalidKey = result.status === 'Invalid API Key' || result.status === 'Provider Authentication Failed';
-    const isQuota = result.status === 'Quota Exceeded';
-
-    const bgColor = isSuccess
-      ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
-      : isInvalidKey
-      ? 'bg-red-50 border-red-200 text-red-900'
-      : isQuota
-      ? 'bg-amber-50 border-amber-200 text-amber-900'
-      : 'bg-orange-50 border-orange-200 text-orange-900';
 
     return (
-      <div className={`p-3 rounded-lg border text-xs space-y-1.5 animate-in fade-in duration-150 ${bgColor}`}>
-        <div className="flex items-center justify-between font-bold">
+      <div
+        className={`p-3.5 rounded-xl border text-xs space-y-1.5 ${
+          isSuccess
+            ? 'bg-[#16A34A]/5 border-[#16A34A]/20 text-[#1F1F1F]'
+            : 'bg-red-50/50 border-red-200 text-[#1F1F1F]'
+        }`}
+      >
+        <div className="flex items-center justify-between font-medium">
           <div className="flex items-center gap-1.5">
             {isSuccess ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-[#16A34A] shrink-0" />
             ) : (
               <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
             )}
-            <span>Status: {result.status}</span>
+            <span className={isSuccess ? 'text-[#16A34A]' : 'text-red-700'}>
+              Status: {result.status}
+            </span>
           </div>
           {result.latencyMs !== undefined && result.latencyMs > 0 && (
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/80 border border-slate-200 flex items-center gap-1">
-              <Clock className="w-2.5 h-2.5 text-slate-500" />
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white border border-[#ECEAE4] text-[#6B6B6B] flex items-center gap-1">
+              <Clock className="w-2.5 h-2.5" />
               {result.latencyMs}ms
             </span>
           )}
         </div>
 
-        <p className="text-[11px] leading-relaxed">
+        <p className="text-xs text-[#6B6B6B] leading-relaxed">
           {isSuccess ? result.message || 'Connection established successfully.' : result.error}
         </p>
 
         {result.echoResponse && (
-          <div className="mt-1.5 p-2 bg-white/90 rounded border border-emerald-200 text-[10px] font-mono flex items-center gap-1.5 text-slate-800">
-            <Terminal className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-            <span className="font-semibold text-emerald-700">Echo:</span>
+          <div className="mt-1.5 p-2 bg-white rounded-lg border border-[#ECEAE4] text-[11px] font-mono flex items-center gap-2 text-[#1F1F1F]">
+            <Terminal className="w-3.5 h-3.5 text-[#16A34A] shrink-0" />
+            <span className="text-[#6B6B6B]">Echo:</span>
             <span className="truncate">&quot;{result.echoResponse}&quot;</span>
           </div>
         )}
@@ -201,56 +192,114 @@ export default function StudentSettingsPage() {
 
   return (
     <PortalLayout>
-      <div className="space-y-6">
+      <div className="space-y-8 max-w-[1000px] mx-auto pb-16">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 pb-4 border-b border-[#ECEAE4]">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
-                Security &amp; Account
-              </span>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#D97706]" />
+              <h1 className="text-2xl font-serif font-normal text-[#1F1F1F] tracking-tight">
+                Settings
+              </h1>
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">AI &amp; Platform Settings</h1>
-            <p className="text-xs text-slate-500 mt-1">
-              Manage your AI Provider credentials (BYOK), connection diagnostics, latency telemetry, and model routing.
+            <p className="text-sm text-[#6B6B6B] mt-0.5 font-sans">
+              Manage your personal identity, academic records, and private AI inference keys.
             </p>
           </div>
+
+          {savedSuccess && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#16A34A]/10 text-[#16A34A] text-xs font-medium"
+            >
+              <Check className="w-3.5 h-3.5" />
+              <span>Settings saved</span>
+            </motion.div>
+          )}
         </div>
 
-        {/* AI Providers Section (BYOK) */}
-        <div className="saas-card p-6 space-y-6">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                <Sparkles className="w-5 h-5" />
-              </div>
+        <form onSubmit={handleSaveAll} className="space-y-6">
+          {/* Section 1: Profile & Identity */}
+          <div className="bg-white p-6 sm:p-7 rounded-2xl border border-[#ECEAE4] shadow-xs space-y-5">
+            <div className="flex items-center gap-2 pb-3 border-b border-[#ECEAE4]">
+              <User className="w-4 h-4 text-[#D97706]" />
+              <h2 className="text-base font-serif text-[#1F1F1F]">Personal Profile &amp; Goal</h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <h2 className="text-sm font-bold text-slate-900">AI Providers Configuration &amp; Diagnostics</h2>
-                <p className="text-xs text-slate-500">
-                  Connect Google Gemini, OpenAI, or Anthropic Claude with real-time ping latency testing.
-                </p>
+                <label className="block text-xs font-mono uppercase tracking-wider text-[#6B6B6B] mb-1.5">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  className="w-full px-3.5 py-2 text-xs bg-[#FAF9F5] border border-[#ECEAE4] rounded-xl focus:outline-none focus:bg-white focus:border-[#D97706] text-[#1F1F1F]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono uppercase tracking-wider text-[#6B6B6B] mb-1.5">
+                  Target Career Role
+                </label>
+                <input
+                  type="text"
+                  value={targetRole}
+                  onChange={(e) => setTargetRole(e.target.value)}
+                  className="w-full px-3.5 py-2 text-xs bg-[#FAF9F5] border border-[#ECEAE4] rounded-xl focus:outline-none focus:bg-white focus:border-[#D97706] text-[#1F1F1F]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono uppercase tracking-wider text-[#6B6B6B] mb-1.5">
+                  Department
+                </label>
+                <select
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value as AcademicDetails['department'])}
+                  className="w-full px-3.5 py-2 text-xs bg-[#FAF9F5] border border-[#ECEAE4] rounded-xl focus:outline-none focus:bg-white focus:border-[#D97706] text-[#1F1F1F]"
+                >
+                  <option value="CSE">CSE</option>
+                  <option value="AIML">AIML</option>
+                  <option value="IT">IT</option>
+                  <option value="ECE">ECE</option>
+                  <option value="Mechanical">Mechanical</option>
+                  <option value="Civil">Civil</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono uppercase tracking-wider text-[#6B6B6B] mb-1.5">
+                  CGPA
+                </label>
+                <input
+                  type="text"
+                  value={cgpa}
+                  onChange={(e) => setCgpa(e.target.value)}
+                  className="w-full px-3.5 py-2 text-xs bg-[#FAF9F5] border border-[#ECEAE4] rounded-xl focus:outline-none focus:bg-white focus:border-[#D97706] text-[#1F1F1F]"
+                />
               </div>
             </div>
-            {savedSuccess && (
-              <span className="text-xs text-emerald-600 font-semibold flex items-center gap-1 bg-emerald-50 px-3 py-1 rounded-md border border-emerald-200">
-                <CheckCircle2 className="w-3.5 h-3.5" /> All Keys Saved &amp; Synced to Profile
+          </div>
+
+          {/* Section 2: AI Provider (BYOK) */}
+          <div className="bg-white p-6 sm:p-7 rounded-2xl border border-[#ECEAE4] shadow-xs space-y-6">
+            <div className="flex items-center justify-between pb-3 border-b border-[#ECEAE4]">
+              <div className="flex items-center gap-2">
+                <Cpu className="w-4 h-4 text-[#D97706]" />
+                <h2 className="text-base font-serif text-[#1F1F1F]">AI Model Routing &amp; Credentials</h2>
+              </div>
+              <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-[#FAF9F5] border border-[#ECEAE4] text-[#6B6B6B]">
+                BYOK Encrypted
               </span>
-            )}
-          </div>
-
-          {/* Privacy Guarantee */}
-          <div className="p-3.5 bg-blue-50/60 border border-blue-100 rounded-lg text-xs text-blue-900 flex items-start gap-3">
-            <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-            <div>
-              <span className="font-semibold">Zero-Leakage BYOK Architecture:</span> All API keys are sanitized (quotes and prefixes stripped), verified through upstream provider servers, and encrypted at rest. SkillBridge AI never logs your private API tokens.
             </div>
-          </div>
 
-          <form onSubmit={handleSaveAI} className="space-y-6">
             {/* Active Provider Selector */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                Active Default Provider
+              <label className="block text-xs font-mono uppercase tracking-wider text-[#6B6B6B] mb-2">
+                Default Active Provider
               </label>
               <div className="grid grid-cols-3 gap-3">
                 {(['gemini', 'openai', 'claude'] as AIProvider[]).map((prov) => (
@@ -258,176 +307,157 @@ export default function StudentSettingsPage() {
                     key={prov}
                     type="button"
                     onClick={() => setActiveAIProvider(prov)}
-                    className={`p-3 rounded-lg border text-left transition-all ${
+                    className={`p-3 rounded-xl border text-left transition-all ${
                       activeProvider === prov
-                        ? 'border-blue-600 bg-blue-50/40 text-blue-900 ring-1 ring-blue-600 font-bold'
-                        : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
+                        ? 'border-[#1F1F1F] bg-[#FAF9F5] text-[#1F1F1F]'
+                        : 'border-[#ECEAE4] bg-white text-[#6B6B6B] hover:border-[#D97706]/40'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs capitalize block">{prov}</span>
-                      {activeProvider === prov && <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />}
+                      <span className="text-xs font-medium capitalize">{prov}</span>
+                      {activeProvider === prov && <div className="w-2 h-2 rounded-full bg-[#D97706]" />}
                     </div>
-                    <span className="text-[10px] text-slate-500 font-normal">
-                      {aiKeys[prov] ? 'Key Configured' : 'No Key Set'}
+                    <span className="text-[10px] text-[#6B6B6B] font-mono block mt-1">
+                      {aiKeys[prov] ? 'Configured' : 'Empty'}
                     </span>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Google Gemini API Key */}
-            <div className="p-4 bg-slate-50/50 rounded-xl border border-slate-200 space-y-3">
+            {/* Google Gemini */}
+            <div className="p-4 bg-[#FAF9F5] rounded-xl border border-[#ECEAE4] space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-900">Google Gemini AI (Gemini 1.5 Flash)</label>
+                <label className="text-xs font-medium text-[#1F1F1F]">Google Gemini AI (Gemini 1.5 Flash)</label>
                 <a
                   href="https://aistudio.google.com/app/apikey"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-[11px] text-blue-600 hover:underline inline-flex items-center gap-0.5 font-medium"
+                  className="text-[11px] text-[#D97706] hover:underline inline-flex items-center gap-1 font-mono"
                 >
                   Get Gemini Key <ExternalLink className="w-2.5 h-2.5" />
                 </a>
               </div>
               <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                    <Key className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="password"
-                    value={geminiKey}
-                    onChange={(e) => {
-                      setGeminiKey(cleanApiKey(e.target.value));
-                      setTestStates((prev) => ({ ...prev, gemini: { testing: false, result: null } }));
-                    }}
-                    placeholder="AIzaSy..."
-                    className="w-full pl-9 pr-4 py-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-600 font-mono text-slate-900"
-                  />
-                </div>
+                <input
+                  type="password"
+                  value={geminiKey}
+                  onChange={(e) => {
+                    setGeminiKey(cleanApiKey(e.target.value));
+                    setTestStates((prev) => ({ ...prev, gemini: { testing: false, result: null } }));
+                  }}
+                  placeholder="AIzaSy..."
+                  className="flex-1 px-3.5 py-2 text-xs bg-white border border-[#ECEAE4] rounded-xl focus:outline-none focus:border-[#D97706] font-mono text-[#1F1F1F]"
+                />
                 <button
                   type="button"
                   onClick={() => runProviderTest('gemini', geminiKey)}
                   disabled={testStates.gemini.testing || !geminiKey}
-                  className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                  className="px-4 py-2 bg-white hover:bg-[#F8F7F3] border border-[#ECEAE4] text-[#1F1F1F] rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all disabled:opacity-50"
                 >
                   {testStates.gemini.testing ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <Loader2 className="w-3 h-3 animate-spin text-[#D97706]" />
                   ) : (
-                    <Activity className="w-3.5 h-3.5" />
+                    <Activity className="w-3 h-3 text-[#D97706]" />
                   )}
-                  <span>Test Key</span>
+                  <span>Test</span>
                 </button>
               </div>
-
               {renderStatusBox(testStates.gemini.result)}
             </div>
 
-            {/* OpenAI API Key */}
-            <div className="p-4 bg-slate-50/50 rounded-xl border border-slate-200 space-y-3">
+            {/* OpenAI */}
+            <div className="p-4 bg-[#FAF9F5] rounded-xl border border-[#ECEAE4] space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-900">OpenAI (GPT-4o / GPT-4o-mini)</label>
+                <label className="text-xs font-medium text-[#1F1F1F]">OpenAI (GPT-4o / GPT-4o-mini)</label>
                 <a
                   href="https://platform.openai.com/api-keys"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-[11px] text-blue-600 hover:underline inline-flex items-center gap-0.5 font-medium"
+                  className="text-[11px] text-[#D97706] hover:underline inline-flex items-center gap-1 font-mono"
                 >
                   Get OpenAI Key <ExternalLink className="w-2.5 h-2.5" />
                 </a>
               </div>
               <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                    <Key className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="password"
-                    value={openaiKey}
-                    onChange={(e) => {
-                      setOpenaiKey(cleanApiKey(e.target.value));
-                      setTestStates((prev) => ({ ...prev, openai: { testing: false, result: null } }));
-                    }}
-                    placeholder="sk-proj-..."
-                    className="w-full pl-9 pr-4 py-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-600 font-mono text-slate-900"
-                  />
-                </div>
+                <input
+                  type="password"
+                  value={openaiKey}
+                  onChange={(e) => {
+                    setOpenaiKey(cleanApiKey(e.target.value));
+                    setTestStates((prev) => ({ ...prev, openai: { testing: false, result: null } }));
+                  }}
+                  placeholder="sk-proj-..."
+                  className="flex-1 px-3.5 py-2 text-xs bg-white border border-[#ECEAE4] rounded-xl focus:outline-none focus:border-[#D97706] font-mono text-[#1F1F1F]"
+                />
                 <button
                   type="button"
                   onClick={() => runProviderTest('openai', openaiKey)}
                   disabled={testStates.openai.testing || !openaiKey}
-                  className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                  className="px-4 py-2 bg-white hover:bg-[#F8F7F3] border border-[#ECEAE4] text-[#1F1F1F] rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all disabled:opacity-50"
                 >
                   {testStates.openai.testing ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <Loader2 className="w-3 h-3 animate-spin text-[#D97706]" />
                   ) : (
-                    <Activity className="w-3.5 h-3.5" />
+                    <Activity className="w-3 h-3 text-[#D97706]" />
                   )}
-                  <span>Test Key</span>
+                  <span>Test</span>
                 </button>
               </div>
-
               {renderStatusBox(testStates.openai.result)}
             </div>
 
-            {/* Anthropic Claude API Key */}
-            <div className="p-4 bg-slate-50/50 rounded-xl border border-slate-200 space-y-3">
+            {/* Anthropic Claude */}
+            <div className="p-4 bg-[#FAF9F5] rounded-xl border border-[#ECEAE4] space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-900">Anthropic Claude (Claude 3.5 Sonnet)</label>
+                <label className="text-xs font-medium text-[#1F1F1F]">Anthropic Claude (Claude 3.5 Sonnet)</label>
                 <a
                   href="https://console.anthropic.com/settings/keys"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-[11px] text-blue-600 hover:underline inline-flex items-center gap-0.5 font-medium"
+                  className="text-[11px] text-[#D97706] hover:underline inline-flex items-center gap-1 font-mono"
                 >
                   Get Claude Key <ExternalLink className="w-2.5 h-2.5" />
                 </a>
               </div>
               <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                    <Key className="w-4 h-4" />
-                  </div>
-                  <input
-                    type="password"
-                    value={claudeKey}
-                    onChange={(e) => {
-                      setClaudeKey(cleanApiKey(e.target.value));
-                      setTestStates((prev) => ({ ...prev, claude: { testing: false, result: null } }));
-                    }}
-                    placeholder="sk-ant-..."
-                    className="w-full pl-9 pr-4 py-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-600 font-mono text-slate-900"
-                  />
-                </div>
+                <input
+                  type="password"
+                  value={claudeKey}
+                  onChange={(e) => {
+                    setClaudeKey(cleanApiKey(e.target.value));
+                    setTestStates((prev) => ({ ...prev, claude: { testing: false, result: null } }));
+                  }}
+                  placeholder="sk-ant-..."
+                  className="flex-1 px-3.5 py-2 text-xs bg-white border border-[#ECEAE4] rounded-xl focus:outline-none focus:border-[#D97706] font-mono text-[#1F1F1F]"
+                />
                 <button
                   type="button"
                   onClick={() => runProviderTest('claude', claudeKey)}
                   disabled={testStates.claude.testing || !claudeKey}
-                  className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                  className="px-4 py-2 bg-white hover:bg-[#F8F7F3] border border-[#ECEAE4] text-[#1F1F1F] rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all disabled:opacity-50"
                 >
                   {testStates.claude.testing ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <Loader2 className="w-3 h-3 animate-spin text-[#D97706]" />
                   ) : (
-                    <Activity className="w-3.5 h-3.5" />
+                    <Activity className="w-3 h-3 text-[#D97706]" />
                   )}
-                  <span>Test Key</span>
+                  <span>Test</span>
                 </button>
               </div>
-
               {renderStatusBox(testStates.claude.result)}
             </div>
+          </div>
 
-            <div className="pt-2 flex justify-end">
-              <button
-                type="submit"
-                className="px-6 py-2.5 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-xs transition-colors flex items-center gap-1.5"
-              >
-                <Zap className="w-3.5 h-3.5" />
-                <span>Save All Credentials</span>
-              </button>
-            </div>
-          </form>
-        </div>
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              className="px-6 py-2.5 text-xs font-medium text-[#FAF9F5] bg-[#1F1F1F] hover:bg-black rounded-xl transition-all shadow-xs"
+            >
+              Save Changes
+            </button>
+          </div>
+        </form>
       </div>
     </PortalLayout>
   );

@@ -2,59 +2,85 @@
 
 @layer base {
   :root {
-    --primary: #2563eb;
-    --primary-hover: #1d4ed8;
-    --primary-light: #eff6ff;
-    --secondary-bg: #f8fafc;
-    --border-subtle: #e2e8f0;
-    --text-primary: #0f172a;
-    --text-muted: #64748b;
+    --bg-warm: #FAF9F5;
+    --bg-surface: #FFFFFF;
+    --border-subtle: #ECEAE4;
+    --text-primary: #1F1F1F;
+    --text-secondary: #6B6B6B;
+    --accent-warm: #D97706;
+    --accent-blue: #2563EB;
+    --success-green: #16A34A;
   }
 
   body {
-    background-color: #f8fafc;
-    color: #0f172a;
+    background-color: #FAF9F5;
+    color: #1F1F1F;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-/* Custom Scrollbar for Enterprise Dashboards */
+/* Minimal Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #ECEAE4;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #D5D2C9;
 }
 
-/* High-Density Card & Table Styles */
-.saas-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+/* Anthropic & Linear Inspired Cards */
+.saas-card, .anthropic-card {
+  background: #FFFFFF;
+  border: 1px solid #ECEAE4;
+  border-radius: 1rem; /* 16px */
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.saas-card:hover {
-  border-color: #cbd5e1;
+.saas-card:hover, .anthropic-card:hover {
+  border-color: #DDD9D0;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.04);
 }
 
-.metric-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.625rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  line-height: 1rem;
+/* Interactive Button Hover Lift */
+.btn-anthropic {
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-anthropic:hover {
+  transform: translateY(-1px);
+}
+
+.btn-anthropic:active {
+  transform: translateY(0.5px) scale(0.99);
+}
+
+/* Shimmer Loading Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-loader {
+  background: linear-gradient(90deg, #F4F2EB 25%, #EBE8DE 50%, #F4F2EB 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.5rem;
 }
