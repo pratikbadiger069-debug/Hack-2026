@@ -33,6 +33,47 @@ import {
 } from './mock-data';
 import { getLevelInfo } from './xp-engine';
 
+export const EMPTY_FRESH_STUDENT_PROFILE: StudentProfile = {
+  id: 'std-fresh',
+  name: 'New Builder',
+  email: '',
+  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+  headline: 'Aspiring Software Builder',
+  targetRole: 'Backend Engineer',
+  college: 'HITAM',
+  department: 'CSE',
+  branch: 'CSE',
+  academic: {
+    college: 'HITAM',
+    department: 'CSE',
+    year: '1st Year',
+    semester: '1st Semester',
+    cgpa: 8.5,
+    studentId: 'SB-2026-001',
+  },
+  professional: {
+    githubUrl: '',
+    linkedinUrl: '',
+    portfolioUrl: '',
+    bio: 'Starting my verified builder journey on SkillBridge.',
+    totalProjects: 0,
+    hackathonWins: 0,
+    researchPapers: 0,
+    openSourceContributions: 0,
+  },
+  builderScores: {
+    overall: 100,
+    execution: 15,
+    leadership: 10,
+    innovation: 15,
+    problemSolving: 20,
+    consistency: 10,
+  },
+  employabilityScore: 35,
+  verifiedSkills: [],
+  evidences: [],
+};
+
 export const CLEAN_SCRATCH_STUDENT_PROFILE: StudentProfile = {
   id: 'std-scratch',
   name: 'New Student',
@@ -40,6 +81,9 @@ export const CLEAN_SCRATCH_STUDENT_PROFILE: StudentProfile = {
   avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
   headline: '',
   targetRole: 'Software Engineer',
+  college: 'HITAM',
+  department: 'CSE',
+  branch: 'CSE',
   academic: {
     college: 'HITAM',
     department: 'CSE',
@@ -98,30 +142,51 @@ export const CLEAN_SCRATCH_STUDENT_PROFILE: StudentProfile = {
       score: 86,
       verificationSources: ['Project', 'Assessment'],
       verifiedDate: 'Nov 19, 2025',
-      verificationCode: 'SB-TS-86102',
+      verificationCode: 'SB-TS-86124',
       evidenceCount: 5,
     },
     {
       id: 'vs-4',
-      name: 'PostgreSQL & pgvector',
-      category: 'Database',
+      name: 'Docker & Microservices',
+      category: 'DevOps',
       level: 'Advanced',
-      score: 89,
-      verificationSources: ['Assessment', 'Project'],
+      score: 91,
+      verificationSources: ['Assessment', 'Project', 'GitHub Repository Analysis'],
+      verifiedDate: 'Dec 05, 2025',
+      verificationCode: 'SB-DC-91402',
+      evidenceCount: 4,
+    },
+    {
+      id: 'vs-5',
+      name: 'PostgreSQL & Query Optimization',
+      category: 'Database',
+      level: 'Intermediate',
+      score: 82,
+      verificationSources: ['Assessment'],
       verifiedDate: 'Jan 10, 2026',
-      verificationCode: 'SB-DB-89412',
-      evidenceCount: 3,
+      verificationCode: 'SB-SQL-82910',
+      evidenceCount: 2,
     },
   ],
   evidences: [
     {
       id: 'ev-1',
-      title: 'Real-time Multimodal Vector Retrieval Engine',
+      title: 'Distributed Rate Limiting Gateway',
       type: 'GitHub Repo',
-      url: 'https://github.com/aarav-builder/vectormind-core',
-      description: 'Engineered high-throughput HNSW index search serving 40k QPS with sub-15ms p99 latency in C++ and Python bindings.',
+      url: 'https://github.com/aarav-builder/distributed-rate-limiter',
+      description: 'Token bucket and sliding window rate limiter in Go with Redis backend handling 15k RPS.',
       date: 'Jan 2026',
-      impactScore: 96,
+      impactScore: 94,
+      verified: true,
+    },
+    {
+      id: 'ev-2',
+      title: 'Vector Search Embedding Indexer',
+      type: 'Live Product',
+      url: 'https://vectormind.ai-demo.dev',
+      description: 'High performance HNSW vector search API indexing 500k research documents.',
+      date: 'Dec 2025',
+      impactScore: 91,
       verified: true,
     },
   ],
@@ -139,6 +204,8 @@ interface AppState {
   currentUser: AuthUser | null;
   setCurrentUser: (user: AuthUser | null) => void;
   loginUser: (email: string, role: UserRole, password?: string, name?: string) => Promise<void>;
+  loginWithGoogle: (email: string, name?: string, avatar?: string) => Promise<void>;
+  loginWithGitHub: (username: string) => Promise<void>;
   registerUser: (email: string, name: string, role: UserRole, password?: string) => Promise<void>;
   logoutUser: () => void;
 
@@ -649,6 +716,116 @@ export const useAppStore = create<AppState>()(
         }));
       },
 
+      loginWithGoogle: async (email, name, avatar) => {
+        const cleanEmail = (email || 'builder@gmail.com').toLowerCase().trim();
+        const cleanName = name || cleanEmail.split('@')[0].split('.').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+
+        const res = await fetch('/api/auth/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: cleanEmail, name: cleanName, avatar }),
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Google authentication failed.');
+        }
+
+        const user = data.user;
+        const isExisting = Boolean(get().userProfilesByEmail[cleanEmail]);
+        const profile = data.profile || (isExisting ? get().userProfilesByEmail[cleanEmail] : {
+          ...EMPTY_FRESH_STUDENT_PROFILE,
+          id: `std-${Date.now()}`,
+          name: user.name || cleanName,
+          email: cleanEmail,
+          avatar: avatar || user.avatar || EMPTY_FRESH_STUDENT_PROFILE.avatar,
+          googleName: user.name || cleanName,
+        });
+
+        set((state) => ({
+          currentUser: user,
+          currentRole: 'student',
+          isDemoMode: false,
+          studentProfile: profile,
+          xp: isExisting ? state.xp : 0,
+          level: isExisting ? state.level : 1,
+          userProfilesByEmail: {
+            ...state.userProfilesByEmail,
+            [cleanEmail]: profile,
+          },
+        }));
+      },
+
+      loginWithGitHub: async (username) => {
+        const cleanUsername = (username || 'builder-dev').trim();
+        const email = `${cleanUsername.toLowerCase()}@github.user`;
+
+        const res = await fetch('/api/auth/github', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ githubUsername: cleanUsername, email }),
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'GitHub authentication failed.');
+        }
+
+        const isExisting = Boolean(get().userProfilesByEmail[email]);
+        const profile = isExisting ? get().userProfilesByEmail[email] : {
+          ...EMPTY_FRESH_STUDENT_PROFILE,
+          id: `std-${Date.now()}`,
+          name: cleanUsername,
+          email,
+          avatar: `https://github.com/${cleanUsername}.png`,
+          professional: {
+            ...EMPTY_FRESH_STUDENT_PROFILE.professional,
+            githubUrl: `https://github.com/${cleanUsername}`,
+          },
+        };
+
+        set((state) => ({
+          currentUser: {
+            id: `gh-user-${Date.now()}`,
+            name: cleanUsername,
+            email,
+            role: 'student',
+            avatar: `https://github.com/${cleanUsername}.png`,
+            isEmailVerified: true,
+            isDemoMode: false,
+            createdAt: new Date().toISOString(),
+          },
+          currentRole: 'student',
+          isDemoMode: false,
+          studentProfile: profile,
+          githubData: {
+            connected: true,
+            username: cleanUsername,
+            avatarUrl: `https://github.com/${cleanUsername}.png`,
+            bio: `Verified GitHub builder @${cleanUsername}`,
+            publicRepos: data.repositoriesCount || 6,
+            totalStars: data.totalStars || 18,
+            followers: 12,
+            following: 8,
+            languages: [
+              { name: 'TypeScript', percentage: 48, color: '#3178C6' },
+              { name: 'Python', percentage: 32, color: '#3572A5' },
+              { name: 'Go', percentage: 20, color: '#00ADD8' },
+            ],
+            pinnedRepos: data.repositories || [],
+            detectedSkills: data.detectedSkills || ['Git', 'TypeScript', 'REST APIs'],
+            recentCommitsCount: data.totalCommits || 45,
+            streakDays: 3,
+          },
+          xp: isExisting ? state.xp : 25,
+          level: isExisting ? state.level : 1,
+          userProfilesByEmail: {
+            ...state.userProfilesByEmail,
+            [email]: profile,
+          },
+        }));
+      },
+
       registerUser: async (email, name, role, password = 'Password123!') => {
         const cleanEmail = email.toLowerCase().trim();
 
@@ -665,7 +842,7 @@ export const useAppStore = create<AppState>()(
 
         const registeredUser = data.user;
         const freshProfile = data.profile || {
-          ...CLEAN_SCRATCH_STUDENT_PROFILE,
+          ...EMPTY_FRESH_STUDENT_PROFILE,
           id: `std-${Date.now()}`,
           name,
           email: cleanEmail,
@@ -676,6 +853,9 @@ export const useAppStore = create<AppState>()(
           currentRole: role,
           isDemoMode: false,
           studentProfile: freshProfile,
+          xp: 0,
+          level: 1,
+          streakDays: 0,
           userProfilesByEmail: {
             ...state.userProfilesByEmail,
             [cleanEmail]: freshProfile,

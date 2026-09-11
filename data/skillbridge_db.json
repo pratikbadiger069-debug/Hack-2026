@@ -91,7 +91,7 @@
       "isEmailVerified": false,
       "emailVerificationToken": "vt_1789123646558_c2c0v4b",
       "createdAt": "2026-09-11T10:47:26.558Z",
-      "updatedAt": "2026-09-11T10:47:26.558Z"
+      "updatedAt": "2026-09-11T18:52:25.353Z"
     },
     "manu18reddy@gmail.com": {
       "id": "usr-1789124286176",
@@ -561,7 +561,7 @@
     },
     "pratik.badiger@gmail.com": {
       "id": "std-1789123646559-hcjt9",
-      "name": "Aarav Sharma",
+      "name": "pratik",
       "email": "pratik.badiger@gmail.com",
       "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
       "headline": "Software Engineer & Distributed Systems Builder",
@@ -571,7 +571,7 @@
         "department": "CSE",
         "year": "1st Year",
         "semester": "1st Semester",
-        "cgpa": 0,
+        "cgpa": 9,
         "studentId": ""
       },
       "professional": {
@@ -679,6 +679,43 @@
       "id": "std-1789150084793-zyo8g",
       "name": "Pranitha",
       "email": "pranitha12@gmail.com",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      "headline": "",
+      "targetRole": "Software Engineer",
+      "academic": {
+        "college": "",
+        "department": "CSE",
+        "year": "1st Year",
+        "semester": "1st Semester",
+        "cgpa": 0,
+        "studentId": ""
+      },
+      "professional": {
+        "githubUrl": "",
+        "linkedinUrl": "",
+        "portfolioUrl": "",
+        "bio": "",
+        "totalProjects": 0,
+        "hackathonWins": 0,
+        "researchPapers": 0,
+        "openSourceContributions": 0
+      },
+      "builderScores": {
+        "overall": 0,
+        "execution": 0,
+        "leadership": 0,
+        "innovation": 0,
+        "problemSolving": 0,
+        "consistency": 0
+      },
+      "employabilityScore": 0,
+      "verifiedSkills": [],
+      "evidences": []
+    },
+    "manutejreddy@gmail.com": {
+      "id": "std-1789152783595-4ngdu",
+      "name": "manu",
+      "email": "manutejreddy@gmail.com",
       "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
       "headline": "",
       "targetRole": "Software Engineer",
@@ -959,6 +996,30 @@
     ]
   },
   "auditLogs": [
+    {
+      "id": "log-1789152868463",
+      "timestamp": "2026-09-11T18:54:28.463Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148818117_r151md3",
+      "role": "INDUSTRY",
+      "details": "Successful authenticated login for: pranitha12@gmail.com"
+    },
+    {
+      "id": "log-1789152783596",
+      "timestamp": "2026-09-11T18:53:03.596Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148645714_20tlt0r",
+      "role": "INSTITUTE",
+      "details": "Successful authenticated login for: manutejreddy@gmail.com"
+    },
+    {
+      "id": "log-1789152719805",
+      "timestamp": "2026-09-11T18:51:59.805Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
     {
       "id": "log-1789152135825",
       "timestamp": "2026-09-11T18:42:15.825Z",

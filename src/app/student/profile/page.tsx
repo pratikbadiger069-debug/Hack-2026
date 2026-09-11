@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
@@ -24,6 +25,12 @@ import {
   GitPullRequest,
   Star,
   Sparkles,
+  LogOut,
+  Key,
+  Trash2,
+  Check,
+  AlertCircle,
+  Unlink,
 } from 'lucide-react';
 
 function GithubIcon({ className = 'w-4 h-4' }: { className?: string }) {
@@ -38,7 +45,39 @@ function GithubIcon({ className = 'w-4 h-4' }: { className?: string }) {
   );
 }
 
+function GoogleIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24">
+      <path
+        fill="#4285F4"
+        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+      />
+    </svg>
+  );
+}
+
+function LinkedInIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg className={className} fill="#0A66C2" viewBox="0 0 24 24">
+      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76c.97 0 1.76-.79 1.76-1.76s-.79-1.76-1.76-1.76-1.76.79-1.76 1.76.79 1.76 1.76 1.76M5.07 18.5h2.78v-8.37H5.07v8.37Z" />
+    </svg>
+  );
+}
+
 export default function StudentProfilePage() {
+  const router = useRouter();
   const {
     studentProfile,
     currentUser,
@@ -47,16 +86,26 @@ export default function StudentProfilePage() {
     quests,
     githubData,
     connectGitHub,
+    disconnectGitHub,
+    syncGitHub,
     achievements,
     unlockAchievement,
+    logoutUser,
+    updateStudentSocials,
   } = useAppStore();
 
   const [isSyncingGitHub, setIsSyncingGitHub] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordMsg, setPasswordMsg] = useState<string | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [showLinkedInInput, setShowLinkedInInput] = useState(false);
+  const [linkedInUrl, setLinkedInUrl] = useState(studentProfile.professional.linkedinUrl || '');
 
   const levelInfo = getLevelInfo(xp);
   const completedQuestsCount = (quests || []).filter((q) => q.completed).length;
   const totalQuestsCount = (quests || []).length || 16;
-  const passRate = totalQuestsCount > 0 ? Math.round((completedQuestsCount / totalQuestsCount) * 100) : 0;
 
   const builderScoreData = calculateTransparentBuilderScore({
     verifiedSkillsCount: (studentProfile.verifiedSkills || []).length,
@@ -70,7 +119,7 @@ export default function StudentProfilePage() {
   const handleSyncGitHub = () => {
     setIsSyncingGitHub(true);
     setTimeout(() => {
-      connectGitHub(githubData.username || 'aarav-builder');
+      syncGitHub();
       setIsSyncingGitHub(false);
     }, 600);
   };
@@ -81,16 +130,45 @@ export default function StudentProfilePage() {
     }
   };
 
+  const handleSignOut = () => {
+    logoutUser();
+    router.push('/login');
+  };
+
+  const handleSaveLinkedIn = () => {
+    updateStudentSocials({ linkedinUrl: linkedInUrl });
+    setShowLinkedInInput(false);
+  };
+
+  const handleChangePassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword.length < 8) {
+      setPasswordMsg('Password must be at least 8 characters long.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordMsg('Passwords do not match.');
+      return;
+    }
+    setPasswordMsg('Password successfully updated!');
+    setTimeout(() => {
+      setShowPasswordModal(false);
+      setPasswordMsg(null);
+      setNewPassword('');
+      setConfirmPassword('');
+    }, 1500);
+  };
+
   return (
     <PortalLayout>
-      <div className="space-y-8 max-w-[1100px] mx-auto pb-16">
+      <div className="space-y-8 max-w-[1100px] mx-auto pb-16 font-sans text-[#1B1B1B]">
         
         {/* SECTION 1: BASIC INFORMATION & HERO IDENTITY */}
         <motion.div
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2 }}
-          className="p-8 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs"
+          className="p-8 rounded-2xl bg-white border border-[#E8E5DD] shadow-none"
         >
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
@@ -107,7 +185,9 @@ export default function StudentProfilePage() {
 
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="text-2xl md:text-3xl font-bold text-[#1B1B1B] tracking-tight">{studentProfile.name || currentUser?.name || 'Aarav Sharma'}</h1>
+                  <h1 className="text-2xl md:text-3xl font-bold text-[#1B1B1B] tracking-tight">
+                    {studentProfile.name || currentUser?.name || 'Aarav Sharma'}
+                  </h1>
                   <span className="px-2.5 py-0.5 rounded-full bg-[#C76A2A]/10 text-[#C76A2A] text-xs font-semibold">
                     {levelInfo.title}
                   </span>
@@ -152,7 +232,7 @@ export default function StudentProfilePage() {
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, delay: 0.05 }}
-            className="p-5 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-1"
+            className="p-5 rounded-2xl bg-white border border-[#E8E5DD] shadow-none space-y-1"
           >
             <span className="text-[11px] font-semibold text-[#6F6A60] uppercase tracking-wider block">Career Goal</span>
             <h3 className="text-base font-bold text-[#1B1B1B]">{studentProfile.targetRole}</h3>
@@ -163,7 +243,7 @@ export default function StudentProfilePage() {
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, delay: 0.1 }}
-            className="p-5 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-1"
+            className="p-5 rounded-2xl bg-white border border-[#E8E5DD] shadow-none space-y-1"
           >
             <span className="text-[11px] font-semibold text-[#6F6A60] uppercase tracking-wider block">Department Rank</span>
             <div className="flex items-baseline gap-1.5">
@@ -177,7 +257,7 @@ export default function StudentProfilePage() {
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, delay: 0.15 }}
-            className="p-5 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-1"
+            className="p-5 rounded-2xl bg-white border border-[#E8E5DD] shadow-none space-y-1"
           >
             <span className="text-[11px] font-semibold text-[#6F6A60] uppercase tracking-wider block">College Rank</span>
             <div className="flex items-baseline gap-1.5">
@@ -191,7 +271,7 @@ export default function StudentProfilePage() {
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, delay: 0.2 }}
-            className="p-5 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-1"
+            className="p-5 rounded-2xl bg-white border border-[#E8E5DD] shadow-none space-y-1"
           >
             <span className="text-[11px] font-semibold text-[#6F6A60] uppercase tracking-wider block">Global Builder Rank</span>
             <div className="flex items-baseline gap-1.5">
@@ -202,15 +282,162 @@ export default function StudentProfilePage() {
           </motion.div>
         </div>
 
-        {/* SECTION 3: BUILDER LEVEL & SCORE BREAKDOWN */}
+        {/* SECTION 3: CONNECTED ACCOUNTS INTEGRATION */}
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, delay: 0.1 }}
+          className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-none space-y-5"
+        >
+          <div>
+            <h2 className="text-base font-bold text-[#1B1B1B]">Connected Accounts &amp; Social Proof</h2>
+            <p className="text-xs text-[#6F6A60]">
+              Link your developer and institutional identities for verified credentials and automated sync.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Google */}
+            <div className="p-4 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD] flex flex-col justify-between space-y-3">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2.5">
+                  <GoogleIcon className="w-5 h-5" />
+                  <div>
+                    <h3 className="text-xs font-bold text-[#1B1B1B]">Google Account</h3>
+                    <p className="text-[11px] text-[#6F6A60] truncate max-w-[160px]">
+                      {currentUser?.email || studentProfile.email || 'student@skillbridge.edu'}
+                    </p>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-[#2F7A45]/10 text-[#2F7A45] text-[10px] font-semibold flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3" /> Linked
+                </span>
+              </div>
+              <div className="text-[11px] text-[#6F6A60]">
+                Single Sign-On &amp; institutional identity verification active.
+              </div>
+            </div>
+
+            {/* GitHub */}
+            <div className="p-4 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD] flex flex-col justify-between space-y-3">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2.5">
+                  <GithubIcon className="w-5 h-5 text-[#1B1B1B]" />
+                  <div>
+                    <h3 className="text-xs font-bold text-[#1B1B1B]">GitHub Account</h3>
+                    <p className="text-[11px] text-[#6F6A60]">
+                      {githubData.connected ? `@${githubData.username}` : 'Not connected'}
+                    </p>
+                  </div>
+                </div>
+                {githubData.connected ? (
+                  <span className="px-2 py-0.5 rounded-full bg-[#2F7A45]/10 text-[#2F7A45] text-[10px] font-semibold flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" /> Synced
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full bg-[#6F6A60]/10 text-[#6F6A60] text-[10px] font-semibold">
+                    Disconnected
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                {githubData.connected ? (
+                  <>
+                    <button
+                      onClick={handleSyncGitHub}
+                      disabled={isSyncingGitHub}
+                      className="px-2.5 py-1.5 bg-white border border-[#E8E5DD] hover:border-[#1B1B1B] text-[#1B1B1B] rounded-lg text-[11px] font-semibold transition-colors flex items-center gap-1"
+                    >
+                      <RefreshCw className={`w-3 h-3 ${isSyncingGitHub ? 'animate-spin' : ''}`} />
+                      <span>{isSyncingGitHub ? 'Syncing...' : 'Sync'}</span>
+                    </button>
+                    <button
+                      onClick={() => disconnectGitHub()}
+                      className="px-2.5 py-1.5 bg-white border border-[#E8E5DD] hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 text-[#6F6A60] rounded-lg text-[11px] font-semibold transition-colors flex items-center gap-1"
+                    >
+                      <Unlink className="w-3 h-3" />
+                      <span>Disconnect</span>
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => connectGitHub('aarav-builder')}
+                    className="w-full py-1.5 bg-[#1B1B1B] text-white rounded-lg text-[11px] font-semibold hover:bg-[#C76A2A] transition-colors"
+                  >
+                    Connect GitHub
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* LinkedIn */}
+            <div className="p-4 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD] flex flex-col justify-between space-y-3">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2.5">
+                  <LinkedInIcon className="w-5 h-5" />
+                  <div>
+                    <h3 className="text-xs font-bold text-[#1B1B1B]">LinkedIn Profile</h3>
+                    <p className="text-[11px] text-[#6F6A60] truncate max-w-[160px]">
+                      {studentProfile.professional.linkedinUrl || 'Not connected'}
+                    </p>
+                  </div>
+                </div>
+                {studentProfile.professional.linkedinUrl ? (
+                  <span className="px-2 py-0.5 rounded-full bg-[#2F7A45]/10 text-[#2F7A45] text-[10px] font-semibold flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" /> Connected
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full bg-[#6F6A60]/10 text-[#6F6A60] text-[10px] font-semibold">
+                    Optional
+                  </span>
+                )}
+              </div>
+
+              {showLinkedInInput ? (
+                <div className="space-y-2">
+                  <input
+                    type="url"
+                    value={linkedInUrl}
+                    onChange={(e) => setLinkedInUrl(e.target.value)}
+                    placeholder="https://linkedin.com/in/username"
+                    className="w-full px-2.5 py-1 text-[11px] bg-white border border-[#E8E5DD] rounded-lg text-[#1B1B1B] outline-none"
+                  />
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={handleSaveLinkedIn}
+                      className="px-2.5 py-1 bg-[#1B1B1B] text-white rounded-md text-[10px] font-semibold hover:bg-[#C76A2A]"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setShowLinkedInInput(false)}
+                      className="px-2.5 py-1 bg-white border border-[#E8E5DD] rounded-md text-[10px] font-semibold text-[#6F6A60]"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowLinkedInInput(true)}
+                  className="w-full py-1.5 bg-white border border-[#E8E5DD] hover:border-[#1B1B1B] text-[#1B1B1B] rounded-lg text-[11px] font-semibold transition-colors"
+                >
+                  {studentProfile.professional.linkedinUrl ? 'Edit URL' : 'Connect LinkedIn'}
+                </button>
+              )}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* SECTION 4: BUILDER LEVEL & SCORE BREAKDOWN */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
           {/* Builder Level Progress */}
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, delay: 0.1 }}
-            className="lg:col-span-5 p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-4"
+            className="lg:col-span-5 p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-none space-y-4"
           >
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-[#6F6A60] uppercase tracking-wider">
@@ -258,7 +485,7 @@ export default function StudentProfilePage() {
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, delay: 0.15 }}
-            className="lg:col-span-7 p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-4"
+            className="lg:col-span-7 p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-none space-y-4"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -294,86 +521,14 @@ export default function StudentProfilePage() {
               ))}
             </div>
           </motion.div>
-
         </div>
-
-        {/* SECTION 4: GITHUB STATUS & INFERRED SKILLS */}
-        <motion.div
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, delay: 0.2 }}
-          className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-4"
-        >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <GithubIcon className="w-5 h-5 text-[#1B1B1B]" />
-                <h2 className="text-base font-bold text-[#1B1B1B]">GitHub Integration</h2>
-                {githubData.connected && (
-                  <span className="px-2 py-0.5 rounded-full bg-[#2F7A45]/10 text-[#2F7A45] text-[10px] font-semibold flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3" /> OAuth Synced
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-[#6F6A60] mt-0.5">
-                Automated commit inspection, language profiling, and skill extraction.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2">
-              {githubData.connected ? (
-                <>
-                  <button
-                    onClick={handleSyncGitHub}
-                    disabled={isSyncingGitHub}
-                    className="px-3 py-1.5 bg-[#F6F4EE] hover:bg-[#E8E5DD] text-[#1B1B1B] rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5"
-                  >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isSyncingGitHub ? 'animate-spin' : ''}`} />
-                    <span>{isSyncingGitHub ? 'Syncing...' : 'Sync GitHub'}</span>
-                  </button>
-                  <Link
-                    href="/student/journey#github"
-                    className="px-3.5 py-1.5 bg-[#1B1B1B] text-white rounded-xl text-xs font-semibold hover:bg-[#C76A2A] transition-colors"
-                  >
-                    View Repositories
-                  </Link>
-                </>
-              ) : (
-                <button
-                  onClick={() => connectGitHub('aarav-builder')}
-                  className="px-4 py-2 bg-[#1B1B1B] text-white rounded-xl text-xs font-semibold hover:bg-[#C76A2A] transition-colors flex items-center gap-1.5"
-                >
-                  <GithubIcon className="w-3.5 h-3.5" />
-                  <span>Connect GitHub OAuth</span>
-                </button>
-              )}
-            </div>
-          </div>
-
-          {githubData.connected && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2 text-xs">
-              <div className="p-3.5 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD]">
-                <span className="text-[#6F6A60] block text-[11px]">Repositories &amp; Stars</span>
-                <strong className="text-sm font-bold text-[#1B1B1B]">{githubData.pinnedRepos?.length || 4} Repos • {githubData.totalStars || 142} ★</strong>
-              </div>
-              <div className="p-3.5 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD]">
-                <span className="text-[#6F6A60] block text-[11px]">Followers &amp; Following</span>
-                <strong className="text-sm font-bold text-[#1B1B1B]">{githubData.followers || 58} Followers • {githubData.following || 34} Following</strong>
-              </div>
-              <div className="p-3.5 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD]">
-                <span className="text-[#6F6A60] block text-[11px]">Inferred Verified Skills</span>
-                <strong className="text-sm font-bold text-[#C76A2A]">{(githubData.detectedSkills || ['FastAPI', 'Docker', 'PostgreSQL']).join(', ')}</strong>
-              </div>
-            </div>
-          )}
-        </motion.div>
 
         {/* SECTION 5: ASSESSMENT PROGRESS & VERIFIED SKILLS */}
         <motion.div
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, delay: 0.25 }}
-          className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-4"
+          className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-none space-y-4"
         >
           <div className="flex items-center justify-between">
             <div>
@@ -411,7 +566,7 @@ export default function StudentProfilePage() {
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, delay: 0.3 }}
-          className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-4"
+          className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-none space-y-4"
         >
           <div className="flex items-center justify-between">
             <div>
@@ -446,6 +601,125 @@ export default function StudentProfilePage() {
             ))}
           </div>
         </motion.div>
+
+        {/* SECTION 7: ACCOUNT MANAGEMENT & SECURITY */}
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, delay: 0.35 }}
+          className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-none space-y-5"
+        >
+          <div>
+            <h2 className="text-base font-bold text-[#1B1B1B]">Account Management &amp; Security</h2>
+            <p className="text-xs text-[#6F6A60]">Manage security credentials, session tokens, and account access.</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <Link
+              href="/student/settings"
+              className="p-4 rounded-xl border border-[#E8E5DD] hover:border-[#1B1B1B] bg-[#F6F4EE] transition-all flex flex-col justify-between space-y-2 text-left group"
+            >
+              <div className="flex items-center gap-2">
+                <Settings className="w-4 h-4 text-[#6F6A60] group-hover:text-[#1B1B1B]" />
+                <span className="text-xs font-bold text-[#1B1B1B]">Update Profile &amp; Bio</span>
+              </div>
+              <p className="text-[11px] text-[#6F6A60]">Configure target roles, academic details, and personal statement.</p>
+            </Link>
+
+            <button
+              onClick={() => setShowPasswordModal(true)}
+              className="p-4 rounded-xl border border-[#E8E5DD] hover:border-[#1B1B1B] bg-[#F6F4EE] transition-all flex flex-col justify-between space-y-2 text-left group"
+            >
+              <div className="flex items-center gap-2">
+                <Key className="w-4 h-4 text-[#6F6A60] group-hover:text-[#1B1B1B]" />
+                <span className="text-xs font-bold text-[#1B1B1B]">Change Password</span>
+              </div>
+              <p className="text-[11px] text-[#6F6A60]">Update login passphrase and refresh authenticated sessions.</p>
+            </button>
+
+            <button
+              onClick={handleSignOut}
+              className="p-4 rounded-xl border border-rose-200 hover:border-rose-300 bg-rose-50/50 hover:bg-rose-50 transition-all flex flex-col justify-between space-y-2 text-left group"
+            >
+              <div className="flex items-center gap-2">
+                <LogOut className="w-4 h-4 text-rose-600" />
+                <span className="text-xs font-bold text-rose-800">Sign Out Session</span>
+              </div>
+              <p className="text-[11px] text-rose-600">Safely log out of your current device and clear credentials.</p>
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Change Password Modal */}
+        {showPasswordModal && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+            <div className="bg-white border border-[#E8E5DD] rounded-2xl p-6 max-w-md w-full shadow-lg space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-bold text-[#1B1B1B]">Update Password</h3>
+                <button
+                  onClick={() => setShowPasswordModal(false)}
+                  className="text-xs text-[#6F6A60] hover:text-[#1B1B1B]"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {passwordMsg && (
+                <div
+                  className={`p-3 rounded-xl text-xs flex items-start gap-2 ${
+                    passwordMsg.includes('success')
+                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                      : 'bg-rose-50 text-rose-800 border border-rose-200'
+                  }`}
+                >
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>{passwordMsg}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleChangePassword} className="space-y-3 text-xs">
+                <div>
+                  <label className="font-semibold text-[#1B1B1B] block mb-1">New Password</label>
+                  <input
+                    type="password"
+                    required
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Min. 8 characters"
+                    className="w-full p-2.5 bg-[#F6F4EE] border border-[#E8E5DD] rounded-xl text-[#1B1B1B] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="font-semibold text-[#1B1B1B] block mb-1">Confirm New Password</label>
+                  <input
+                    type="password"
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full p-2.5 bg-[#F6F4EE] border border-[#E8E5DD] rounded-xl text-[#1B1B1B] outline-none"
+                  />
+                </div>
+
+                <div className="pt-2 flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowPasswordModal(false)}
+                    className="px-4 py-2 rounded-xl border border-[#E8E5DD] bg-white text-xs font-semibold text-[#6F6A60]"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-xl bg-[#C76A2A] text-white text-xs font-semibold hover:bg-[#b05c22]"
+                  >
+                    Update Password
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
       </div>
     </PortalLayout>
