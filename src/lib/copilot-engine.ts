@@ -14,6 +14,7 @@ import {
   GitHubProfileAnalysis,
   GitHubData,
 } from '@/types';
+import { formatUserProfileLocation } from './location-utils';
 
 export interface TargetRoleBenchmark {
   role: string;
@@ -670,6 +671,7 @@ ACTIVE ASSISTANT MODE: ${mode.toUpperCase()}
 
 STUDENT PROFILE CONTEXT:
 - Name: ${profile.name}
+- Location: ${formatUserProfileLocation(profile)}
 - University / College: ${profile.academic?.college || profile.college || 'HITAM'}
 - Degree & Branch: ${profile.degree || profile.academic?.degree || 'B.Tech'} in ${profile.academic?.department || profile.branch || 'CSE'}
 - Graduation Year: Class of ${profile.graduationYear || profile.academic?.graduationYear || '2026'} (Semester: ${profile.academic?.semester || '6th'})

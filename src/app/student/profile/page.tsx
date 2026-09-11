@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
 import { getLevelInfo, calculateTransparentBuilderScore } from '@/lib/xp-engine';
+import { formatUserProfileLocation } from '@/lib/location-utils';
 import { User, ShieldCheck, Building, Target, MapPin, Trophy, CheckCircle2, ExternalLink, Flame, Award, BookOpen, ArrowRight, Settings, RefreshCw, GitPullRequest, Star, Sparkles, LogOut, Key, Trash2, Check, AlertCircle, Unlink } from 'lucide-react';
 import { UserAvatar } from '@/components/avatar/UserAvatar';
 import { AvatarModal } from '@/components/avatar/AvatarModal';
@@ -191,7 +192,7 @@ export default function StudentProfilePage() {
                   <span>•</span>
                   <span className="font-semibold text-[#1B1B1B]">CGPA: {studentProfile.academic.cgpa}</span>
                   <span>•</span>
-                  <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> Bengaluru, India</span>
+                  <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {formatUserProfileLocation(studentProfile)}</span>
                 </p>
 
                 <p className="text-xs text-[#1B1B1B] max-w-2xl leading-relaxed font-medium">

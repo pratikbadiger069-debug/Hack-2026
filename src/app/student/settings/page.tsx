@@ -96,6 +96,9 @@ export default function StudentSettingsPage() {
   const [department, setDepartment] = useState<AcademicDetails['department']>(studentProfile.academic.department || 'CSE');
   const [cgpa, setCgpa] = useState(studentProfile.academic.cgpa?.toString() || '9.14');
   const [targetRole, setTargetRole] = useState(studentProfile.targetRole || 'Backend Engineer');
+  const [city, setCity] = useState(studentProfile.city || studentProfile.academic.city || 'Hyderabad');
+  const [state, setState] = useState(studentProfile.state || studentProfile.academic.state || 'Telangana');
+  const [country, setCountry] = useState(studentProfile.country || studentProfile.academic.country || 'India');
   const [bio, setBio] = useState(studentProfile.professional.bio || '');
 
   // Connected Accounts
@@ -191,10 +194,16 @@ export default function StudentSettingsPage() {
     updateStudentFullProfile({
       name: userName,
       targetRole: targetRole,
+      city,
+      state,
+      country,
       academic: {
         ...studentProfile.academic,
         department,
         cgpa: parseFloat(cgpa) || 9.0,
+        city,
+        state,
+        country,
       },
       professional: {
         ...studentProfile.professional,
@@ -396,6 +405,39 @@ export default function StudentSettingsPage() {
                     max="10"
                     value={cgpa}
                     onChange={(e) => setCgpa(e.target.value)}
+                    className="w-full p-2.5 bg-[#F6F4EE] border border-[#E8E5DD] rounded-xl text-[#1B1B1B] focus:border-[#C76A2A] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="font-semibold text-[#1B1B1B] block mb-1.5">City</label>
+                  <input
+                    type="text"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder="e.g. Hyderabad"
+                    className="w-full p-2.5 bg-[#F6F4EE] border border-[#E8E5DD] rounded-xl text-[#1B1B1B] focus:border-[#C76A2A] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="font-semibold text-[#1B1B1B] block mb-1.5">State</label>
+                  <input
+                    type="text"
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
+                    placeholder="e.g. Telangana"
+                    className="w-full p-2.5 bg-[#F6F4EE] border border-[#E8E5DD] rounded-xl text-[#1B1B1B] focus:border-[#C76A2A] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="font-semibold text-[#1B1B1B] block mb-1.5">Country</label>
+                  <input
+                    type="text"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    placeholder="e.g. India"
                     className="w-full p-2.5 bg-[#F6F4EE] border border-[#E8E5DD] rounded-xl text-[#1B1B1B] focus:border-[#C76A2A] outline-none"
                   />
                 </div>

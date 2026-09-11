@@ -22,6 +22,9 @@ export const mockStudentProfile: StudentProfile = {
   avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
   headline: 'Aspiring AI Systems Engineer | Full-Stack & Distributed Systems Builder',
   targetRole: 'AI Engineer',
+  city: 'Hyderabad',
+  state: 'Telangana',
+  country: 'India',
   academic: {
     college: 'Apex Institute of Technology & Science',
     department: 'CSE',
@@ -29,6 +32,9 @@ export const mockStudentProfile: StudentProfile = {
     semester: '6th Semester',
     cgpa: 9.14,
     studentId: 'AIT-CSE-2023-042',
+    city: 'Hyderabad',
+    state: 'Telangana',
+    country: 'India',
   },
   professional: {
     githubUrl: 'https://github.com/aarav-sharma-builder',

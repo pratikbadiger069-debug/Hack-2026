@@ -79,6 +79,7 @@ export interface AcademicDetails {
   branch?: string;
   graduationYear?: string;
   country?: string;
+  state?: string;
   city?: string;
 }
 
@@ -234,6 +235,7 @@ export interface StudentProfile {
   degree?: string;
   graduationYear?: string;
   country?: string;
+  state?: string;
   city?: string;
   careerPath?: string;
   skillLevel?: string;
@@ -610,3 +612,84 @@ export interface IndustryAssessmentDraft {
   companyName: string;
   questions: QuestQuestion[];
 }
+
+// ASSESSMENT SYSTEM 4.0 MODELS
+export interface QuestionLearningReferences {
+  officialDocs: { title: string; url: string; provider: string };
+  article: { title: string; url: string; source: string };
+  videoTutorial: { title: string; url: string; channel: string };
+  practiceQuestions: { title: string; count: number; url: string };
+  miniAssessment: { title: string; questionsCount: number; topic: string };
+}
+
+export interface QuestionReviewItem {
+  questionNumber: number;
+  questionId: string;
+  question: string;
+  codeSnippet?: string;
+  subtopic?: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard' | 'Expert';
+  userAnswerIndex: number;
+  userAnswerText: string;
+  correctAnswerIndex: number;
+  correctAnswerText: string;
+  isCorrect: boolean;
+  explanation: string;
+  whyMissed: string;
+  references: QuestionLearningReferences;
+}
+
+export interface AssessmentAttemptRecord {
+  id: string;
+  topic: string;
+  department: string;
+  attemptNumber: number;
+  date: string;
+  timestamp: number;
+  score: number;
+  passed: boolean;
+  totalQuestions: number;
+  correctCount: number;
+  wrongCount: number;
+  timeTakenSeconds: number;
+  timeTakenFormatted: string;
+  xpEarned: number;
+  builderScoreImpact: number;
+  difficultyReached: 'Foundational' | 'Intermediate' | 'Advanced' | 'Industry Expert';
+  reviewItems: QuestionReviewItem[];
+  strongAreas: string[];
+  weakAreas: string[];
+  difficultyBreakdown: {
+    easy: { correct: number; total: number };
+    medium: { correct: number; total: number };
+    hard: { correct: number; total: number };
+    expert: { correct: number; total: number };
+  };
+  skillGapRecommendations: {
+    concept: string;
+    gapSeverity: 'Critical' | 'Moderate' | 'Low';
+    action: string;
+    resourceUrl?: string;
+  }[];
+  aiStudyPlan: {
+    day: string;
+    title: string;
+    focus: string;
+    task: string;
+    estimatedMinutes: number;
+  }[];
+}
+
+export interface AssessmentTopicSummary {
+  topic: string;
+  department: string;
+  completed: boolean;
+  attemptsCount: number;
+  bestScore: number;
+  latestScore: number;
+  firstScore: number;
+  improvementTrend: string; // e.g. "+19%" or "0%"
+  latestAttemptDate: string;
+  latestRecord?: AssessmentAttemptRecord;
+}
+

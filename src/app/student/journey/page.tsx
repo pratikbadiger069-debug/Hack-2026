@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
 import { getLevelInfo, calculateTransparentBuilderScore } from '@/lib/xp-engine';
+import { formatUserProfileLocation } from '@/lib/location-utils';
 import { UserAvatar } from '@/components/avatar/UserAvatar';
 import { AvatarModal } from '@/components/avatar/AvatarModal';
 import { GrowthInsights } from '@/components/growth/GrowthInsights';
@@ -142,7 +143,7 @@ export default function MyJourneyPage() {
                   </span>
                   <span>•</span>
                   <span className="flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5" /> Bengaluru, India
+                    <MapPin className="w-3.5 h-3.5" /> {formatUserProfileLocation(studentProfile)}
                   </span>
                   <span>•</span>
                   <span className="flex items-center gap-1 font-mono text-[#C76A2A] font-semibold">

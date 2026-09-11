@@ -138,8 +138,9 @@ export default function OnboardingPage() {
   const [branch, setBranch] = useState(studentProfile?.academic?.department || studentProfile?.department || 'Computer Science & Engineering (CSE)');
   const [graduationYear, setGraduationYear] = useState(studentProfile?.academic?.graduationYear || studentProfile?.graduationYear || '2026');
   const [semester, setSemester] = useState(studentProfile?.academic?.semester || '6th Semester');
+  const [city, setCity] = useState(studentProfile?.academic?.city || studentProfile?.city || 'Hyderabad');
+  const [state, setState] = useState(studentProfile?.academic?.state || studentProfile?.state || 'Telangana');
   const [country, setCountry] = useState(studentProfile?.academic?.country || studentProfile?.country || 'India');
-  const [city, setCity] = useState(studentProfile?.academic?.city || studentProfile?.city || '');
 
   // Step 2: Career Interests
   const [careerPath, setCareerPath] = useState(studentProfile?.careerPath || 'Software Development');
@@ -240,8 +241,9 @@ export default function OnboardingPage() {
           branch,
           graduationYear,
           semester,
-          country,
           city,
+          state,
+          country,
           careerPath,
           skillLevel,
           careerGoal,
@@ -456,22 +458,8 @@ export default function OnboardingPage() {
                   </div>
                 </div>
 
-                {/* Country & City */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  <div>
-                    <label className="block text-xs font-semibold text-[#1B1B1B] mb-1">
-                      Country <span className="text-[#C76A2A]">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={country}
-                      onChange={(e) => setCountry(e.target.value)}
-                      placeholder="e.g. India"
-                      className="w-full px-3.5 py-2.5 text-xs bg-white border border-[#E8E5DD] rounded-xl text-[#1B1B1B] placeholder:text-[#9E9E9A] focus:outline-none focus:border-[#C76A2A] transition-colors"
-                    />
-                  </div>
-
+                {/* City, State & Country */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                   <div>
                     <label className="block text-xs font-semibold text-[#1B1B1B] mb-1">
                       City <span className="text-[#C76A2A]">*</span>
@@ -482,6 +470,34 @@ export default function OnboardingPage() {
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
                       placeholder="e.g. Hyderabad"
+                      className="w-full px-3.5 py-2.5 text-xs bg-white border border-[#E8E5DD] rounded-xl text-[#1B1B1B] placeholder:text-[#9E9E9A] focus:outline-none focus:border-[#C76A2A] transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-[#1B1B1B] mb-1">
+                      State <span className="text-[#C76A2A]">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={state}
+                      onChange={(e) => setState(e.target.value)}
+                      placeholder="e.g. Telangana"
+                      className="w-full px-3.5 py-2.5 text-xs bg-white border border-[#E8E5DD] rounded-xl text-[#1B1B1B] placeholder:text-[#9E9E9A] focus:outline-none focus:border-[#C76A2A] transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-[#1B1B1B] mb-1">
+                      Country <span className="text-[#C76A2A]">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={country}
+                      onChange={(e) => setCountry(e.target.value)}
+                      placeholder="e.g. India"
                       className="w-full px-3.5 py-2.5 text-xs bg-white border border-[#E8E5DD] rounded-xl text-[#1B1B1B] placeholder:text-[#9E9E9A] focus:outline-none focus:border-[#C76A2A] transition-colors"
                     />
                   </div>

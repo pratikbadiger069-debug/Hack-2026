@@ -19,6 +19,7 @@ import {
   LearningPath,
   CopilotMemory,
   CopilotMemoryItem,
+  AssessmentAttemptRecord,
 } from '@/types';
 import { AuthUser, DEMO_USERS } from './auth-service';
 import { getInitialCopilotMemory } from './copilot-engine';
@@ -46,6 +47,9 @@ export const EMPTY_FRESH_STUDENT_PROFILE: StudentProfile = {
   college: 'HITAM',
   department: 'CSE',
   branch: 'CSE',
+  city: 'Hyderabad',
+  state: 'Telangana',
+  country: 'India',
   academic: {
     college: 'HITAM',
     department: 'CSE',
@@ -53,6 +57,9 @@ export const EMPTY_FRESH_STUDENT_PROFILE: StudentProfile = {
     semester: '1st Semester',
     cgpa: 8.5,
     studentId: 'SB-2026-001',
+    city: 'Hyderabad',
+    state: 'Telangana',
+    country: 'India',
   },
   professional: {
     githubUrl: '',
@@ -87,6 +94,9 @@ export const CLEAN_SCRATCH_STUDENT_PROFILE: StudentProfile = {
   college: 'HITAM',
   department: 'CSE',
   branch: 'CSE',
+  city: 'Hyderabad',
+  state: 'Telangana',
+  country: 'India',
   academic: {
     college: 'HITAM',
     department: 'CSE',
@@ -94,6 +104,9 @@ export const CLEAN_SCRATCH_STUDENT_PROFILE: StudentProfile = {
     semester: '6th Semester',
     cgpa: 9.14,
     studentId: 'HITAM-CSE-2023-042',
+    city: 'Hyderabad',
+    state: 'Telangana',
+    country: 'India',
   },
   professional: {
     githubUrl: 'https://github.com/aarav-builder',
@@ -297,6 +310,10 @@ interface AppState {
   updateCopilotMemory: (updates: Partial<CopilotMemory>) => void;
   addCopilotMemoryItem: (item: Omit<CopilotMemoryItem, 'id' | 'timestamp'>) => void;
   clearCopilotMemory: () => void;
+
+  // Assessment 4.0 Certification & Retake History
+  assessmentHistory: Record<string, AssessmentAttemptRecord[]>;
+  recordAssessmentAttempt: (record: AssessmentAttemptRecord) => void;
 
   // Industry Portal State
   candidates: CandidateApplication[];
@@ -1260,6 +1277,66 @@ export const useAppStore = create<AppState>()(
           copilotMemory: getInitialCopilotMemory(state.studentProfile),
         })),
 
+      assessmentHistory: {},
+      recordAssessmentAttempt: (record) =>
+        set((state) => {
+          const topicKey = record.topic;
+          const currentAttempts = state.assessmentHistory[topicKey] || [];
+          const updatedAttempts = [record, ...currentAttempts];
+
+          const newXP = state.xp + record.xpEarned;
+          const levelInfo = getLevelInfo(newXP);
+
+          // Update verified skills if passed
+          let updatedSkills = [...state.studentProfile.verifiedSkills];
+          if (record.passed) {
+            const existingIdx = updatedSkills.findIndex((s) => s.name.toLowerCase() === record.topic.toLowerCase());
+            if (existingIdx >= 0) {
+              updatedSkills[existingIdx] = {
+                ...updatedSkills[existingIdx],
+                score: Math.max(updatedSkills[existingIdx].score, record.score),
+                level: record.difficultyReached === 'Industry Expert' ? 'Expert' : 'Advanced',
+                verifiedDate: record.date,
+              };
+            } else {
+              updatedSkills.push({
+                id: `vs-${Date.now()}`,
+                name: record.topic,
+                category: record.department.includes('AI') ? 'AI & ML' : record.department.includes('Cyber') ? 'DevOps' : 'Programming',
+                level: record.difficultyReached === 'Industry Expert' ? 'Expert' : 'Intermediate',
+                score: record.score,
+                verificationSources: ['Assessment'],
+                verifiedDate: record.date,
+                verificationCode: `SB-${record.topic.slice(0, 3).toUpperCase()}-${Math.floor(10000 + Math.random() * 90000)}`,
+                evidenceCount: 1,
+              });
+            }
+          }
+
+          const newOverall = Math.min(1000, state.studentProfile.builderScores.overall + record.builderScoreImpact);
+          const newProblemSolving = Math.min(100, state.studentProfile.builderScores.problemSolving + (record.passed ? 8 : 2));
+
+          const updatedProfile = {
+            ...state.studentProfile,
+            verifiedSkills: updatedSkills,
+            builderScores: {
+              ...state.studentProfile.builderScores,
+              overall: newOverall,
+              problemSolving: newProblemSolving,
+            },
+          };
+
+          return {
+            assessmentHistory: {
+              ...state.assessmentHistory,
+              [topicKey]: updatedAttempts,
+            },
+            xp: newXP,
+            level: levelInfo.level,
+            studentProfile: updatedProfile,
+          };
+        }),
+
       moveCandidateStage: (candidateId, newStage) =>
         set((state) => ({
           candidates: state.candidates.map((cand) =>
@@ -1300,6 +1377,7 @@ export const useAppStore = create<AppState>()(
         jobs: state.jobs,
         copilotResults: state.copilotResults,
         copilotMemory: state.copilotMemory,
+        assessmentHistory: state.assessmentHistory,
         curriculumAnalyses: state.curriculumAnalyses,
         xp: state.xp,
         level: state.level,
