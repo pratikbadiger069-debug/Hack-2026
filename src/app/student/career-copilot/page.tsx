@@ -64,6 +64,7 @@ export default function CareerCopilotPage() {
     xp,
     level,
     streakDays,
+    assessmentHistory,
   } = useAppStore();
 
   const [activeMode, setActiveMode] = useState<CopilotAssistantMode>('career');
@@ -148,7 +149,8 @@ export default function CareerCopilotPage() {
         activeKey,
         currentMode,
         copilotMemory,
-        githubData
+        githubData,
+        assessmentHistory
       );
 
       const copilotMsg: CopilotChatMessage = {

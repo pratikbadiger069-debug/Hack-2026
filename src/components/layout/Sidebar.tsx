@@ -41,17 +41,22 @@ export function Sidebar() {
     { name: 'Home', href: '/student', icon: Home },
     { name: 'My Journey', href: '/student/journey', icon: MapPin },
     { name: 'Assessments', href: '/student/assessments', icon: CheckCircle2 },
+    { name: 'Digital Portfolio', href: '/student/portfolio', icon: FileCheck },
     { name: 'Career Copilot', href: '/student/career-copilot', icon: Bot },
     { name: 'Opportunities', href: '/student/opportunities', icon: Compass },
+    { name: 'Applications', href: '/student/applications', icon: Layers },
+    { name: 'Collaborations', href: '/student/collaborations', icon: Sparkles },
     { name: 'Settings', href: '/student/settings', icon: Settings },
   ];
 
   const instituteLinks: NavItem[] = [
     { name: 'Dashboard', href: '/institute', icon: Home },
     { name: 'Students Roster', href: '/institute/students', icon: Users },
+    { name: 'Faculty Portal', href: '/faculty', icon: UserCheck },
     { name: 'Departments', href: '/institute/departments', icon: Building },
     { name: 'Curriculum Analysis', href: '/institute/curriculum', icon: FileSpreadsheet },
-    { name: 'Placement Cell', href: '/institute/placement', icon: UserCheck },
+    { name: 'Placement Cell', href: '/institute/placement', icon: TrendingUp },
+    { name: 'Collaborations', href: '/collaborations', icon: Sparkles },
     { name: 'Reports', href: '/institute/reports', icon: LineChart },
     { name: 'Settings', href: '/institute/settings', icon: Settings },
   ];
@@ -60,8 +65,9 @@ export function Sidebar() {
     { name: 'Dashboard', href: '/industry', icon: Home },
     { name: 'Job Requirements', href: '/industry/jobs', icon: Briefcase },
     { name: 'Talent Discovery', href: '/industry/talent', icon: Sparkles },
-    { name: 'Assignments', href: '/industry/assignments', icon: Code },
     { name: 'Pipeline', href: '/industry/pipeline', icon: Layers },
+    { name: 'Collaborations', href: '/collaborations', icon: UserCheck },
+    { name: 'Assignments', href: '/industry/assignments', icon: Code },
     { name: 'Reports', href: '/industry/reports', icon: LineChart },
     { name: 'Settings', href: '/industry/settings', icon: Settings },
   ];

@@ -15,6 +15,11 @@ import {
   ShieldCheck,
   Target,
   ArrowRight,
+  AlertTriangle,
+  ExternalLink,
+  Layers,
+  Award,
+  CheckCircle2,
 } from 'lucide-react';
 
 interface Opportunity {
@@ -31,14 +36,15 @@ interface Opportunity {
   howToImprove: string;
   matchedSkills: string[];
   missingSkills: string[];
+  strengths: string[];
+  weaknesses: string[];
   link: string;
 }
 
 export default function StudentOpportunitiesPage() {
-  const { studentProfile } = useAppStore();
+  const { studentProfile, applyForInternship, candidates } = useAppStore();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [appliedIds, setAppliedIds] = useState<Record<string, boolean>>({});
 
   const opportunities: Opportunity[] = [
     {
@@ -55,6 +61,8 @@ export default function StudentOpportunitiesPage() {
       howToImprove: 'Complete the Distributed Rate Limiter challenge to reach 99% match calibration.',
       matchedSkills: ['Java', 'SQL', 'Docker'],
       missingSkills: ['Redis Clustered Streams'],
+      strengths: ['High-concurrency data models', 'Strong SQL joins & indexing', 'Verified Java collections score'],
+      weaknesses: ['Missing distributed lock implementation proof in GitHub repos'],
       link: 'https://razorpay.com/jobs',
     },
     {
@@ -67,10 +75,12 @@ export default function StudentOpportunitiesPage() {
       type: 'Remote',
       compensation: '₹22 - ₹28 LPA',
       deadline: 'Rolling 2026',
-      whyItMatches: 'Your builder profile demonstrates 4 backend GitHub repositories and verified REST API contract design.',
+      whyItMatches: 'Your builder profile demonstrates backend GitHub repositories and verified REST API contract design.',
       howToImprove: 'Earn the Advanced Cloud & Kubernetes badge on SkillBridge.',
       matchedSkills: ['REST APIs', 'Docker', 'Git'],
       missingSkills: ['Kubernetes Operators'],
+      strengths: ['Proven REST & OpenAPI architecture', 'Active GitHub commit streak', 'Clean schema design'],
+      weaknesses: ['Kubernetes CRD controllers not yet verified'],
       link: 'https://postman.com/careers',
     },
     {
@@ -87,6 +97,8 @@ export default function StudentOpportunitiesPage() {
       howToImprove: 'Form a verified team of builders from your university roster.',
       matchedSkills: ['Algorithms', 'Java', 'Problem Solving'],
       missingSkills: [],
+      strengths: ['Consistent daily LeetCode/SkillBridge assessment streak', 'Fast execution velocity'],
+      weaknesses: ['None detected for this hackathon tier'],
       link: 'https://devpost.com',
     },
     {
@@ -103,7 +115,27 @@ export default function StudentOpportunitiesPage() {
       howToImprove: 'Add benchmark telemetry graphs to your GitHub proof of work.',
       matchedSkills: ['PyTorch', 'Python', 'Algorithms'],
       missingSkills: ['Triton Kernels'],
+      strengths: ['Strong linear algebra foundation', 'Vector search embeddings codebase live on GitHub'],
+      weaknesses: ['GPU kernel profiling (Triton / CUDA) requires completion'],
       link: 'https://deepmind.google',
+    },
+    {
+      id: 'opp-5',
+      title: 'Full-Stack Product Engineering Resident',
+      company: 'Swiggy Consumer Tech',
+      category: 'Internships',
+      matchScore: 93,
+      location: 'Bengaluru (On-site)',
+      type: 'Full-time Intern',
+      compensation: '₹50,000 / mo',
+      deadline: 'In 8 days',
+      whyItMatches: 'Matches your Next.js full-stack profile, WebSockets real-time state sync, and clean component architecture.',
+      howToImprove: 'Build a simulated live delivery tracking map with WebSockets.',
+      matchedSkills: ['Next.js', 'TypeScript', 'Tailwind', 'PostgreSQL'],
+      missingSkills: ['Server-Driven UI'],
+      strengths: ['Clean responsive Apple/Linear design sensibility', 'Fast frontend rendering performance'],
+      weaknesses: ['Server-driven UI configuration experience needed'],
+      link: 'https://swiggy.com/careers',
     },
   ];
 
@@ -118,46 +150,64 @@ export default function StudentOpportunitiesPage() {
     return matchesCat && matchesSearch;
   });
 
-  const handleApply = (id: string, link: string) => {
-    setAppliedIds((prev) => ({ ...prev, [id]: true }));
-    window.open(link, '_blank');
+  const handleApply = (opp: Opportunity) => {
+    applyForInternship(opp.id, {
+      role: opp.title,
+      title: opp.title,
+      matchScore: opp.matchScore,
+    });
+    if (opp.link && opp.link.startsWith('http')) {
+      window.open(opp.link, '_blank');
+    }
   };
 
   return (
     <PortalLayout>
-      <div className="space-y-8 max-w-[1100px] mx-auto pb-16">
+      <div className="space-y-8 max-w-[1140px] mx-auto pb-16">
         
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-          className="pb-5 border-b border-[#E8E5DD] flex flex-col md:flex-row md:items-center justify-between gap-4"
-        >
-          <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#C76A2A] mb-1 block">
-              Verified Talent Pipeline
-            </span>
-            <h1 className="text-3xl font-bold text-[#1B1B1B] tracking-tight">
-              Verified Opportunities
-            </h1>
-            <p className="text-xs text-[#6F6A60] mt-0.5">
-              Matched strictly using your verified skills, projects, GitHub code, and Builder Score.
-            </p>
+        <div className="p-8 rounded-3xl bg-white border border-[#E8E5DD] shadow-xs space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-0.5 rounded-full bg-[#C76A2A]/10 text-[#C76A2A] text-xs font-bold font-mono uppercase">
+                  Opportunity Engine 3.0
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full bg-[#2F7A45]/10 text-[#2F7A45] text-xs font-bold flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  Proof-Based Matching Active
+                </span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#1B1B1B] tracking-tight mt-1.5">
+                Verified Internships &amp; Placements
+              </h1>
+              <p className="text-xs sm:text-sm text-[#6F6A60] mt-1">
+                Matched strictly using your verified skills passport, GitHub code proof, Assessment 4.0 certifications, and Builder Score.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 bg-[#F6F4EE] p-3.5 rounded-2xl border border-[#E8E5DD] text-xs self-start md:self-auto shrink-0">
+              <div>
+                <span className="text-[10px] text-[#6F6A60] block font-medium uppercase">Active Submissions</span>
+                <strong className="text-[#1B1B1B] font-mono font-bold">
+                  {candidates.filter((c) => c.studentId === studentProfile.id || c.name === studentProfile.name).length} Pipeline Active
+                </strong>
+              </div>
+            </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Filter & Search Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                className={`px-3.5 py-1.5 rounded-xl transition-all cursor-pointer ${
                   selectedCategory === cat
                     ? 'bg-[#1B1B1B] text-white shadow-xs'
-                    : 'bg-white text-[#6F6A60] hover:text-[#1B1B1B] border border-[#E8E5DD]'
+                    : 'bg-white border border-[#E8E5DD] text-[#6F6A60] hover:text-[#1B1B1B]'
                 }`}
               >
                 {cat}
@@ -165,14 +215,14 @@ export default function StudentOpportunitiesPage() {
             ))}
           </div>
 
-          <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#6F6A60]" />
+          <div className="relative min-w-[260px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6F6A60]" />
             <input
               type="text"
-              placeholder="Search companies, skills..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-[#E8E5DD] rounded-xl focus:outline-none focus:border-[#C76A2A] text-[#1B1B1B]"
+              placeholder="Search roles, companies, or tech..."
+              className="w-full pl-9 pr-3 py-1.5 bg-white border border-[#E8E5DD] rounded-xl text-xs focus:outline-none focus:border-[#1B1B1B]"
             />
           </div>
         </div>
@@ -180,45 +230,50 @@ export default function StudentOpportunitiesPage() {
         {/* Opportunities List */}
         <div className="space-y-4">
           {filtered.map((opp) => {
-            const isApplied = appliedIds[opp.id];
+            const isApplied = candidates.some(
+              (c) =>
+                (c.id === opp.id || c.jobId === opp.id || c.targetRole === opp.title) &&
+                (c.studentId === studentProfile.id || c.name === studentProfile.name)
+            );
 
             return (
-              <motion.div
+              <div
                 key={opp.id}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-                className="p-6 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-4 hover:border-[#C76A2A] transition-all"
+                className="p-6 rounded-3xl bg-white border border-[#E8E5DD] hover:border-[#1B1B1B] transition-all space-y-4"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
+                {/* Header Row */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E8E5DD]">
+                  <div className="space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
+                      <span className="px-2.5 py-0.5 rounded-md bg-[#1B1B1B] text-white text-[10px] font-mono font-bold uppercase">
+                        {opp.category}
+                      </span>
                       <h3 className="text-base font-bold text-[#1B1B1B]">{opp.title}</h3>
                       <span className="px-2.5 py-0.5 rounded-full bg-[#2F7A45]/10 text-[#2F7A45] text-xs font-bold font-mono">
                         {opp.matchScore}% Match
                       </span>
                     </div>
-                    <p className="text-xs text-[#6F6A60] mt-0.5 flex items-center gap-3">
-                      <span className="font-semibold text-[#1B1B1B]">{opp.company}</span>
+                    <p className="text-xs text-[#6F6A60] flex items-center gap-2 flex-wrap">
+                      <span className="font-bold text-[#1B1B1B]">{opp.company}</span>
                       <span>•</span>
                       <span>{opp.location}</span>
                       <span>•</span>
-                      <span className="font-mono font-medium text-[#C76A2A]">{opp.compensation}</span>
+                      <span className="font-mono font-bold text-[#C76A2A]">{opp.compensation}</span>
                     </p>
                   </div>
 
                   <button
-                    onClick={() => handleApply(opp.id, opp.link)}
-                    className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors shrink-0 flex items-center gap-1.5 ${
+                    onClick={() => handleApply(opp)}
+                    className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer shadow-xs ${
                       isApplied
                         ? 'bg-[#2F7A45] text-white'
-                        : 'bg-[#1B1B1B] text-white hover:bg-[#C76A2A]'
+                        : 'bg-[#1B1B1B] hover:bg-[#C76A2A] text-white'
                     }`}
                   >
                     {isApplied ? (
                       <>
                         <Check className="w-3.5 h-3.5" />
-                        <span>Profile Submitted</span>
+                        <span>Passport Submitted</span>
                       </>
                     ) : (
                       <>
@@ -229,36 +284,54 @@ export default function StudentOpportunitiesPage() {
                   </button>
                 </div>
 
-                {/* Match Reason & Improvement Tips */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 text-xs">
-                  <div className="p-3.5 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD] space-y-1">
-                    <strong className="text-[#1B1B1B] block">Why You Match:</strong>
-                    <p className="text-[#6F6A60]">{opp.whyItMatches}</p>
+                {/* Match Analysis: Strengths & Weaknesses (Audit requirement) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                  <div className="p-3.5 rounded-2xl bg-[#2F7A45]/5 border border-[#2F7A45]/20 space-y-1.5">
+                    <span className="font-bold text-[#2F7A45] flex items-center gap-1 uppercase tracking-wider text-[11px]">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Profile Strengths for this Role:
+                    </span>
+                    <ul className="space-y-1 text-[#1B1B1B] text-[11px]">
+                      {opp.strengths.map((s, idx) => (
+                        <li key={idx} className="flex items-center gap-1.5">
+                          <span className="text-[#2F7A45] font-bold">✓</span> {s}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <div className="p-3.5 rounded-xl bg-[#F6F4EE] border border-[#E8E5DD] space-y-1">
-                    <strong className="text-[#1B1B1B] block">How to Improve Fit:</strong>
-                    <p className="text-[#6F6A60]">{opp.howToImprove}</p>
+
+                  <div className="p-3.5 rounded-2xl bg-orange-50/50 border border-orange-200/80 space-y-1.5">
+                    <span className="font-bold text-[#C76A2A] flex items-center gap-1 uppercase tracking-wider text-[11px]">
+                      <AlertTriangle className="w-3.5 h-3.5" /> Identified Skill Gaps to Bridge:
+                    </span>
+                    <ul className="space-y-1 text-[#1B1B1B] text-[11px]">
+                      {opp.weaknesses.map((w, idx) => (
+                        <li key={idx} className="flex items-center gap-1.5">
+                          <span className="text-[#C76A2A] font-bold">⚠</span> {w}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
 
-                {/* Skills Tagged */}
-                <div className="flex items-center justify-between pt-1 border-t border-[#E8E5DD] text-xs">
+                {/* Skills Tagged & Deadline */}
+                <div className="flex items-center justify-between pt-2 border-t border-[#E8E5DD] text-xs">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="text-[#6F6A60] text-[11px] font-medium">Matched Skills:</span>
                     {opp.matchedSkills.map((s) => (
-                      <span key={s} className="px-2 py-0.5 rounded-md bg-[#2F7A45]/10 text-[#2F7A45] text-[11px] font-semibold">
+                      <span key={s} className="px-2.5 py-0.5 rounded-md bg-[#2F7A45]/10 text-[#2F7A45] text-[11px] font-bold">
                         ✓ {s}
                       </span>
                     ))}
                     {opp.missingSkills.map((s) => (
-                      <span key={s} className="px-2 py-0.5 rounded-md bg-[#F6F4EE] text-[#6F6A60] text-[11px]">
-                        + {s}
+                      <span key={s} className="px-2.5 py-0.5 rounded-md bg-[#F6F4EE] text-[#6F6A60] text-[11px] font-medium">
+                        + Missing: {s}
                       </span>
                     ))}
                   </div>
+
                   <span className="text-[11px] font-mono text-[#6F6A60]">Deadline: {opp.deadline}</span>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>

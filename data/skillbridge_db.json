@@ -1417,6 +1417,30 @@
   },
   "auditLogs": [
     {
+      "id": "log-1789165860346",
+      "timestamp": "2026-09-11T22:31:00.346Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148818117_r151md3",
+      "role": "INDUSTRY",
+      "details": "Successful authenticated login for: pranitha12@gmail.com"
+    },
+    {
+      "id": "log-1789165817918",
+      "timestamp": "2026-09-11T22:30:17.918Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789161544074_trgl0y0",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badige12r@gmail.com"
+    },
+    {
+      "id": "log-1789165658913",
+      "timestamp": "2026-09-11T22:27:38.913Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148818117_r151md3",
+      "role": "INDUSTRY",
+      "details": "Successful authenticated login for: pranitha12@gmail.com"
+    },
+    {
       "id": "log-1789161544074",
       "timestamp": "2026-09-11T21:19:04.074Z",
       "action": "USER_REGISTERED_BCRYPT",

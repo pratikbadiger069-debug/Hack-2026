@@ -300,7 +300,7 @@ interface AppState {
   updateStudentFullProfile: (updates: FullProfileUpdates) => void;
   addVerifiedSkill: (skillName: string, level: any, category: any) => void;
   addBuilderEvidence: (evidence: any) => void;
-  applyForInternship: (internshipId: string) => void;
+  applyForInternship: (internshipId: string, customDetails?: any) => void;
   completeAssessment: (assessmentId: string, score: number) => void;
 
   // AI Copilot Results & Persistent Memory
@@ -336,9 +336,9 @@ export const useAppStore = create<AppState>()(
       isDemoMode: false,
       currentUser: null,
       userProfilesByEmail: {},
-      candidates: [],
-      jobs: [],
-      curriculumAnalyses: [],
+      candidates: mockCandidatesPipeline,
+      jobs: mockJobRequirements,
+      curriculumAnalyses: [mockCurriculumAnalysis],
 
       // Builder Gamification State
       xp: 2450,
@@ -1211,14 +1211,41 @@ export const useAppStore = create<AppState>()(
           };
         }),
 
-      applyForInternship: (internshipId) =>
-        set((state) => ({
-          candidates: state.candidates.map((c) =>
-            c.studentId === state.studentProfile.id && c.jobId === internshipId
-              ? { ...c, stage: 'Matched' }
-              : c
-          ),
-        })),
+      applyForInternship: (internshipId, customDetails) =>
+        set((state) => {
+          const existingIndex = state.candidates.findIndex(
+            (c) => (c.id === internshipId || c.jobId === internshipId) && (c.studentId === state.studentProfile.id || c.name === state.studentProfile.name)
+          );
+
+          if (existingIndex >= 0) {
+            const updated = [...state.candidates];
+            updated[existingIndex] = { ...updated[existingIndex], stage: 'Shortlisted' };
+            return { candidates: updated };
+          }
+
+          const newApp: CandidateApplication = {
+            id: internshipId || `app-${Date.now()}`,
+            jobId: internshipId,
+            studentId: state.studentProfile.id,
+            name: state.studentProfile.name,
+            avatar: state.studentProfile.avatar || state.currentUser?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
+            department: state.studentProfile.academic?.department || state.studentProfile.branch || 'CSE',
+            college: state.studentProfile.academic?.college || 'HITAM',
+            targetRole: customDetails?.role || customDetails?.title || state.studentProfile.targetRole || 'Software Development',
+            builderScore: state.studentProfile.builderScores?.overall || 785,
+            employabilityScore: state.studentProfile.careerReadinessScore || 88,
+            stage: 'Matched',
+            appliedDate: 'Just now',
+            topSkills: (state.studentProfile.verifiedSkills || []).map((s) => s.name).slice(0, 4),
+            githubUrl: state.studentProfile.professional?.githubUrl || (state.githubData.connected ? `https://github.com/${state.githubData.username}` : 'https://github.com'),
+            matchScore: customDetails?.matchScore || 94,
+          };
+
+          return {
+            candidates: [newApp, ...state.candidates],
+            unreadNotificationsCount: state.unreadNotificationsCount + 1,
+          };
+        }),
 
       completeAssessment: (assessmentId, score) =>
         set((state) => {

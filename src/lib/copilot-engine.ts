@@ -604,7 +604,8 @@ export async function generateSmartCopilotResponse(
   apiKey?: string,
   mode: CopilotAssistantMode = 'career',
   memory?: CopilotMemory,
-  githubData?: GitHubData
+  githubData?: GitHubData,
+  assessmentHistory?: Record<string, any[]>
 ): Promise<{ text: string; structuredType?: any; structuredPayload?: any; memoryUpdate?: Partial<CopilotMemory> }> {
   const context = analyzeStudentCareerContext(profile, targetRole);
   const q = userQuery.toLowerCase().trim();
@@ -682,6 +683,16 @@ STUDENT PROFILE CONTEXT:
 - Career Readiness Score: ${context.readinessScore}% (Industry Benchmark: ${context.industryAvg}%)
 - Verified Competencies: ${profile.verifiedSkills?.map((s) => `${s.name} (${s.score}%)`).join(', ') || 'Java, Python, SQL'}
 - Missing Skills: ${context.missingSkills.join(', ') || 'Distributed Caching, Docker'}
+- Assessment 4.0 Diagnostics: ${
+  assessmentHistory && Object.keys(assessmentHistory).length > 0
+    ? Object.entries(assessmentHistory)
+        .map(([topic, attempts]) => {
+          const latest = attempts[attempts.length - 1];
+          return `${topic} (Best: ${Math.max(...attempts.map((a: any) => a.score))}%, Weak Areas: ${latest?.weakAreas?.join(', ') || 'None'})`;
+        })
+        .join('; ')
+    : 'No diagnostic assessments taken yet'
+}
 - GitHub Activity: ${githubData?.connected ? `@${githubData.username} with ${githubData.recentCommitsCount || 348} commits and ${githubData.totalStars || 142} stars` : 'Not connected'}${memoryContext}
 
 CRITICAL RULES:

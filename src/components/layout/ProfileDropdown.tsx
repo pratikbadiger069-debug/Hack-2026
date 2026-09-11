@@ -241,6 +241,20 @@ export function ProfileDropdown() {
               </Link>
 
               <Link
+                href="/student/portfolio"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-[#FAF9F5] transition-colors"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Award className="w-4 h-4 text-[#6F6A60]" />
+                  <span>Digital Portfolio</span>
+                </div>
+                <span className="text-[10px] text-[#2F7A45] font-semibold bg-[#2F7A45]/10 px-1.5 py-0.2 rounded">
+                  Shareable
+                </span>
+              </Link>
+
+              <Link
                 href="/student/assessments"
                 onClick={() => setIsOpen(false)}
                 className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-[#FAF9F5] transition-colors"
