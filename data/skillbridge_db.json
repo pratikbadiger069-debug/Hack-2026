@@ -674,6 +674,43 @@
           "date": "Sep 11, 2026"
         }
       ]
+    },
+    "pranitha12@gmail.com": {
+      "id": "std-1789150084793-zyo8g",
+      "name": "Pranitha",
+      "email": "pranitha12@gmail.com",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      "headline": "",
+      "targetRole": "Software Engineer",
+      "academic": {
+        "college": "",
+        "department": "CSE",
+        "year": "1st Year",
+        "semester": "1st Semester",
+        "cgpa": 0,
+        "studentId": ""
+      },
+      "professional": {
+        "githubUrl": "",
+        "linkedinUrl": "",
+        "portfolioUrl": "",
+        "bio": "",
+        "totalProjects": 0,
+        "hackathonWins": 0,
+        "researchPapers": 0,
+        "openSourceContributions": 0
+      },
+      "builderScores": {
+        "overall": 0,
+        "execution": 0,
+        "leadership": 0,
+        "innovation": 0,
+        "problemSolving": 0,
+        "consistency": 0
+      },
+      "employabilityScore": 0,
+      "verifiedSkills": [],
+      "evidences": []
     }
   },
   "instituteData": {
@@ -922,6 +959,30 @@
     ]
   },
   "auditLogs": [
+    {
+      "id": "log-1789152135825",
+      "timestamp": "2026-09-11T18:42:15.825Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789150084794",
+      "timestamp": "2026-09-11T18:08:04.794Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148818117_r151md3",
+      "role": "INDUSTRY",
+      "details": "Successful authenticated login for: pranitha12@gmail.com"
+    },
+    {
+      "id": "log-1789149936793",
+      "timestamp": "2026-09-11T18:05:36.793Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
     {
       "id": "log-1789149037877",
       "timestamp": "2026-09-11T17:50:37.877Z",
