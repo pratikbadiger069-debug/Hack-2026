@@ -1,29 +1,51 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/security';
+import { verifyToken, AUTH_COOKIE_NAME } from '@/lib/auth-jwt';
+import { cleanApiKey } from '@/lib/ai-diagnostics';
+import { dbService } from '@/lib/server-db';
 import { AIProvider } from '@/types';
 
 export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
-    const rateCheck = checkRateLimit(`ai_gen_${ip}`, 20, 60000);
+    const rateCheck = checkRateLimit(`ai_gen_${ip}`, 25, 60000);
     if (!rateCheck.allowed) {
       return NextResponse.json({ error: 'Rate limit exceeded for AI generation. Please wait a moment.' }, { status: 429 });
     }
 
-    const { provider, apiKey, systemPrompt, userPrompt } = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const { provider = 'gemini', systemPrompt, userPrompt } = body;
+    let rawApiKey = body.apiKey;
 
-    if (!provider || !apiKey) {
-      return NextResponse.json({ error: 'Provider and valid API key are required.' }, { status: 400 });
+    // If key not in request, fallback to database or environment variables
+    if (!rawApiKey || rawApiKey.trim().length < 8) {
+      const token = req.cookies.get(AUTH_COOKIE_NAME)?.value;
+      let userEmail: string | undefined;
+      if (token) {
+        const payload = await verifyToken(token);
+        userEmail = payload?.email;
+      }
+      const storedKeys = dbService.getUserAIKeys(userEmail);
+      if (provider === 'gemini') rawApiKey = storedKeys.gemini;
+      if (provider === 'openai') rawApiKey = storedKeys.openai;
+      if (provider === 'claude') rawApiKey = storedKeys.anthropic;
     }
 
-    const key = apiKey.trim();
+    const key = cleanApiKey(rawApiKey);
+
+    if (!key || key.length < 8) {
+      return NextResponse.json({ error: 'Valid AI provider API key is required. Please configure your key in Settings or BYOK modal.' }, { status: 400 });
+    }
 
     // 1. Gemini Inference
     if (provider === 'gemini') {
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(key)}`;
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': key,
+        },
         body: JSON.stringify({
           contents: [
             {

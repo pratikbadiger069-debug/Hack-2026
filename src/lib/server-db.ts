@@ -3,6 +3,15 @@ import path from 'path';
 import bcrypt from 'bcryptjs';
 import { StudentProfile, UserRole } from '@/types';
 import { mockStudentProfile, mockCandidatesPipeline, mockJobRequirements, mockCurriculumAnalysis } from './mock-data';
+import { cleanApiKey } from './ai-diagnostics';
+
+export interface UserAIKeys {
+  gemini?: string;
+  openai?: string;
+  anthropic?: string;
+  customEndpoint?: string;
+  updatedAt?: string;
+}
 
 export interface DBUser {
   id: string;
@@ -20,6 +29,7 @@ export interface DBUser {
   emailVerificationToken?: string;
   passwordResetToken?: string;
   passwordResetExpires?: number;
+  aiKeys?: UserAIKeys;
   createdAt: string;
   updatedAt: string;
 }
@@ -491,5 +501,120 @@ export const dbService = {
   getAuditLogs: () => {
     const db = ensureDbFile();
     return db.auditLogs;
+  },
+
+  saveUserAIKeys: (
+    email: string,
+    keys: { gemini?: string; openai?: string; anthropic?: string; customEndpoint?: string }
+  ): UserAIKeys => {
+    const db = ensureDbFile();
+    const cleanEmail = email.toLowerCase().trim();
+    const user = db.users[cleanEmail];
+    if (!user) {
+      throw new Error(`User ${email} not found`);
+    }
+
+    const currentKeys = user.aiKeys || {};
+    const updated: UserAIKeys = {
+      ...currentKeys,
+      gemini: keys.gemini !== undefined ? cleanApiKey(keys.gemini) : currentKeys.gemini,
+      openai: keys.openai !== undefined ? cleanApiKey(keys.openai) : currentKeys.openai,
+      anthropic: keys.anthropic !== undefined ? cleanApiKey(keys.anthropic) : currentKeys.anthropic,
+      customEndpoint: keys.customEndpoint !== undefined ? keys.customEndpoint.trim() : currentKeys.customEndpoint,
+      updatedAt: new Date().toISOString(),
+    };
+
+    user.aiKeys = updated;
+    user.updatedAt = new Date().toISOString();
+
+    db.auditLogs.unshift({
+      id: `log-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      action: 'AI_KEYS_UPDATED',
+      userId: user.id,
+      role: user.role.toUpperCase(),
+      details: `User updated AI provider credentials securely.`,
+    });
+
+    saveDb(db);
+    return updated;
+  },
+
+  getUserAIKeys: (
+    email?: string | null
+  ): { gemini: string; openai: string; anthropic: string; customEndpoint: string; hasStoredKeys: boolean } => {
+    const envGemini = cleanApiKey(process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY || '');
+    const envOpenAI = cleanApiKey(process.env.OPENAI_API_KEY || '');
+    const envAnthropic = cleanApiKey(process.env.ANTHROPIC_API_KEY || '');
+
+    if (!email) {
+      return {
+        gemini: envGemini,
+        openai: envOpenAI,
+        anthropic: envAnthropic,
+        customEndpoint: '',
+        hasStoredKeys: !!(envGemini || envOpenAI || envAnthropic),
+      };
+    }
+
+    const db = ensureDbFile();
+    const cleanEmail = email.toLowerCase().trim();
+    const user = db.users[cleanEmail];
+    const userKeys = user?.aiKeys || {};
+
+    const gemini = userKeys.gemini || envGemini;
+    const openai = userKeys.openai || envOpenAI;
+    const anthropic = userKeys.anthropic || envAnthropic;
+    const customEndpoint = userKeys.customEndpoint || '';
+
+    return {
+      gemini,
+      openai,
+      anthropic,
+      customEndpoint,
+      hasStoredKeys: !!(userKeys.gemini || userKeys.openai || userKeys.anthropic || envGemini || envOpenAI || envAnthropic),
+    };
+  },
+
+  getMaskedAIKeys: (
+    email?: string | null
+  ): {
+    gemini: { configured: boolean; masked: string; source: 'user' | 'env' | 'none' };
+    openai: { configured: boolean; masked: string; source: 'user' | 'env' | 'none' };
+    anthropic: { configured: boolean; masked: string; source: 'user' | 'env' | 'none' };
+  } => {
+    const mask = (key: string) => {
+      if (!key || key.length < 8) return '';
+      return `${key.slice(0, 4)}...${key.slice(-4)}`;
+    };
+
+    let userKeys: UserAIKeys = {};
+    if (email) {
+      const db = ensureDbFile();
+      const user = db.users[email.toLowerCase().trim()];
+      userKeys = user?.aiKeys || {};
+    }
+
+    const envGemini = cleanApiKey(process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY || '');
+    const envOpenAI = cleanApiKey(process.env.OPENAI_API_KEY || '');
+    const envAnthropic = cleanApiKey(process.env.ANTHROPIC_API_KEY || '');
+
+    return {
+      gemini: userKeys.gemini
+        ? { configured: true, masked: mask(userKeys.gemini), source: 'user' }
+        : envGemini
+        ? { configured: true, masked: mask(envGemini), source: 'env' }
+        : { configured: false, masked: '', source: 'none' },
+      openai: userKeys.openai
+        ? { configured: true, masked: mask(userKeys.openai), source: 'user' }
+        : envOpenAI
+        ? { configured: true, masked: mask(envOpenAI), source: 'env' }
+        : { configured: false, masked: '', source: 'none' },
+      anthropic: userKeys.anthropic
+        ? { configured: true, masked: mask(userKeys.anthropic), source: 'user' }
+        : envAnthropic
+        ? { configured: true, masked: mask(envAnthropic), source: 'env' }
+        : { configured: false, masked: '', source: 'none' },
+    };
   },
 };
