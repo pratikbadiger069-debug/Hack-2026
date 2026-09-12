@@ -3,6 +3,10 @@ import { persist } from 'zustand/middleware';
 import {
   UserRole,
   AIProvider,
+  AIProviderConfig,
+  CopilotMentorMode,
+  CopilotChatMessage,
+  CopilotChatSession,
   StudentProfile,
   CandidateApplication,
   PipelineStage,
@@ -37,13 +41,108 @@ import {
 } from './mock-data';
 import { getLevelInfo } from './xp-engine';
 
+export const DEFAULT_AI_PROVIDER_CONFIGS: Record<AIProvider, AIProviderConfig> = {
+  gemini: {
+    id: 'gemini',
+    name: 'Google Gemini AI',
+    model: 'gemini-1.5-flash',
+    models: ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash'],
+    apiKey: '',
+    enabled: true,
+    isDefault: true,
+    status: 'connected',
+    docsUrl: 'https://aistudio.google.com/app/apikey',
+  },
+  openai: {
+    id: 'openai',
+    name: 'OpenAI (ChatGPT)',
+    model: 'gpt-4o-mini',
+    models: ['gpt-4o-mini', 'gpt-4o', 'o1-mini'],
+    apiKey: '',
+    enabled: true,
+    isDefault: false,
+    status: 'untested',
+    docsUrl: 'https://platform.openai.com/api-keys',
+  },
+  claude: {
+    id: 'claude',
+    name: 'Anthropic Claude',
+    model: 'claude-3-5-sonnet-20241022',
+    models: ['claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022'],
+    apiKey: '',
+    enabled: true,
+    isDefault: false,
+    status: 'untested',
+    docsUrl: 'https://console.anthropic.com/settings/keys',
+  },
+  groq: {
+    id: 'groq',
+    name: 'Groq Cloud (LPU Ultra-Fast)',
+    model: 'llama-3.3-70b-versatile',
+    models: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768'],
+    apiKey: '',
+    enabled: true,
+    isDefault: false,
+    status: 'untested',
+    docsUrl: 'https://console.groq.com/keys',
+  },
+  openrouter: {
+    id: 'openrouter',
+    name: 'OpenRouter AI (Multi-Model)',
+    model: 'deepseek/deepseek-chat',
+    models: ['deepseek/deepseek-chat', 'anthropic/claude-3.5-sonnet', 'meta-llama/llama-3.3-70b-instruct'],
+    apiKey: '',
+    enabled: true,
+    isDefault: false,
+    status: 'untested',
+    docsUrl: 'https://openrouter.ai/keys',
+  },
+  deepseek: {
+    id: 'deepseek',
+    name: 'DeepSeek AI (Reasoning & Code)',
+    model: 'deepseek-chat',
+    models: ['deepseek-chat', 'deepseek-reasoner'],
+    apiKey: '',
+    enabled: true,
+    isDefault: false,
+    status: 'untested',
+    docsUrl: 'https://platform.deepseek.com/api_keys',
+  },
+};
+
+export const INITIAL_COPILOT_SESSION: CopilotChatSession = {
+  id: 'session-master-1',
+  title: 'Full-Stack & Systems Architecture Mentor',
+  mode: 'career',
+  pinned: true,
+  createdAt: 'Today',
+  updatedAt: 'Just now',
+  messages: [
+    {
+      id: 'msg-init-1',
+      sender: 'assistant',
+      content:
+        `Hello **Manutej**! 👋\n\nI am your **Personal AI Career & Technical Mentor** on SkillBridge.\n\nI have loaded your complete live profile:\n- **Academic & Branch**: B.Tech CSE • HITAM (2026)\n- **Target Role**: Full-Stack Software Engineer & AI Builder\n- **Verified Skills**: Python & FastAPI, TypeScript, PostgreSQL, Distributed Systems\n- **GitHub Activity**: \`manutejreddy\` (18 public repos, 12-day streak)\n- **Builder Score**: 885 / 1000 (Level 4 Senior Architect)\n\nWhat high-impact milestone would you like to tackle today?`,
+      timestamp: 'Just now',
+      mode: 'career',
+      suggestedActions: [
+        '🎯 Review my profile & GitHub',
+        '⚡ Explain my top skill gaps for AI Engineer',
+        '🎙️ Start technical mock interview',
+        '🏗️ Architecture review for my next project',
+        '💼 Recommend top matching opportunities',
+      ],
+    },
+  ],
+};
+
 export const EMPTY_FRESH_STUDENT_PROFILE: StudentProfile = {
   id: 'std-fresh',
-  name: 'New Builder',
-  email: '',
+  name: 'Manutej Reddy',
+  email: 'manutej.reddy@hitam.org',
   avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-  headline: 'Aspiring Software Builder',
-  targetRole: 'Backend Engineer',
+  headline: 'Aspiring Systems & AI Builder | CSE • HITAM',
+  targetRole: 'Full Stack & AI Engineer',
   college: 'HITAM',
   department: 'CSE',
   branch: 'CSE',
@@ -53,44 +152,44 @@ export const EMPTY_FRESH_STUDENT_PROFILE: StudentProfile = {
   academic: {
     college: 'HITAM',
     department: 'CSE',
-    year: '1st Year',
-    semester: '1st Semester',
-    cgpa: 8.5,
-    studentId: 'SB-2026-001',
+    year: '3rd Year',
+    semester: '6th Semester',
+    cgpa: 8.92,
+    studentId: 'HITAM-CSE-2023-088',
     city: 'Hyderabad',
     state: 'Telangana',
     country: 'India',
   },
   professional: {
-    githubUrl: '',
-    linkedinUrl: '',
-    portfolioUrl: '',
-    bio: 'Starting my verified builder journey on SkillBridge.',
-    totalProjects: 0,
-    hackathonWins: 0,
-    researchPapers: 0,
-    openSourceContributions: 0,
+    githubUrl: 'https://github.com/manutejreddy',
+    linkedinUrl: 'https://linkedin.com/in/manutejreddy',
+    portfolioUrl: 'https://manutejreddy.dev',
+    bio: 'Passionate builder crafting distributed backends, LLM inference pipelines, and cloud native tools.',
+    totalProjects: 6,
+    hackathonWins: 2,
+    researchPapers: 1,
+    openSourceContributions: 24,
   },
   builderScores: {
-    overall: 100,
-    execution: 15,
-    leadership: 10,
-    innovation: 15,
-    problemSolving: 20,
-    consistency: 10,
+    overall: 840,
+    execution: 85,
+    leadership: 80,
+    innovation: 88,
+    problemSolving: 90,
+    consistency: 82,
   },
-  employabilityScore: 35,
+  employabilityScore: 88,
   verifiedSkills: [],
   evidences: [],
 };
 
 export const CLEAN_SCRATCH_STUDENT_PROFILE: StudentProfile = {
   id: 'std-scratch',
-  name: 'New Student',
-  email: '',
+  name: 'Manutej Reddy',
+  email: 'manutej.reddy@hitam.org',
   avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
-  headline: '',
-  targetRole: 'Software Engineer',
+  headline: 'Full-Stack & Systems Builder | CSE • HITAM',
+  targetRole: 'Full-Stack Software Engineer',
   college: 'HITAM',
   department: 'CSE',
   branch: 'CSE',
@@ -109,9 +208,9 @@ export const CLEAN_SCRATCH_STUDENT_PROFILE: StudentProfile = {
     country: 'India',
   },
   professional: {
-    githubUrl: 'https://github.com/aarav-builder',
-    linkedinUrl: '',
-    portfolioUrl: '',
+    githubUrl: 'https://github.com/manutejreddy',
+    linkedinUrl: 'https://linkedin.com/in/manutejreddy',
+    portfolioUrl: 'https://manutejreddy.dev',
     bio: 'Passionate builder crafting distributed backends, LLM inference pipelines, and cloud native tools.',
     totalProjects: 14,
     hackathonWins: 3,
@@ -231,11 +330,15 @@ interface AppState {
   // Stored Profiles Dictionary per email
   userProfilesByEmail: Record<string, StudentProfile>;
 
-  // AI Provider Keys (BYOK)
+  // AI Provider Keys & Configurations (BYOK)
   aiKeys: Record<AIProvider, string>;
   activeProvider: AIProvider;
+  aiProviderConfigs: Record<AIProvider, AIProviderConfig>;
   setAIKey: (provider: AIProvider, key: string) => void;
   setActiveAIProvider: (provider: AIProvider) => void;
+  saveAIProviderConfig: (config: Partial<AIProviderConfig> & { id: AIProvider }) => void;
+  setDefaultAIProvider: (provider: AIProvider) => void;
+  removeAIProviderConfig: (provider: AIProvider) => void;
   hasConfiguredAI: () => boolean;
 
   // Gen Z Builder System & Gamification
@@ -303,7 +406,20 @@ interface AppState {
   applyForInternship: (internshipId: string, customDetails?: any) => void;
   completeAssessment: (assessmentId: string, score: number) => void;
 
-  // AI Copilot Results & Persistent Memory
+  // AI Copilot 4.0 Multi-Session Chat & Persistent Memory
+  copilotSessions: CopilotChatSession[];
+  activeCopilotSessionId: string;
+  activeCopilotMode: CopilotMentorMode;
+  createCopilotSession: (mode?: CopilotMentorMode, title?: string) => string;
+  switchCopilotSession: (sessionId: string) => void;
+  renameCopilotSession: (sessionId: string, newTitle: string) => void;
+  deleteCopilotSession: (sessionId: string) => void;
+  pinCopilotSession: (sessionId: string) => void;
+  addMessageToActiveSession: (msg: Omit<CopilotChatMessage, 'id' | 'timestamp'> & { id?: string; timestamp?: string }) => void;
+  updateLastAssistantMessage: (content: string, suggestedActions?: string[], codeSnippets?: any[]) => void;
+  clearActiveSessionMessages: () => void;
+  setCopilotMentorMode: (mode: CopilotMentorMode) => void;
+
   copilotResults: Record<string, CopilotAnalysisResult>;
   saveCopilotResult: (targetRole: string, result: CopilotAnalysisResult) => void;
   copilotMemory: CopilotMemory;
@@ -453,7 +569,7 @@ export const useAppStore = create<AppState>()(
           };
         }),
 
-      connectGitHub: async (username = 'aarav-builder') => {
+      connectGitHub: async (username = 'manutejreddy') => {
         const cleanUser = username.trim();
         const currentEmail = get().studentProfile.email || get().currentUser?.email || '';
         const geminiApiKey = get().aiKeys.gemini;
@@ -534,7 +650,7 @@ export const useAppStore = create<AppState>()(
         })),
 
       syncGitHub: async () => {
-        const username = get().githubData?.username || 'aarav-builder';
+        const username = get().githubData?.username || 'manutejreddy';
         const currentEmail = get().studentProfile.email || get().currentUser?.email || '';
         const geminiApiKey = get().aiKeys.gemini;
 
@@ -748,7 +864,7 @@ export const useAppStore = create<AppState>()(
             studentProfile: existingProfile || {
               ...CLEAN_SCRATCH_STUDENT_PROFILE,
               email: currentEmail || '',
-              name: get().currentUser?.name || 'New Student',
+              name: get().currentUser?.name || 'Manutej Reddy',
             },
             candidates: [],
             jobs: [],
@@ -964,17 +1080,84 @@ export const useAppStore = create<AppState>()(
         gemini: '',
         openai: '',
         claude: '',
+        groq: '',
+        openrouter: '',
+        deepseek: '',
       },
       activeProvider: 'gemini',
+      aiProviderConfigs: DEFAULT_AI_PROVIDER_CONFIGS,
       setAIKey: (provider, key) =>
+        set((state) => {
+          const trimmed = key.trim();
+          const existingConfig = state.aiProviderConfigs?.[provider] || DEFAULT_AI_PROVIDER_CONFIGS[provider];
+          return {
+            aiKeys: {
+              ...state.aiKeys,
+              [provider]: trimmed,
+            },
+            aiProviderConfigs: {
+              ...state.aiProviderConfigs,
+              [provider]: {
+                ...existingConfig,
+                apiKey: trimmed,
+                status: trimmed.length > 5 ? 'connected' : 'untested',
+              },
+            },
+          };
+        }),
+      setActiveAIProvider: (provider) =>
+        set((state) => ({
+          activeProvider: provider,
+          aiProviderConfigs: Object.fromEntries(
+            Object.entries(state.aiProviderConfigs || DEFAULT_AI_PROVIDER_CONFIGS).map(([k, cfg]) => [
+              k,
+              { ...cfg, isDefault: k === provider },
+            ])
+          ) as Record<AIProvider, AIProviderConfig>,
+        })),
+      saveAIProviderConfig: (config) =>
+        set((state) => {
+          const existing = state.aiProviderConfigs?.[config.id] || DEFAULT_AI_PROVIDER_CONFIGS[config.id];
+          const updated = { ...existing, ...config };
+          return {
+            aiProviderConfigs: {
+              ...state.aiProviderConfigs,
+              [config.id]: updated,
+            },
+            aiKeys: {
+              ...state.aiKeys,
+              [config.id]: config.apiKey !== undefined ? config.apiKey.trim() : state.aiKeys[config.id],
+            },
+            activeProvider: config.isDefault ? config.id : state.activeProvider,
+          };
+        }),
+      setDefaultAIProvider: (provider) =>
+        set((state) => ({
+          activeProvider: provider,
+          aiProviderConfigs: Object.fromEntries(
+            Object.entries(state.aiProviderConfigs || DEFAULT_AI_PROVIDER_CONFIGS).map(([k, cfg]) => [
+              k,
+              { ...cfg, isDefault: k === provider },
+            ])
+          ) as Record<AIProvider, AIProviderConfig>,
+        })),
+      removeAIProviderConfig: (provider) =>
         set((state) => ({
           aiKeys: {
             ...state.aiKeys,
-            [provider]: key.trim(),
+            [provider]: '',
           },
+          aiProviderConfigs: {
+            ...state.aiProviderConfigs,
+            [provider]: {
+              ...(state.aiProviderConfigs?.[provider] || DEFAULT_AI_PROVIDER_CONFIGS[provider]),
+              apiKey: '',
+              status: 'disconnected',
+              isDefault: false,
+            },
+          },
+          activeProvider: state.activeProvider === provider ? 'gemini' : state.activeProvider,
         })),
-      setActiveAIProvider: (provider) =>
-        set({ activeProvider: provider }),
       hasConfiguredAI: () => {
         const { aiKeys, activeProvider } = get();
         return Boolean(aiKeys[activeProvider] && aiKeys[activeProvider].trim().length > 5);
@@ -1034,19 +1217,28 @@ export const useAppStore = create<AppState>()(
 
       updateStudentAcademic: (academic) =>
         set((state) => {
-          const updated = {
+          const updatedAcademic = {
+            ...state.studentProfile.academic,
+            ...academic,
+          };
+          const updated: StudentProfile = {
             ...state.studentProfile,
-            academic: {
-              ...state.studentProfile.academic,
-              ...academic,
-            },
+            college: updatedAcademic.college || state.studentProfile.college,
+            degree: updatedAcademic.degree || state.studentProfile.degree,
+            branch: updatedAcademic.branch || updatedAcademic.department || state.studentProfile.branch,
+            department: updatedAcademic.department || updatedAcademic.branch || state.studentProfile.department,
+            graduationYear: updatedAcademic.graduationYear || state.studentProfile.graduationYear,
+            city: updatedAcademic.city || state.studentProfile.city,
+            state: updatedAcademic.state || state.studentProfile.state,
+            country: updatedAcademic.country || state.studentProfile.country,
+            academic: updatedAcademic,
           };
           const email = state.studentProfile.email?.toLowerCase().trim();
           if (email && !state.isDemoMode) {
             fetch('/api/students/profile', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email, academic: updated.academic }),
+              body: JSON.stringify({ email, academic: updated.academic, college: updated.college, degree: updated.degree, branch: updated.branch, graduationYear: updated.graduationYear }),
             }).catch(() => {});
           }
           return {
@@ -1084,13 +1276,22 @@ export const useAppStore = create<AppState>()(
 
       updateStudentFullProfile: (updates) =>
         set((state) => {
+          const mergedAcademic = {
+            ...state.studentProfile.academic,
+            ...(updates.academic || {}),
+          };
           const updated: StudentProfile = {
             ...state.studentProfile,
             ...updates,
-            academic: {
-              ...state.studentProfile.academic,
-              ...(updates.academic || {}),
-            },
+            college: mergedAcademic.college || updates.college || state.studentProfile.college,
+            degree: mergedAcademic.degree || updates.degree || state.studentProfile.degree,
+            branch: mergedAcademic.branch || mergedAcademic.department || updates.branch || state.studentProfile.branch,
+            department: mergedAcademic.department || mergedAcademic.branch || updates.department || state.studentProfile.department,
+            graduationYear: mergedAcademic.graduationYear || updates.graduationYear || state.studentProfile.graduationYear,
+            city: mergedAcademic.city || updates.city || state.studentProfile.city,
+            state: mergedAcademic.state || updates.state || state.studentProfile.state,
+            country: mergedAcademic.country || updates.country || state.studentProfile.country,
+            academic: mergedAcademic,
             professional: {
               ...state.studentProfile.professional,
               ...(updates.professional || {}),
@@ -1112,6 +1313,7 @@ export const useAppStore = create<AppState>()(
                 name: updates.name || state.currentUser.name,
                 linkedInName: updates.linkedInName || state.currentUser.linkedInName,
                 googleName: updates.googleName || state.currentUser.googleName,
+                institution: mergedAcademic.college || updates.college || state.currentUser.institution,
               }
             : state.currentUser;
 
@@ -1211,7 +1413,7 @@ export const useAppStore = create<AppState>()(
           };
         }),
 
-      applyForInternship: (internshipId, customDetails) =>
+      applyForInternship: (internshipId: string, customDetails?: any) =>
         set((state) => {
           const existingIndex = state.candidates.findIndex(
             (c) => (c.id === internshipId || c.jobId === internshipId) && (c.studentId === state.studentProfile.id || c.name === state.studentProfile.name)
@@ -1230,15 +1432,38 @@ export const useAppStore = create<AppState>()(
             name: state.studentProfile.name,
             avatar: state.studentProfile.avatar || state.currentUser?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
             department: state.studentProfile.academic?.department || state.studentProfile.branch || 'CSE',
+            branch: state.studentProfile.academic?.branch || state.studentProfile.branch || 'CSE',
             college: state.studentProfile.academic?.college || 'HITAM',
+            institution: state.studentProfile.academic?.college || 'HITAM',
+            degree: state.studentProfile.academic?.degree || 'B.Tech',
+            graduationYear: state.studentProfile.academic?.graduationYear || '2026',
             targetRole: customDetails?.role || customDetails?.title || state.studentProfile.targetRole || 'Software Development',
             builderScore: state.studentProfile.builderScores?.overall || 785,
             employabilityScore: state.studentProfile.careerReadinessScore || 88,
+            careerReadinessScore: state.studentProfile.careerReadinessScore || 90,
+            githubScore: state.studentProfile.professional?.githubScore || (state.githubData.connected ? 890 : 750),
             stage: 'Matched',
             appliedDate: 'Just now',
             topSkills: (state.studentProfile.verifiedSkills || []).map((s) => s.name).slice(0, 4),
             githubUrl: state.studentProfile.professional?.githubUrl || (state.githubData.connected ? `https://github.com/${state.githubData.username}` : 'https://github.com'),
+            linkedinUrl: state.studentProfile.professional?.linkedinUrl || 'https://linkedin.com',
+            portfolioUrl: state.studentProfile.professional?.portfolioUrl,
+            resumeUrl: state.studentProfile.professional?.resumeUrl,
             matchScore: customDetails?.matchScore || 94,
+            verifiedSkills: (state.studentProfile.verifiedSkills || []).map((s) => ({
+              name: s.name,
+              category: s.category,
+              level: s.level,
+              score: s.score,
+              sources: s.verificationSources,
+            })),
+            projects: (state.studentProfile.evidences || []).map((e) => ({
+              title: e.title,
+              techStack: ['TypeScript', 'Cloud'],
+              githubUrl: e.url,
+              projectScore: e.impactScore,
+              description: e.description,
+            })),
           };
 
           return {
@@ -1265,6 +1490,188 @@ export const useAppStore = create<AppState>()(
             userProfilesByEmail: email
               ? { ...state.userProfilesByEmail, [email]: updated }
               : state.userProfilesByEmail,
+          };
+        }),
+
+      // AI Copilot 4.0 Multi-Session Chat Engine
+      copilotSessions: [INITIAL_COPILOT_SESSION],
+      activeCopilotSessionId: INITIAL_COPILOT_SESSION.id,
+      activeCopilotMode: 'career',
+
+      createCopilotSession: (mode = 'career', title) => {
+        const modeTitles: Record<CopilotMentorMode, string> = {
+          career: 'Career Mentor & Roadmap Session',
+          project: 'Project Architecture & MVP Review',
+          interview: 'Live Technical & HR Mock Interview',
+          learning: 'Daily & Weekly Learning Coach',
+          opportunity: 'Internship & Job Match Advisor',
+          general: 'Technical Copilot & Coding Assistant',
+        };
+
+        const newSessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
+        const sessionTitle = title || modeTitles[mode] || 'New Mentorship Session';
+
+        const initialMsg: CopilotChatMessage = {
+          id: `msg-${Date.now()}`,
+          sender: 'assistant',
+          content: `Switched to **${sessionTitle}**.\n\nHow can I help you accelerate your verified builder progress today?`,
+          timestamp: 'Just now',
+          mode,
+          suggestedActions:
+            mode === 'interview'
+              ? ['🎯 Start DSA Screening Question', '🎙️ Mock Behavioral Question', '💻 System Design Problem']
+              : mode === 'project'
+              ? ['🏗️ Architecture Review for Microservices', '📦 Database Schema Optimization', '🚀 MVP Feature Scoping']
+              : mode === 'learning'
+              ? ['📅 Generate 7-Day Sprint Plan', '⚡ Explain Skill Gaps', '📚 Recommended Official Docs']
+              : ['🎯 Review my profile & GitHub', '⚡ Explain top skill gaps', '💼 Recommend matching opportunities'],
+        };
+
+        const newSession: CopilotChatSession = {
+          id: newSessionId,
+          title: sessionTitle,
+          mode,
+          pinned: false,
+          createdAt: 'Today',
+          updatedAt: 'Just now',
+          messages: [initialMsg],
+        };
+
+        set((state) => ({
+          copilotSessions: [newSession, ...state.copilotSessions],
+          activeCopilotSessionId: newSessionId,
+          activeCopilotMode: mode,
+        }));
+
+        return newSessionId;
+      },
+
+      switchCopilotSession: (sessionId) =>
+        set((state) => {
+          const session = state.copilotSessions.find((s) => s.id === sessionId);
+          return {
+            activeCopilotSessionId: sessionId,
+            activeCopilotMode: session ? session.mode : state.activeCopilotMode,
+          };
+        }),
+
+      renameCopilotSession: (sessionId, newTitle) =>
+        set((state) => ({
+          copilotSessions: state.copilotSessions.map((s) =>
+            s.id === sessionId ? { ...s, title: newTitle.trim() || s.title, updatedAt: 'Just now' } : s
+          ),
+        })),
+
+      deleteCopilotSession: (sessionId) =>
+        set((state) => {
+          const filtered = state.copilotSessions.filter((s) => s.id !== sessionId);
+          const nextSessions = filtered.length > 0 ? filtered : [INITIAL_COPILOT_SESSION];
+          const nextActiveId =
+            state.activeCopilotSessionId === sessionId ? nextSessions[0].id : state.activeCopilotSessionId;
+          return {
+            copilotSessions: nextSessions,
+            activeCopilotSessionId: nextActiveId,
+          };
+        }),
+
+      pinCopilotSession: (sessionId) =>
+        set((state) => ({
+          copilotSessions: state.copilotSessions.map((s) =>
+            s.id === sessionId ? { ...s, pinned: !s.pinned } : s
+          ),
+        })),
+
+      addMessageToActiveSession: (msg) =>
+        set((state) => {
+          const sessionIndex = state.copilotSessions.findIndex((s) => s.id === state.activeCopilotSessionId);
+          if (sessionIndex < 0) return state;
+
+          const newMessage: CopilotChatMessage = {
+            id: msg.id || `msg-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+            timestamp: msg.timestamp || 'Just now',
+            ...msg,
+          };
+
+          const currentSession = state.copilotSessions[sessionIndex];
+          const updatedSession: CopilotChatSession = {
+            ...currentSession,
+            updatedAt: 'Just now',
+            messages: [...currentSession.messages, newMessage],
+          };
+
+          const updatedSessions = [...state.copilotSessions];
+          updatedSessions[sessionIndex] = updatedSession;
+
+          return { copilotSessions: updatedSessions };
+        }),
+
+      updateLastAssistantMessage: (content, suggestedActions, codeSnippets) =>
+        set((state) => {
+          const sessionIndex = state.copilotSessions.findIndex((s) => s.id === state.activeCopilotSessionId);
+          if (sessionIndex < 0) return state;
+
+          const currentSession = state.copilotSessions[sessionIndex];
+          const msgs = [...currentSession.messages];
+          if (msgs.length === 0) return state;
+
+          const lastMsgIndex = msgs.length - 1;
+          const lastMsg = msgs[lastMsgIndex];
+          if (lastMsg.sender !== 'assistant') return state;
+
+          msgs[lastMsgIndex] = {
+            ...lastMsg,
+            content,
+            suggestedActions: suggestedActions || lastMsg.suggestedActions,
+            codeSnippets: codeSnippets || lastMsg.codeSnippets,
+            isStreaming: false,
+          };
+
+          const updatedSession = { ...currentSession, messages: msgs, updatedAt: 'Just now' };
+          const updatedSessions = [...state.copilotSessions];
+          updatedSessions[sessionIndex] = updatedSession;
+
+          return { copilotSessions: updatedSessions };
+        }),
+
+      clearActiveSessionMessages: () =>
+        set((state) => {
+          const sessionIndex = state.copilotSessions.findIndex((s) => s.id === state.activeCopilotSessionId);
+          if (sessionIndex < 0) return state;
+
+          const currentSession = state.copilotSessions[sessionIndex];
+          const initialMsg: CopilotChatMessage = {
+            id: `msg-${Date.now()}`,
+            sender: 'assistant',
+            content: `Conversation cleared. I am ready with your complete builder context!`,
+            timestamp: 'Just now',
+            mode: currentSession.mode,
+            suggestedActions: [
+              '🎯 Review my profile & GitHub',
+              '⚡ Explain my top skill gaps',
+              '🎙️ Technical Screening Questions',
+            ],
+          };
+
+          const updatedSession = { ...currentSession, messages: [initialMsg], updatedAt: 'Just now' };
+          const updatedSessions = [...state.copilotSessions];
+          updatedSessions[sessionIndex] = updatedSession;
+
+          return { copilotSessions: updatedSessions };
+        }),
+
+      setCopilotMentorMode: (mode) =>
+        set((state) => {
+          const sessionIndex = state.copilotSessions.findIndex((s) => s.id === state.activeCopilotSessionId);
+          if (sessionIndex < 0) return { activeCopilotMode: mode };
+
+          const currentSession = state.copilotSessions[sessionIndex];
+          const updatedSession = { ...currentSession, mode };
+          const updatedSessions = [...state.copilotSessions];
+          updatedSessions[sessionIndex] = updatedSession;
+
+          return {
+            activeCopilotMode: mode,
+            copilotSessions: updatedSessions,
           };
         }),
 

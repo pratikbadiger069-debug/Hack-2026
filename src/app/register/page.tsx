@@ -65,8 +65,8 @@ export default function RegisterPage() {
     setErrorMessage(null);
     try {
       await new Promise((res) => setTimeout(res, 600));
-      const dummyEmail = email.trim() || 'student@skillbridge.edu';
-      const dummyName = name.trim() || 'New Builder';
+      const dummyEmail = email.trim() || 'manutej.reddy@hitam.org';
+      const dummyName = name.trim() || 'Manutej Reddy';
       loginWithGoogle(dummyEmail, dummyName);
       router.push('/onboarding');
     } catch (err: any) {
@@ -79,7 +79,7 @@ export default function RegisterPage() {
     setOauthLoading('github');
     setErrorMessage(null);
     try {
-      const ghUser = name.trim() ? name.trim().toLowerCase().replace(/\s+/g, '-') : 'builder-dev';
+      const ghUser = name.trim() ? name.trim().toLowerCase().replace(/\s+/g, '-') : 'manutejreddy';
       await loginWithGitHub(ghUser);
       router.push('/onboarding');
     } catch (err: any) {

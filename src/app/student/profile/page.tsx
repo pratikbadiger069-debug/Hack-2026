@@ -8,6 +8,7 @@ import { PortalLayout } from '@/components/layout/PortalLayout';
 import { useAppStore } from '@/lib/store';
 import { getLevelInfo, calculateTransparentBuilderScore } from '@/lib/xp-engine';
 import { formatUserProfileLocation } from '@/lib/location-utils';
+import { getUserDisplayName } from '@/lib/user-utils';
 import { User, ShieldCheck, Building, Target, MapPin, Trophy, CheckCircle2, ExternalLink, Flame, Award, BookOpen, ArrowRight, Settings, RefreshCw, GitPullRequest, Star, Sparkles, LogOut, Key, Trash2, Check, AlertCircle, Unlink } from 'lucide-react';
 import { UserAvatar } from '@/components/avatar/UserAvatar';
 import { AvatarModal } from '@/components/avatar/AvatarModal';
@@ -162,7 +163,7 @@ export default function StudentProfilePage() {
               >
                 <UserAvatar
                   src={studentProfile.avatar || currentUser?.avatar}
-                  name={studentProfile.name || currentUser?.name || 'Aarav Sharma'}
+                  name={getUserDisplayName(studentProfile, currentUser)}
                   size="2xl"
                   interactive
                 />
@@ -174,7 +175,7 @@ export default function StudentProfilePage() {
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h1 className="text-2xl md:text-3xl font-bold text-[#1B1B1B] tracking-tight">
-                    {studentProfile.name || currentUser?.name || 'Aarav Sharma'}
+                    {getUserDisplayName(studentProfile, currentUser)}
                   </h1>
                   <span className="px-2.5 py-0.5 rounded-full bg-[#C76A2A]/10 text-[#C76A2A] text-xs font-semibold">
                     Level {levelInfo.level} {levelInfo.title}
@@ -357,7 +358,7 @@ export default function StudentProfilePage() {
                   </>
                 ) : (
                   <button
-                    onClick={() => connectGitHub('aarav-builder')}
+                    onClick={() => connectGitHub('manutejreddy')}
                     className="w-full py-1.5 bg-[#1B1B1B] text-white rounded-lg text-[11px] font-semibold hover:bg-[#C76A2A] transition-colors"
                   >
                     Connect GitHub

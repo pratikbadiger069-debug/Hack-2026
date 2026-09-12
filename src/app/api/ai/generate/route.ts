@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
           'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
-          model: 'claude-3-5-sonnet-20241022',
+          model: body.model || 'claude-3-5-sonnet-20241022',
           system: systemPrompt || undefined,
           messages: [{ role: 'user', content: userPrompt }],
           max_tokens: 4000,
@@ -122,7 +122,96 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ result: text });
     }
 
-    return NextResponse.json({ error: 'Unsupported provider' }, { status: 400 });
+    // 4. Groq Inference
+    if (provider === 'groq') {
+      const endpoint = 'https://api.groq.com/openai/v1/chat/completions';
+      const messages = [];
+      if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
+      messages.push({ role: 'user', content: userPrompt });
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${key}`,
+        },
+        body: JSON.stringify({
+          model: body.model || 'llama-3.3-70b-versatile',
+          messages,
+        }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        return NextResponse.json({ error: err?.error?.message || 'Groq generation failed' }, { status: response.status });
+      }
+
+      const data = await response.json();
+      const text = data?.choices?.[0]?.message?.content || '';
+      return NextResponse.json({ result: text });
+    }
+
+    // 5. OpenRouter Inference
+    if (provider === 'openrouter') {
+      const endpoint = 'https://openrouter.ai/api/v1/chat/completions';
+      const messages = [];
+      if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
+      messages.push({ role: 'user', content: userPrompt });
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${key}`,
+          'HTTP-Referer': 'https://skillbridge.ai',
+          'X-Title': 'SkillBridge AI Builder OS',
+        },
+        body: JSON.stringify({
+          model: body.model || 'deepseek/deepseek-chat',
+          messages,
+        }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        return NextResponse.json({ error: err?.error?.message || 'OpenRouter generation failed' }, { status: response.status });
+      }
+
+      const data = await response.json();
+      const text = data?.choices?.[0]?.message?.content || '';
+      return NextResponse.json({ result: text });
+    }
+
+    // 6. DeepSeek Inference
+    if (provider === 'deepseek') {
+      const endpoint = 'https://api.deepseek.com/chat/completions';
+      const messages = [];
+      if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
+      messages.push({ role: 'user', content: userPrompt });
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${key}`,
+        },
+        body: JSON.stringify({
+          model: body.model || 'deepseek-chat',
+          messages,
+        }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        return NextResponse.json({ error: err?.error?.message || 'DeepSeek generation failed' }, { status: response.status });
+      }
+
+      const data = await response.json();
+      const text = data?.choices?.[0]?.message?.content || '';
+      return NextResponse.json({ result: text });
+    }
+
+    return NextResponse.json({ error: `Unsupported provider: ${provider}` }, { status: 400 });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'AI request failed' }, { status: 500 });
   }

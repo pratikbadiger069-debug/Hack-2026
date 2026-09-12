@@ -90,5 +90,5 @@ export function generateSvgAvatar(seed: string, style: AvatarStyle = 'minimalist
  * Returns default avatar for a given user or seed
  */
 export function getDefaultAvatar(nameOrEmail: string): string {
-  return generateSvgAvatar(nameOrEmail || 'aarav-builder', 'minimalist-geometric');
+  return generateSvgAvatar(nameOrEmail || 'manutejreddy', 'minimalist-geometric');
 }

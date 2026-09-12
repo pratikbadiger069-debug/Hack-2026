@@ -3,10 +3,15 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '@/lib/store';
 import { UserRole } from '@/types';
 import { getUserDisplayName } from '@/lib/user-utils';
+import GlassCard from '@/components/ui/GlassCard';
+import GradientButton from '@/components/ui/GradientButton';
+import AnimatedCounter from '@/components/ui/AnimatedCounter';
+import SectionHeading from '@/components/ui/SectionHeading';
+import ParticleField from '@/components/ui/ParticleField';
 import {
   Sparkles,
   ArrowRight,
@@ -18,6 +23,12 @@ import {
   Building,
   Users,
   Briefcase,
+  Code2,
+  GitBranch,
+  Trophy,
+  MessageSquare,
+  Flame,
+  Target,
 } from 'lucide-react';
 
 export default function LandingPage() {
@@ -33,15 +44,6 @@ export default function LandingPage() {
 
   const displayName = getUserDisplayName({ user: currentUser, profile: studentProfile });
 
-  const liveStats = [
-    { label: 'Students Verified', value: '14,820+', icon: Users, change: '+18% this month' },
-    { label: 'Assessments Completed', value: '58,400+', icon: CheckCircle2, change: '100% proctored' },
-    { label: 'Projects Evaluated', value: '12,900+', icon: Layers, change: 'Code verified' },
-    { label: 'Institutions Connected', value: '185+', icon: GraduationCap, change: 'Autonomous & State' },
-    { label: 'Industry Partners', value: '420+', icon: Building, change: 'Hiring verified builders' },
-    { label: 'Opportunities Generated', value: '3,600+', icon: Briefcase, change: 'Avg $95k CTC' },
-  ];
-
   const howItWorksSteps = [
     {
       step: '01',
@@ -49,7 +51,8 @@ export default function LandingPage() {
       subtitle: 'Projects • Assessments • Challenges',
       description: 'Solve real-world distributed systems, full-stack microservices, and AI inference tasks with strict in-browser evaluation and zero guesswork.',
       tags: ['Production Repos', 'MCQs & Coding', 'Debugging Benchmarks'],
-      accent: '#C76A2A',
+      icon: Code2,
+      accent: 'var(--accent)',
     },
     {
       step: '02',
@@ -57,7 +60,8 @@ export default function LandingPage() {
       subtitle: 'Skills • GitHub • Industry Challenges',
       description: 'Every achievement earns cryptographic verification codes, confidence ratings (70-98%), and deterministic Builder Score points.',
       tags: ['Skill Confidence Engine', 'GitHub Scan', 'Faculty Audited'],
-      accent: '#1B1B1B',
+      icon: ShieldCheck,
+      accent: 'var(--text-primary)',
     },
     {
       step: '03',
@@ -65,38 +69,96 @@ export default function LandingPage() {
       subtitle: 'Opportunities • Internships • Mentors',
       description: 'Match directly with top tech firms based on verified proof of work. No static resume screening—your verifiable score speaks for itself.',
       tags: ['Direct Recruiter Access', 'Automated Shortlisting', 'Career Copilot'],
-      accent: '#2F7A45',
+      icon: Target,
+      accent: 'var(--success)',
     },
   ];
 
+  const builderScorePillars = [
+    { pillar: 'Verified Assessments', weight: 30, points: 300, desc: 'Strict proctored MCQs, debugging benchmarks, and architecture challenges.', icon: CheckCircle2 },
+    { pillar: 'Verified Projects', weight: 25, points: 250, desc: 'Production repositories with tests, benchmarks, and runnable live demos.', icon: Layers },
+    { pillar: 'GitHub Proof of Work', weight: 15, points: 150, desc: 'Scanned commit frequency, multi-language distribution, and stars.', icon: GitBranch },
+    { pillar: 'Industry Challenges', weight: 10, points: 100, desc: 'Company-sponsored hiring challenges, hackathons, and certifications.', icon: Trophy },
+    { pillar: 'Communication', weight: 10, points: 100, desc: 'Technical RFC design writing, constructive code reviews, and pitch.', icon: MessageSquare },
+    { pillar: 'Consistency', weight: 10, points: 100, desc: 'Daily building streak, weekly verification cadence, and continuous effort.', icon: Flame },
+  ];
+
+  const portalTabs = [
+    { id: 'student', label: 'Student Portal', role: 'student' as UserRole, icon: GraduationCap },
+    { id: 'industry', label: 'Industry Portal', role: 'industry' as UserRole, icon: Briefcase },
+    { id: 'institute', label: 'Institution Portal', role: 'institute' as UserRole, icon: Building },
+    { id: 'admin', label: 'Admin Portal', role: 'admin' as UserRole, icon: Users },
+  ];
+
+  const portalContent = {
+    student: {
+      title: 'Student Portal — Builder Operating System',
+      desc: 'Real-time XP, deterministic 6-pillar score, verified passport, and adaptive assessments.',
+      cards: [
+        { label: 'Builder Score', value: '885 / 1000', detail: '30% Assessments + 25% Projects + 15% GitHub + 10% Industry + 10% Comm + 10% Streak', color: 'var(--text-primary)' },
+        { label: 'Adaptive Assessments', value: '16 Seeded Tracks', detail: 'Java, Spring Boot, REST APIs, Microservices, ML, Neural Networks, Docker, React', color: 'var(--accent)' },
+        { label: 'Career Copilot', value: 'Personalized Mentor', detail: 'Evaluates verified git commits and gaps to recommend targeted high-impact tracks', color: 'var(--success)' },
+      ],
+    },
+    industry: {
+      title: 'Industry Portal — Assessment Builder & Talent Discovery',
+      desc: 'Build multi-format assessments, set custom XP/thresholds, and filter top-tier verified builders.',
+      cards: [
+        { label: 'Assessment Builder', value: 'Multi-Format Creator', detail: 'MCQ, Coding, Debugging, Case Study, and Video/File submission proofs', color: 'var(--accent)' },
+        { label: 'Talent Pipeline', value: 'Zero-Resume Screening', detail: 'Filter by verified score ≥ 850, proven git repositories, and challenge pass rates', color: 'var(--text-primary)' },
+        { label: 'Direct Fast-Track', value: 'Instant Candidate Pipeline', detail: 'Passing company challenges immediately routes students into recruiter interview queues', color: 'var(--success)' },
+      ],
+    },
+    institute: {
+      title: 'Institution Portal — Institutional Intelligence',
+      desc: 'Track department readiness, placement velocity, curriculum gaps, and top student builders.',
+      cards: [
+        { label: 'Department Benchmarks', value: 'CSE: 86% • AIML: 89%', detail: 'Live student aggregate readiness calculated from proctored challenge results', color: 'var(--text-primary)' },
+        { label: 'Curriculum Alignment', value: 'Industry Relevance: 78%', detail: 'Highlights missing modules: Vector DBs, Cloud Native CI/CD, and gRPC microservices', color: 'var(--accent)' },
+        { label: 'Placement Cell', value: 'Pre-Verified Roster', detail: 'Share verified builder passports directly with visiting campus recruitment panels', color: 'var(--success)' },
+      ],
+    },
+    admin: {
+      title: 'Super Admin Portal — Governance & Scale',
+      desc: 'Platform-wide health, verification audit logs, institution management, and skill demand intelligence.',
+      cards: [
+        { label: 'System Health', value: '99.99% Uptime', detail: 'Live telemetry monitoring assessment test runners and OAuth synchronizations', color: 'var(--success)' },
+        { label: 'Verification Queue', value: 'Cryptographic Signatures', detail: 'Audit code submissions, anti-cheat flags, and issue immutable certificate IDs', color: 'var(--text-primary)' },
+        { label: 'Skill Demand Intel', value: 'Real-time Market Telemetry', detail: 'Aggregated hiring demand from industry partners across AI, Cloud, and Backend', color: 'var(--accent)' },
+      ],
+    },
+  };
+
+  const activePortal = portalContent[activePortalTab];
+
   return (
-    <div className="min-h-screen bg-[#F6F4EE] text-[#1B1B1B] selection:bg-[#E8E5DD]">
-      
-      {/* Sticky Clean Header */}
-      <header className="sticky top-0 z-50 w-full bg-[#F6F4EE]/90 backdrop-blur-md border-b border-[#E8E5DD]">
+    <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-primary)] selection:bg-[var(--accent-light)]">
+
+      {/* ──── STICKY GLASS HEADER ──── */}
+      <header className="sticky top-0 z-50 w-full border-b border-[var(--border-main)]" style={{ background: 'var(--glass-bg)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
         <div className="flex items-center justify-between h-16 px-6 lg:px-12 max-w-[1400px] mx-auto">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#1B1B1B] flex items-center justify-center text-white font-bold text-xs">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-8 h-8 rounded-xl bg-[var(--text-primary)] flex items-center justify-center text-[var(--bg-page)] font-bold text-xs transition-all group-hover:bg-[var(--accent)] group-hover:scale-105">
               SB
             </div>
             <div className="flex items-baseline gap-1.5">
-              <span className="font-bold text-sm tracking-tight text-[#1B1B1B]">SKILLBRIDGE</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-md bg-[#C76A2A]/10 text-[#C76A2A] font-bold">V7</span>
+              <span className="font-bold text-sm tracking-tight text-[var(--text-primary)]">SKILLBRIDGE</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-[var(--accent-light)] text-[var(--accent)] font-bold">V7</span>
             </div>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-8 text-xs font-semibold text-[#6F6A60]">
-            <a href="#how-it-works" className="hover:text-[#1B1B1B] transition-colors">How It Works</a>
-            <a href="#portals" className="hover:text-[#1B1B1B] transition-colors">Ecosystem</a>
-            <a href="#formula" className="hover:text-[#1B1B1B] transition-colors">Builder Score Formula</a>
-            <Link href="/demo" className="hover:text-[#1B1B1B] transition-colors">Interactive Demo</Link>
+          <nav className="hidden md:flex items-center gap-8 text-xs font-semibold text-[var(--text-secondary)]">
+            <a href="#how-it-works" className="nav-link">How It Works</a>
+            <a href="#portals" className="nav-link">Ecosystem</a>
+            <a href="#formula" className="nav-link">Builder Score</a>
+            <Link href="/demo" className="nav-link">Interactive Demo</Link>
           </nav>
 
           <div className="flex items-center gap-3">
             {currentUser ? (
               <Link
                 href="/student"
-                className="px-4 py-2 bg-[#1B1B1B] text-white rounded-xl text-xs font-semibold hover:bg-[#C76A2A] transition-all shadow-xs"
+                className="px-4 py-2 bg-[var(--text-primary)] text-[var(--bg-page)] rounded-xl text-xs font-semibold hover:bg-[var(--accent)] transition-all shadow-sm"
               >
                 Go to Workspace ({displayName.split(' ')[0]})
               </Link>
@@ -104,449 +166,324 @@ export default function LandingPage() {
               <>
                 <Link
                   href="/login"
-                  className="px-3.5 py-1.5 text-xs font-semibold text-[#6F6A60] hover:text-[#1B1B1B] transition-colors"
+                  className="px-3.5 py-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
                 >
                   Sign In
                 </Link>
-                <Link
-                  href="/register"
-                  className="px-4 py-2 bg-[#1B1B1B] text-white rounded-xl text-xs font-semibold hover:bg-[#C76A2A] transition-all shadow-xs"
-                >
+                <GradientButton href="/register" size="sm" variant="primary" icon={<ArrowRight className="w-3.5 h-3.5" />}>
                   Get Started
-                </Link>
+                </GradientButton>
               </>
             )}
           </div>
         </div>
       </header>
 
-      {/* HERO SECTION */}
-      <section className="pt-20 pb-16 px-6 lg:px-12 max-w-[1300px] mx-auto text-center space-y-8">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white text-[#1B1B1B] border border-[#E8E5DD] shadow-xs"
-        >
-          <Sparkles className="w-3.5 h-3.5 text-[#C76A2A]" />
-          <span>National-Scale Student → Industry Intelligence Platform</span>
-        </motion.div>
+      {/* ──── HERO SECTION ──── */}
+      <section className="relative pt-24 pb-20 px-6 lg:px-12 max-w-[1300px] mx-auto text-center space-y-8 overflow-hidden">
+        <ParticleField count={20} />
 
-        <motion.h1
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.05 }}
-          className="text-5xl sm:text-7xl font-extrabold tracking-tight text-[#1B1B1B] max-w-4xl mx-auto leading-[1.08]"
-        >
-          Build Proof.<br />
-          <span className="text-[#6F6A60] font-normal">Not Just Profiles.</span>
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-          className="text-base sm:text-lg text-[#6F6A60] max-w-2xl mx-auto leading-relaxed font-medium"
-        >
-          SkillBridge helps students prove their skills, discover career gaps, and connect with opportunities through verified assessments and project-based evaluation.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.15 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2"
-        >
-          <Link
-            href="/register"
-            className="w-full sm:w-auto px-7 py-3.5 bg-[#1B1B1B] hover:bg-[#C76A2A] text-white rounded-xl text-xs font-semibold transition-all shadow-xs flex items-center justify-center gap-2"
+        <div className="relative z-10 space-y-8">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold glass-card border border-[var(--glass-border)] shadow-sm"
           >
-            <span>Get Started</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-          <button
-            onClick={() => handleLaunchDemo('student')}
-            className="w-full sm:w-auto px-7 py-3.5 bg-white hover:bg-[#F6F4EE] text-[#1B1B1B] border border-[#E8E5DD] rounded-xl text-xs font-semibold transition-all shadow-xs flex items-center justify-center gap-2"
-          >
-            <span>View Demo</span>
-          </button>
-        </motion.div>
+            <Sparkles className="w-3.5 h-3.5 text-[var(--accent)]" />
+            <span>National-Scale Student → Industry Intelligence Platform</span>
+          </motion.div>
 
-        {/* LIVE PLATFORM STATS GRID */}
-        <div className="pt-12 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {liveStats.map((stat, idx) => {
-            const Icon = stat.icon;
+          <motion.h1
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.08 }}
+            className="text-5xl sm:text-7xl lg:text-8xl font-extrabold tracking-tight text-[var(--text-primary)] max-w-5xl mx-auto leading-[1.05]"
+          >
+            Build Proof.<br />
+            <span className="text-[var(--text-secondary)] font-normal">Not Just Profiles.</span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.16 }}
+            className="text-base sm:text-lg text-[var(--text-secondary)] max-w-2xl mx-auto leading-relaxed font-medium"
+          >
+            SkillBridge helps students prove their skills, discover career gaps, and connect with opportunities through verified assessments and project-based evaluation.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.24 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
+          >
+            <GradientButton href="/register" size="lg" variant="primary" icon={<ArrowRight className="w-4 h-4" />}>
+              Get Started
+            </GradientButton>
+            <GradientButton onClick={() => handleLaunchDemo('student')} size="lg" variant="glass">
+              View Demo
+            </GradientButton>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ──── PROBLEM & SOLUTION ──── */}
+      <section className="py-24 px-6 lg:px-12 bg-gradient-section border-y border-[var(--border-main)]">
+        <div className="max-w-[1200px] mx-auto space-y-14">
+          <SectionHeading
+            label="The Fundamental Problem"
+            title="Traditional Education Measures Marks. Industry Measures Skills. SkillBridge Bridges Both."
+            subtitle="Resumes can be exaggerated and college GPAs only measure memory. SkillBridge creates verifiable digital proof through proctored coding assessments, repository commits, and project reviews."
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <GlassCard className="p-8 space-y-5" delay={0.1}>
+              <span className="inline-block px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold uppercase dark:bg-red-900/30 dark:text-red-400">
+                The Old Broken Way
+              </span>
+              <h3 className="text-lg font-bold text-[var(--text-primary)]">Unverifiable Claims & Keyword Games</h3>
+              <ul className="space-y-3 text-sm text-[var(--text-secondary)]">
+                {[
+                  'Students spend hours crafting ATS resumes with fake bullet points.',
+                  'Recruiters spend 6 seconds skimming keywords, rejecting top builders.',
+                  'Institutions have zero visibility into real industry skill alignment.',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5">
+                    <span className="text-red-500 font-bold mt-0.5 shrink-0">✕</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </GlassCard>
+
+            <GlassCard variant="dark" className="p-8 space-y-5 text-white" delay={0.2}>
+              <span className="inline-block px-3 py-1 rounded-full bg-[var(--accent)] text-white text-xs font-bold uppercase">
+                The SkillBridge Standard
+              </span>
+              <h3 className="text-lg font-bold text-white">Cryptographic Proof of Real Competence</h3>
+              <ul className="space-y-3 text-sm text-white/80">
+                {[
+                  'Deterministic 6-pillar Builder Score calculated across code, MCQs, and git.',
+                  'Skill Confidence Engine (70-98%) with direct source audit trails.',
+                  'Direct talent discovery pipeline: companies filter by verified score, not college tier.',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5">
+                    <span className="text-[var(--success)] font-bold mt-0.5 shrink-0">✓</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </GlassCard>
+          </div>
+        </div>
+      </section>
+
+      {/* ──── HOW IT WORKS 3-STEP PIPELINE ──── */}
+      <section id="how-it-works" className="py-24 px-6 lg:px-12 max-w-[1300px] mx-auto space-y-14">
+        <SectionHeading
+          label="The 3-Step Verification Engine"
+          title="How SkillBridge Works"
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+          {/* Connector line (desktop only) */}
+          <div className="hidden md:block absolute top-1/2 left-0 right-0 h-[2px] -translate-y-1/2 z-0">
+            <div className="w-full h-full bg-gradient-to-r from-[var(--accent)] via-[var(--text-muted)] to-[var(--success)] opacity-15 rounded-full" />
+          </div>
+
+          {howItWorksSteps.map((step, idx) => {
+            const Icon = step.icon;
             return (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.25, delay: 0.1 + idx * 0.04 }}
-                className="p-4 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs text-left space-y-1"
+              <GlassCard
+                key={step.step}
+                className="p-8 flex flex-col justify-between space-y-6 relative z-10"
+                hoverGlow
+                delay={idx * 0.12}
               >
-                <div className="flex items-center justify-between">
-                  <Icon className="w-4 h-4 text-[#C76A2A]" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#2F7A45] animate-pulse" />
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: `${step.accent}15` }}>
+                      <Icon className="w-5 h-5" style={{ color: step.accent }} />
+                    </div>
+                    <span className="text-3xl font-black font-mono" style={{ color: step.accent, opacity: 0.25 }}>{step.step}</span>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-[var(--text-primary)]">{step.title}</h3>
+                    <span className="text-xs font-mono font-semibold text-[var(--text-muted)] block mt-1">{step.subtitle}</span>
+                  </div>
+                  <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{step.description}</p>
                 </div>
-                <div className="text-xl font-bold font-mono text-[#1B1B1B] pt-1">{stat.value}</div>
-                <div className="text-[11px] font-semibold text-[#6F6A60]">{stat.label}</div>
-                <div className="text-[10px] text-[#2F7A45] font-semibold">{stat.change}</div>
-              </motion.div>
+
+                <div className="flex flex-wrap gap-1.5 pt-4 border-t border-[var(--border-subtle)]">
+                  {step.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2.5 py-1 rounded-lg text-[11px] font-semibold text-[var(--text-primary)]"
+                      style={{ background: 'var(--accent-light)' }}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </GlassCard>
             );
           })}
         </div>
       </section>
 
-      {/* PROBLEM & SOLUTION SECTION */}
-      <section className="py-20 px-6 lg:px-12 bg-white border-y border-[#E8E5DD]">
-        <div className="max-w-[1200px] mx-auto space-y-12 text-center">
-          <div className="space-y-3">
-            <span className="text-xs font-mono uppercase tracking-wider text-[#C76A2A] font-bold">
-              The Fundamental Problem
-            </span>
-            <h2 className="text-3xl sm:text-5xl font-extrabold text-[#1B1B1B] tracking-tight max-w-3xl mx-auto">
-              Traditional Education Measures Marks.<br />
-              <span className="text-[#C76A2A]">Industry Measures Skills.</span><br />
-              SkillBridge Bridges Both.
-            </h2>
-            <p className="text-xs sm:text-sm text-[#6F6A60] max-w-2xl mx-auto leading-relaxed">
-              Resumes can be exaggerated and college GPAs only measure memory. SkillBridge creates verifiable digital proof through proctored coding assessments, repository commits, and project reviews.
-            </p>
-          </div>
+      {/* ──── 4 CORE PORTALS ECOSYSTEM ──── */}
+      <section id="portals" className="py-24 px-6 lg:px-12 bg-gradient-section border-y border-[var(--border-main)]">
+        <div className="max-w-[1300px] mx-auto space-y-12">
+          <SectionHeading
+            label="Interconnected Platform Architecture"
+            title="4 Core Portals. One Central Intelligence Layer."
+            subtitle="Actions in one portal instantly cascade across the entire ecosystem. Nothing is isolated."
+          />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-            <div className="p-8 rounded-2xl bg-[#F6F4EE] border border-[#E8E5DD] space-y-4">
-              <span className="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold uppercase">
-                The Old Broken Way
-              </span>
-              <h3 className="text-lg font-bold text-[#1B1B1B]">Unverifiable Claims &amp; Keyword Games</h3>
-              <ul className="space-y-2.5 text-xs text-[#6F6A60]">
-                <li className="flex items-start gap-2">
-                  <span className="text-red-500 font-bold">✕</span>
-                  <span>Students spend hours crafting ATS resumes with fake bullet points.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-red-500 font-bold">✕</span>
-                  <span>Recruiters spend 6 seconds skimming keywords, rejecting top builders.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-red-500 font-bold">✕</span>
-                  <span>Institutions have zero visibility into real industry skill alignment.</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="p-8 rounded-2xl bg-[#1B1B1B] text-white space-y-4">
-              <span className="px-3 py-1 rounded-full bg-[#C76A2A] text-white text-xs font-bold uppercase">
-                The SkillBridge Standard
-              </span>
-              <h3 className="text-lg font-bold text-white">Cryptographic Proof of Real Competence</h3>
-              <ul className="space-y-2.5 text-xs text-white/80">
-                <li className="flex items-start gap-2">
-                  <span className="text-[#2F7A45] font-bold">✓</span>
-                  <span>Deterministic 6-pillar Builder Score calculated across code, MCQs, and git.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[#2F7A45] font-bold">✓</span>
-                  <span>Skill Confidence Engine (70-98%) with direct source audit trails.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[#2F7A45] font-bold">✓</span>
-                  <span>Direct talent discovery pipeline: companies filter by verified score, not college tier.</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS 3-STEP PIPELINE */}
-      <section id="how-it-works" className="py-20 px-6 lg:px-12 max-w-[1300px] mx-auto space-y-12">
-        <div className="text-center space-y-2">
-          <span className="text-xs font-mono uppercase tracking-wider text-[#C76A2A] font-bold">
-            The 3-Step Verification Engine
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1B1B1B] tracking-tight">
-            How SkillBridge Works
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {howItWorksSteps.map((step) => (
-            <div
-              key={step.step}
-              className="p-8 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs flex flex-col justify-between space-y-6 hover:border-[#C76A2A] transition-all"
-            >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-black font-mono text-[#C76A2A]">{step.step}</span>
-                  <span className="text-xs font-mono font-semibold text-[#6F6A60]">{step.subtitle}</span>
-                </div>
-                <h3 className="text-xl font-bold text-[#1B1B1B]">{step.title}</h3>
-                <p className="text-xs text-[#6F6A60] leading-relaxed">{step.description}</p>
-              </div>
-
-              <div className="flex flex-wrap gap-1.5 pt-2 border-t border-[#E8E5DD]">
-                {step.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-2 py-0.5 rounded-md bg-[#F6F4EE] border border-[#E8E5DD] text-[11px] font-semibold text-[#1B1B1B]"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 4 CORE PORTALS ECOSYSTEM SHOWCASE */}
-      <section id="portals" className="py-20 px-6 lg:px-12 bg-white border-y border-[#E8E5DD]">
-        <div className="max-w-[1300px] mx-auto space-y-10">
-          <div className="text-center space-y-2">
-            <span className="text-xs font-mono uppercase tracking-wider text-[#C76A2A] font-bold">
-              Interconnected Platform Architecture
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1B1B1B] tracking-tight">
-              4 Core Portals. One Central Intelligence Layer.
-            </h2>
-            <p className="text-xs text-[#6F6A60] max-w-xl mx-auto">
-              Actions in one portal instantly cascade across the entire ecosystem. Nothing is isolated.
-            </p>
-          </div>
-
-          {/* Portal Tabs */}
+          {/* Pill Tabs */}
           <div className="flex items-center justify-center gap-2 flex-wrap">
-            {[
-              { id: 'student', label: '1. Student Portal (Builder OS)', role: 'student' as UserRole },
-              { id: 'industry', label: '2. Industry Portal (Hiring & Assessor)', role: 'industry' as UserRole },
-              { id: 'institute', label: '3. Institution Portal (Academic Intel)', role: 'institute' as UserRole },
-              { id: 'admin', label: '4. Super Admin Portal (Governance)', role: 'admin' as UserRole },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActivePortalTab(tab.id as any)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                  activePortalTab === tab.id
-                    ? 'bg-[#1B1B1B] text-white shadow-xs'
-                    : 'bg-[#F6F4EE] text-[#6F6A60] hover:text-[#1B1B1B] border border-[#E8E5DD]'
-                }`}
+            {portalTabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <motion.button
+                  key={tab.id}
+                  onClick={() => setActivePortalTab(tab.id as any)}
+                  className={`tab-pill flex items-center gap-2 ${activePortalTab === tab.id ? 'tab-pill-active' : ''}`}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {tab.label}
+                </motion.button>
+              );
+            })}
+          </div>
+
+          {/* Portal Content */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activePortalTab}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.3, ease: [0.33, 1, 0.68, 1] }}
+            >
+              <GlassCard className="p-8 space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-[var(--text-primary)]">{activePortal.title}</h3>
+                    <p className="text-sm text-[var(--text-secondary)] mt-1">{activePortal.desc}</p>
+                  </div>
+                  <GradientButton
+                    onClick={() => handleLaunchDemo(portalTabs.find(t => t.id === activePortalTab)?.role || 'student')}
+                    size="sm"
+                    variant="primary"
+                    icon={<ArrowRight className="w-3.5 h-3.5" />}
+                  >
+                    Open Workspace
+                  </GradientButton>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {activePortal.cards.map((card, idx) => (
+                    <GlassCard key={card.label} className="p-5 space-y-2" delay={idx * 0.08}>
+                      <span className="text-xs font-bold text-[var(--text-primary)] block">{card.label}</span>
+                      <span className="text-lg font-bold block" style={{ color: card.color }}>{card.value}</span>
+                      <p className="text-[11px] text-[var(--text-secondary)]">{card.detail}</p>
+                    </GlassCard>
+                  ))}
+                </div>
+              </GlassCard>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </section>
+
+      {/* ──── BUILDER SCORE FORMULA ──── */}
+      <section id="formula" className="py-24 px-6 lg:px-12 max-w-[1200px] mx-auto space-y-14">
+        <SectionHeading
+          label="Transparent Evaluation Standards"
+          title="The 6-Pillar Builder Score Formula"
+          subtitle="Zero hidden algorithms. A deterministic 1000-point formula calculated across verifiable achievements."
+        />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {builderScorePillars.map((item, idx) => {
+            const Icon = item.icon;
+            return (
+              <GlassCard
+                key={item.pillar}
+                className="p-6 space-y-4"
+                gradientBorder
+                delay={idx * 0.08}
               >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Interactive Portal Preview Container */}
-          <div className="p-8 rounded-3xl bg-[#F6F4EE] border border-[#E8E5DD] shadow-xs">
-            {activePortalTab === 'student' && (
-              <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-[#1B1B1B]">Student Portal — Builder Operating System</h3>
-                    <p className="text-xs text-[#6F6A60]">Real-time XP, deterministic 6-pillar score, verified passport, and adaptive assessments.</p>
-                  </div>
-                  <button
-                    onClick={() => handleLaunchDemo('student')}
-                    className="px-4 py-2 bg-[#1B1B1B] text-white rounded-xl text-xs font-semibold hover:bg-[#C76A2A] transition-colors shrink-0"
-                  >
-                    Open Student Workspace →
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-4 rounded-xl bg-white border border-[#E8E5DD] space-y-2">
-                    <span className="text-xs font-bold text-[#1B1B1B] block">Builder Score</span>
-                    <span className="text-3xl font-bold font-mono text-[#1B1B1B]">885 / 1000</span>
-                    <p className="text-[11px] text-[#6F6A60]">30% Assessments + 25% Projects + 15% GitHub + 10% Industry + 10% Comm + 10% Streak</p>
-                  </div>
-                  <div className="p-4 rounded-xl bg-white border border-[#E8E5DD] space-y-2">
-                    <span className="text-xs font-bold text-[#1B1B1B] block">Adaptive Assessments</span>
-                    <span className="text-xl font-bold text-[#C76A2A]">16 Seeded Tracks</span>
-                    <p className="text-[11px] text-[#6F6A60]">Java, Spring Boot, REST APIs, Microservices, ML, Neural Networks, Docker, React</p>
-                  </div>
-                  <div className="p-4 rounded-xl bg-white border border-[#E8E5DD] space-y-2">
-                    <span className="text-xs font-bold text-[#1B1B1B] block">Career Copilot</span>
-                    <span className="text-xl font-bold text-[#2F7A45]">Personalized Mentor</span>
-                    <p className="text-[11px] text-[#6F6A60]">Evaluates verified git commits and gaps to recommend targeted high-impact tracks</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[var(--accent-light)]">
+                      <Icon className="w-4 h-4 text-[var(--accent)]" />
+                    </div>
+                    <span className="text-sm font-bold text-[var(--text-primary)]">{item.pillar}</span>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {activePortalTab === 'industry' && (
-              <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-[#1B1B1B]">Industry Portal — Assessment Builder &amp; Talent Discovery</h3>
-                    <p className="text-xs text-[#6F6A60]">Build multi-format assessments, set custom XP/thresholds, and filter top-tier verified builders.</p>
-                  </div>
-                  <button
-                    onClick={() => handleLaunchDemo('industry')}
-                    className="px-4 py-2 bg-[#1B1B1B] text-white rounded-xl text-xs font-semibold hover:bg-[#C76A2A] transition-colors shrink-0"
-                  >
-                    Open Industry Workspace →
-                  </button>
+                <div className="flex items-baseline gap-2">
+                  <AnimatedCounter target={item.weight} suffix="%" className="text-2xl text-[var(--accent)]" />
+                  <span className="text-xs text-[var(--text-muted)] font-mono">({item.points} pts)</span>
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-4 rounded-xl bg-white border border-[#E8E5DD] space-y-2">
-                    <span className="text-xs font-bold text-[#1B1B1B] block">Assessment Builder</span>
-                    <span className="text-sm font-bold text-[#C76A2A]">Multi-Format Creator</span>
-                    <p className="text-[11px] text-[#6F6A60]">MCQ, Coding, Debugging, Case Study, and Video/File submission proofs</p>
-                  </div>
-                  <div className="p-4 rounded-xl bg-white border border-[#E8E5DD] space-y-2">
-                    <span className="text-xs font-bold text-[#1B1B1B] block">Talent Pipeline</span>
-                    <span className="text-sm font-bold text-[#1B1B1B]">Zero-Resume Screening</span>
-                    <p className="text-[11px] text-[#6F6A60]">Filter by verified score $\ge 850$, proven git repositories, and challenge pass rates</p>
-                  </div>
-                  <div className="p-4 rounded-xl bg-white border border-[#E8E5DD] space-y-2">
-                    <span className="text-xs font-bold text-[#1B1B1B] block">Direct Fast-Track</span>
-                    <span className="text-sm font-bold text-[#2F7A45]">Instant Candidate Pipeline</span>
-                    <p className="text-[11px] text-[#6F6A60]">Passing company challenges immediately routes students into recruiter interview queues</p>
-                  </div>
+                {/* Visual weight bar */}
+                <div className="w-full h-1.5 rounded-full bg-[var(--border-subtle)] overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full"
+                    style={{ background: 'linear-gradient(90deg, var(--accent), var(--success))' }}
+                    initial={{ width: 0 }}
+                    whileInView={{ width: `${item.weight * 3.33}%` }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1, delay: 0.3 + idx * 0.1, ease: [0.33, 1, 0.68, 1] }}
+                  />
                 </div>
-              </div>
-            )}
-
-            {activePortalTab === 'institute' && (
-              <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-[#1B1B1B]">Institution Portal — Institutional Intelligence</h3>
-                    <p className="text-xs text-[#6F6A60]">Track department readiness, placement velocity, curriculum gaps, and top student builders.</p>
-                  </div>
-                  <button
-                    onClick={() => handleLaunchDemo('institute')}
-                    className="px-4 py-2 bg-[#1B1B1B] text-white rounded-xl text-xs font-semibold hover:bg-[#C76A2A] transition-colors shrink-0"
-                  >
-                    Open Institution Workspace →
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-4 rounded-xl bg-white border border-[#E8E5DD] space-y-2">
-                    <span className="text-xs font-bold text-[#1B1B1B] block">Department Benchmarks</span>
-                    <span className="text-sm font-bold text-[#1B1B1B]">CSE: 86% • AIML: 89%</span>
-                    <p className="text-[11px] text-[#6F6A60]">Live student aggregate readiness calculated from proctored challenge results</p>
-                  </div>
-                  <div className="p-4 rounded-xl bg-white border border-[#E8E5DD] space-y-2">
-                    <span className="text-xs font-bold text-[#1B1B1B] block">Curriculum Alignment</span>
-                    <span className="text-sm font-bold text-[#C76A2A]">Industry Relevance: 78%</span>
-                    <p className="text-[11px] text-[#6F6A60]">Highlights missing modules: Vector DBs, Cloud Native CI/CD, and gRPC microservices</p>
-                  </div>
-                  <div className="p-4 rounded-xl bg-white border border-[#E8E5DD] space-y-2">
-                    <span className="text-xs font-bold text-[#1B1B1B] block">Placement Cell</span>
-                    <span className="text-sm font-bold text-[#2F7A45]">Pre-Verified Roster</span>
-                    <p className="text-[11px] text-[#6F6A60]">Share verified builder passports directly with visiting campus recruitment panels</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activePortalTab === 'admin' && (
-              <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-[#1B1B1B]">Super Admin Portal — Governance &amp; Scale</h3>
-                    <p className="text-xs text-[#6F6A60]">Platform-wide health, verification audit logs, institution management, and skill demand intelligence.</p>
-                  </div>
-                  <button
-                    onClick={() => handleLaunchDemo('admin')}
-                    className="px-4 py-2 bg-[#1B1B1B] text-white rounded-xl text-xs font-semibold hover:bg-[#C76A2A] transition-colors shrink-0"
-                  >
-                    Open Admin Workspace →
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-4 rounded-xl bg-white border border-[#E8E5DD] space-y-2">
-                    <span className="text-xs font-bold text-[#1B1B1B] block">System Health</span>
-                    <span className="text-sm font-bold text-[#2F7A45]">99.99% Uptime</span>
-                    <p className="text-[11px] text-[#6F6A60]">Live telemetry monitoring assessment test runners and OAuth synchronizations</p>
-                  </div>
-                  <div className="p-4 rounded-xl bg-white border border-[#E8E5DD] space-y-2">
-                    <span className="text-xs font-bold text-[#1B1B1B] block">Verification Queue</span>
-                    <span className="text-sm font-bold text-[#1B1B1B]">Cryptographic Signatures</span>
-                    <p className="text-[11px] text-[#6F6A60]">Audit code submissions, anti-cheat flags, and issue immutable certificate IDs</p>
-                  </div>
-                  <div className="p-4 rounded-xl bg-white border border-[#E8E5DD] space-y-2">
-                    <span className="text-xs font-bold text-[#1B1B1B] block">Skill Demand Intel</span>
-                    <span className="text-sm font-bold text-[#C76A2A]">Real-time Market Telemetry</span>
-                    <p className="text-[11px] text-[#6F6A60]">Aggregated hiring demand from 420+ industry partners across AI, Cloud, and Backend</p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{item.desc}</p>
+              </GlassCard>
+            );
+          })}
         </div>
       </section>
 
-      {/* DETERMINISTIC BUILDER SCORE FORMULA BREAKDOWN */}
-      <section id="formula" className="py-20 px-6 lg:px-12 max-w-[1200px] mx-auto space-y-10">
-        <div className="text-center space-y-2">
-          <span className="text-xs font-mono uppercase tracking-wider text-[#C76A2A] font-bold">
-            Transparent Evaluation Standards
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1B1B1B] tracking-tight">
-            The 6-Pillar Builder Score Formula
-          </h2>
-          <p className="text-xs text-[#6F6A60] max-w-xl mx-auto">
-            Zero hidden algorithms. A deterministic 1000-point formula calculated across verifiable achievements.
-          </p>
-        </div>
+      {/* ──── CTA FOOTER ──── */}
+      <footer className="relative py-20 px-6 lg:px-12 overflow-hidden" style={{ background: 'linear-gradient(180deg, var(--text-primary) 0%, #0A0A0A 100%)' }}>
+        {/* Decorative gradient orb */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full opacity-20 blur-[100px]" style={{ background: 'radial-gradient(circle, var(--accent), transparent)' }} />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[
-            { pillar: 'Verified Assessments', weight: '30%', points: '300 pts', desc: 'Strict proctored MCQs, debugging benchmarks, and architecture challenges.' },
-            { pillar: 'Verified Projects', weight: '25%', points: '250 pts', desc: 'Production repositories with tests, benchmarks, and runnable live demos.' },
-            { pillar: 'GitHub Proof of Work', weight: '15%', points: '150 pts', desc: 'Scanned commit frequency, multi-language distribution, and stars.' },
-            { pillar: 'Industry Challenges', weight: '10%', points: '100 pts', desc: 'Company-sponsored hiring challenges, hackathons, and certifications.' },
-            { pillar: 'Communication', weight: '10%', points: '100 pts', desc: 'Technical RFC design writing, constructive code reviews, and pitch.' },
-            { pillar: 'Consistency', weight: '10%', points: '100 pts', desc: 'Daily building streak, weekly verification cadence, and continuous effort.' },
-          ].map((item) => (
-            <div key={item.pillar} className="p-5 rounded-2xl bg-white border border-[#E8E5DD] shadow-xs space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#1B1B1B]">{item.pillar}</span>
-                <span className="px-2 py-0.5 rounded-full bg-[#C76A2A]/10 text-[#C76A2A] text-xs font-mono font-bold">
-                  {item.weight} ({item.points})
-                </span>
-              </div>
-              <p className="text-xs text-[#6F6A60]">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA FOOTER */}
-      <footer className="py-16 px-6 lg:px-12 bg-[#1B1B1B] text-white border-t border-[#E8E5DD]">
-        <div className="max-w-[1300px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
-          <div className="space-y-1">
-            <h3 className="text-xl font-bold text-white tracking-tight">Ready to build verified proof of work?</h3>
-            <p className="text-xs text-white/60">Join over 14,800+ builders proving their engineering capabilities on SkillBridge.</p>
+        <div className="relative z-10 max-w-[1300px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-8 text-center sm:text-left">
+          <div className="space-y-2">
+            <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              Ready to build verified proof of work?
+            </h3>
+            <p className="text-sm text-white/50 max-w-md">
+              Join builders who are proving their engineering capabilities on SkillBridge with deterministic verification.
+            </p>
           </div>
           <div className="flex items-center gap-3">
-            <Link
-              href="/register"
-              className="px-6 py-3 bg-[#C76A2A] hover:bg-[#B55E22] text-white rounded-xl text-xs font-bold transition-all shadow-xs"
-            >
+            <GradientButton href="/register" size="lg" variant="primary">
               Get Started
-            </Link>
-            <button
+            </GradientButton>
+            <motion.button
               onClick={() => handleLaunchDemo('student')}
-              className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-all"
+              className="px-6 py-3.5 bg-white/10 hover:bg-white/15 text-white rounded-xl text-sm font-semibold transition-all border border-white/10 hover:border-white/20"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
             >
               View Demo
-            </button>
+            </motion.button>
           </div>
         </div>
-        <div className="max-w-[1300px] mx-auto pt-8 mt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-[11px] text-white/40 gap-4">
+
+        <div className="relative z-10 max-w-[1300px] mx-auto pt-10 mt-10 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs text-white/30 gap-4">
           <span>&copy; 2026 SkillBridge Intelligence Inc. National Workforce Systems.</span>
           <div className="flex items-center gap-6">
-            <Link href="/docs" className="hover:text-white">Documentation</Link>
-            <Link href="/pricing" className="hover:text-white">Institutional Licensing</Link>
-            <Link href="/demo" className="hover:text-white">Demo Portal</Link>
+            <Link href="/docs" className="hover:text-white transition-colors">Documentation</Link>
+            <Link href="/pricing" className="hover:text-white transition-colors">Institutional Licensing</Link>
+            <Link href="/demo" className="hover:text-white transition-colors">Demo Portal</Link>
           </div>
         </div>
       </footer>

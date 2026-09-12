@@ -135,39 +135,71 @@ export function ProfileDropdown() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 4, scale: 0.98 }}
             transition={{ duration: 0.15 }}
-            className="hidden sm:block absolute right-0 mt-2 w-72 rounded-2xl bg-white border border-[#E8E5DD] shadow-xl z-40 p-4 space-y-3 pointer-events-none"
+            className="hidden sm:block absolute right-0 mt-2 w-80 rounded-2xl bg-white border border-[#E8E5DD] shadow-2xl z-40 p-4 space-y-3.5"
           >
+            {/* Quick Profile Header */}
             <div className="flex items-center gap-3">
               <UserAvatar
                 src={studentProfile?.avatar || currentUser?.avatar}
                 name={displayName}
                 size="md"
               />
-              <div className="min-w-0">
-                <h4 className="text-xs font-bold text-[#1B1B1B] truncate">{displayName}</h4>
-                <p className="text-[10px] text-[#6F6A60] truncate">{studentProfile?.academic?.college || 'HITAM'}</p>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold text-[#1B1B1B] truncate">{displayName}</h4>
+                  <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#C76A2A]/10 text-[#C76A2A] font-bold">
+                    Lvl {levelInfo.level}
+                  </span>
+                </div>
+                <p className="text-[10px] text-[#6F6A60] truncate">{studentProfile?.headline || studentProfile?.academic?.college || 'HITAM'}</p>
               </div>
             </div>
 
-
-            <div className="grid grid-cols-3 gap-2 p-2.5 bg-[#FAF9F5] rounded-xl border border-[#E8E5DD] text-center text-xs">
+            {/* Metrics Row: Builder Level, Score, Career Readiness, XP */}
+            <div className="grid grid-cols-4 gap-1.5 p-2.5 bg-[#FAF9F5] rounded-xl border border-[#E8E5DD] text-center text-xs">
               <div>
-                <span className="text-[9px] font-mono text-[#6F6A60] block uppercase">XP</span>
-                <strong className="text-[#C76A2A] font-mono text-[11px]">{xp}</strong>
+                <span className="text-[8px] font-mono text-[#6F6A60] block uppercase">Level</span>
+                <strong className="text-[#C76A2A] font-mono text-[11px]">{levelInfo.level}</strong>
               </div>
               <div>
-                <span className="text-[9px] font-mono text-[#6F6A60] block uppercase">Score</span>
+                <span className="text-[8px] font-mono text-[#6F6A60] block uppercase">Score</span>
                 <strong className="text-[#1B1B1B] font-mono text-[11px]">{builderScoreData.totalScore}</strong>
               </div>
               <div>
-                <span className="text-[9px] font-mono text-[#6F6A60] block uppercase">Readiness</span>
+                <span className="text-[8px] font-mono text-[#6F6A60] block uppercase">Readiness</span>
                 <strong className="text-[#2F7A45] font-mono text-[11px]">{readinessScore}%</strong>
+              </div>
+              <div>
+                <span className="text-[8px] font-mono text-[#6F6A60] block uppercase">XP</span>
+                <strong className="text-[#1B1B1B] font-mono text-[11px]">{xp}</strong>
               </div>
             </div>
 
-            <div className="text-[10px] text-[#6E6E6A] flex items-center justify-between pt-1 border-t border-[#E8E5DD]">
-              <span>Click avatar to open menu</span>
-              <span className="font-mono text-[#C76A2A]">Lvl {levelInfo.level} {levelInfo.title}</span>
+            {/* Quick Action Buttons: View Journey, GitHub, LinkedIn */}
+            <div className="grid grid-cols-3 gap-1.5 pt-1">
+              <Link
+                href="/journey"
+                className="flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg bg-[#1B1B1B] text-white text-[10px] font-semibold hover:bg-[#C76A2A] transition-colors"
+              >
+                <span>View Journey</span>
+              </Link>
+              <a
+                href={githubProfileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg bg-[#F6F4EE] border border-[#E8E5DD] text-[#1B1B1B] text-[10px] font-semibold hover:border-[#1B1B1B] transition-colors"
+              >
+                <GithubIcon className="w-3 h-3" />
+                <span>GitHub</span>
+              </a>
+              <a
+                href={studentProfile?.professional?.linkedinUrl || 'https://linkedin.com'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg bg-[#0077B5]/10 border border-[#0077B5]/30 text-[#0077B5] text-[10px] font-semibold hover:bg-[#0077B5]/20 transition-colors"
+              >
+                <span>LinkedIn</span>
+              </a>
             </div>
           </motion.div>
         )}
@@ -241,20 +273,6 @@ export function ProfileDropdown() {
               </Link>
 
               <Link
-                href="/student/portfolio"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-[#FAF9F5] transition-colors"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Award className="w-4 h-4 text-[#6F6A60]" />
-                  <span>Digital Portfolio</span>
-                </div>
-                <span className="text-[10px] text-[#2F7A45] font-semibold bg-[#2F7A45]/10 px-1.5 py-0.2 rounded">
-                  Shareable
-                </span>
-              </Link>
-
-              <Link
                 href="/student/assessments"
                 onClick={() => setIsOpen(false)}
                 className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-[#FAF9F5] transition-colors"
@@ -269,21 +287,40 @@ export function ProfileDropdown() {
               </Link>
 
               <Link
-                href="/student/journey#achievements"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-[#FAF9F5] transition-colors"
-              >
-                <Trophy className="w-4 h-4 text-[#6F6A60]" />
-                <span>Achievements</span>
-              </Link>
-
-              <Link
                 href="/student/roadmap"
                 onClick={() => setIsOpen(false)}
                 className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-[#FAF9F5] transition-colors"
               >
                 <BookOpen className="w-4 h-4 text-[#6F6A60]" />
-                <span>Learning Roadmap</span>
+                <span>Roadmap</span>
+              </Link>
+
+              <Link
+                href="/student/opportunities"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-[#FAF9F5] transition-colors"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Target className="w-4 h-4 text-[#6F6A60]" />
+                  <span>Opportunities</span>
+                </div>
+                <span className="text-[10px] text-[#C76A2A] font-semibold bg-[#C76A2A]/10 px-1.5 py-0.2 rounded">
+                  Matched
+                </span>
+              </Link>
+
+              <Link
+                href="/github-analytics"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-[#FAF9F5] transition-colors"
+              >
+                <div className="flex items-center gap-2.5">
+                  <GithubIcon className="w-4 h-4 text-[#1B1B1B]" />
+                  <span>GitHub Analytics</span>
+                </div>
+                <span className="text-[10px] text-[#2F7A45] font-semibold bg-[#2F7A45]/10 px-1.5 py-0.2 rounded">
+                  Live
+                </span>
               </Link>
 
               <Link
@@ -294,21 +331,6 @@ export function ProfileDropdown() {
                 <Settings className="w-4 h-4 text-[#6F6A60]" />
                 <span>Settings</span>
               </Link>
-
-              {/* View GitHub Profile Link */}
-              <a
-                href={githubProfileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-[#FAF9F5] transition-colors"
-              >
-                <div className="flex items-center gap-2.5">
-                  <GithubIcon className="w-4 h-4 text-[#6F6A60]" />
-                  <span>View GitHub Profile</span>
-                </div>
-                <ExternalLink className="w-3.5 h-3.5 text-[#6F6A60]" />
-              </a>
             </div>
 
             {/* Logout Action */}

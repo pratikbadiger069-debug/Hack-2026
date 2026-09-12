@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '@/lib/store';
+import { getUserDisplayName } from '@/lib/user-utils';
 import {
   AVATAR_PRESETS,
   AvatarStyle,
@@ -25,8 +26,8 @@ interface AvatarModalProps {
   onClose: () => void;
 }
 
-const STYLES: { id: AvatarStyle; label: string; desc: string }[] = [
-  { id: 'minimalist-geometric', label: 'Minimalist Vector', desc: 'Clean, Apple & Linear inspired vector portrait' },
+const AVATAR_STYLES: { id: AvatarStyle; label: string; desc: string }[] = [
+  { id: 'minimalist-geometric', label: 'Minimalist Clean', desc: 'Precision geometric tech avatar' },
   { id: 'cyber-builder', label: 'Cyber Core', desc: 'Futuristic bot & tech engineering aesthetic' },
   { id: 'abstract-gradient', label: 'Abstract Shapes', desc: 'Modern geometric gradient art' },
   { id: '3d-clay', label: '3D Clay Tech', desc: 'Playful textured 3D builder design' },
@@ -38,7 +39,7 @@ const STYLES: { id: AvatarStyle; label: string; desc: string }[] = [
 export function AvatarModal({ isOpen, onClose }: AvatarModalProps) {
   const { studentProfile, updateStudentProfile, currentUser, setCurrentUser } = useAppStore();
   
-  const initialName = studentProfile?.name || currentUser?.name || 'Aarav Sharma';
+  const initialName = getUserDisplayName(studentProfile, currentUser);
   const [selectedStyle, setSelectedStyle] = useState<AvatarStyle>('minimalist-geometric');
   const [seed, setSeed] = useState(initialName);
   const [previewUrl, setPreviewUrl] = useState(studentProfile?.avatar || getDefaultAvatar(initialName));
@@ -165,7 +166,7 @@ export function AvatarModal({ isOpen, onClose }: AvatarModalProps) {
           {activeTab === 'generate' && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-56 overflow-y-auto pr-1">
-                {STYLES.map((style) => (
+                {AVATAR_STYLES.map((style) => (
                   <button
                     key={style.id}
                     onClick={() => handleGenerateStyle(style.id)}

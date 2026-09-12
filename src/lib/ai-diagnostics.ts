@@ -63,12 +63,18 @@ export function classifyProviderError(
     gemini: 'Google Gemini AI',
     openai: 'OpenAI (GPT-4o)',
     claude: 'Anthropic Claude',
+    groq: 'Groq Cloud (LLaMA 3.3)',
+    openrouter: 'OpenRouter AI',
+    deepseek: 'DeepSeek AI',
   };
 
   const defaultModels: Record<AIProvider, string> = {
     gemini: 'gemini-1.5-flash',
     openai: 'gpt-4o-mini',
     claude: 'claude-3-5-sonnet-20241022',
+    groq: 'llama-3.3-70b-versatile',
+    openrouter: 'deepseek/deepseek-chat',
+    deepseek: 'deepseek-chat',
   };
 
   const providerName = providerNames[provider] || provider;

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '@/lib/store';
+import { getUserDisplayName } from '@/lib/user-utils';
 import {
   Compass,
   GraduationCap,
@@ -129,9 +130,7 @@ export default function OnboardingPage() {
 
   // Step 1: Basic Information
   const [fullName, setFullName] = useState(
-    studentProfile?.name && studentProfile.name !== 'New Student' && studentProfile.name !== 'New Builder'
-      ? studentProfile.name
-      : currentUser?.name || ''
+    getUserDisplayName(studentProfile, currentUser)
   );
   const [college, setCollege] = useState(studentProfile?.academic?.college || studentProfile?.college || '');
   const [degree, setDegree] = useState(studentProfile?.academic?.degree || studentProfile?.degree || 'B.Tech');

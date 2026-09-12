@@ -85,7 +85,7 @@
     "pratik.badiger@gmail.com": {
       "id": "usr-1789123646558",
       "email": "pratik.badiger@gmail.com",
-      "name": "Pratik",
+      "name": "Manutej Reddy",
       "role": "student",
       "passwordHash": "$2b$12$6ubja9iUVafwtbahPnBQVOmGtgHFnZx81yNNn0nSCatq.YsRM9Y7m",
       "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
@@ -93,7 +93,7 @@
       "isEmailVerified": false,
       "emailVerificationToken": "vt_1789123646558_c2c0v4b",
       "createdAt": "2026-09-11T10:47:26.558Z",
-      "updatedAt": "2026-09-11T22:39:17.917Z",
+      "updatedAt": "2026-09-12T03:48:09.777Z",
       "googleName": "New Builder"
     },
     "manu18reddy@gmail.com": {
@@ -125,7 +125,7 @@
     "pranitha12@gmail.com": {
       "id": "usr_1789148818117_r151md3",
       "email": "pranitha12@gmail.com",
-      "name": "Aarav Sharma",
+      "name": "Manutej Reddy",
       "role": "industry",
       "passwordHash": "$2b$12$vA604yb9TE3cPjYaM.q0auz3Zr5YVxjmrUk8/xB.TNhQDYsqoF2Su",
       "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
@@ -133,8 +133,8 @@
       "isEmailVerified": false,
       "emailVerificationToken": "vt_1789148818117_n5snm7u",
       "createdAt": "2026-09-11T17:46:58.117Z",
-      "updatedAt": "2026-09-11T22:35:54.064Z",
-      "googleName": "Aarav Sharma"
+      "updatedAt": "2026-09-12T04:19:40.631Z",
+      "googleName": "Manutej Reddy"
     },
     "aarav-builder@github.user": {
       "id": "usr_1789154371055_yzgl0gf",
@@ -161,6 +161,19 @@
       "emailVerificationToken": "vt_1789161544074_b4dy27b",
       "createdAt": "2026-09-11T21:19:04.074Z",
       "updatedAt": "2026-09-11T21:23:55.000Z"
+    },
+    "pratik.badiger12@gmail.com": {
+      "id": "usr_1789187738979_0gqlewe",
+      "email": "pratik.badiger12@gmail.com",
+      "name": "praneet",
+      "role": "student",
+      "passwordHash": "$2b$12$IVE3DzQELsnFt3quwESpH.8SN0YVc9Y7pfrt793IUx/SnzulJZ/0e",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      "isDemoUser": false,
+      "isEmailVerified": false,
+      "emailVerificationToken": "vt_1789187738979_p8msop4",
+      "createdAt": "2026-09-12T04:35:38.979Z",
+      "updatedAt": "2026-09-12T04:37:30.202Z"
     }
   },
   "studentProfiles": {
@@ -591,13 +604,13 @@
     },
     "pratik.badiger@gmail.com": {
       "id": "std-1789123646559-hcjt9",
-      "name": "Pratik",
+      "name": "Manutej Reddy",
       "email": "pratik.badiger@gmail.com",
       "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
-      "headline": "Software Development Candidate | Stanford University '26",
-      "targetRole": "Software Development",
+      "headline": "Full-Stack & Systems Builder | CSE • HITAM",
+      "targetRole": "Full-Stack Software Engineer",
       "academic": {
-        "college": "Stanford University",
+        "college": "HITAM",
         "department": "CSE",
         "year": "1st Year",
         "semester": "1st Semester",
@@ -611,18 +624,18 @@
         "city": "Hyderabad"
       },
       "professional": {
-        "githubUrl": "https://github.com/pratikbadiger069-debug",
-        "linkedinUrl": "https://www.linkedin.com/public-profile/settings/?trk=d_flagship3_profile_self_view_public_profile&lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base%3Bsn21OQftQKKshSBim%2BUZBg%3D%3D",
-        "portfolioUrl": "",
-        "bio": "Intermediate builder focused on Software Development with a target goal of Internship.",
+        "githubUrl": "https://github.com/manutejreddy",
+        "linkedinUrl": "https://linkedin.com/in/manutejreddy",
+        "portfolioUrl": "https://manutejreddy.dev",
+        "bio": "Passionate builder crafting distributed backends, LLM inference pipelines, and cloud native tools.",
         "totalProjects": 2,
         "hackathonWins": 1,
         "researchPapers": 0,
         "openSourceContributions": 12,
-        "resumeUrl": "",
+        "resumeUrl": "/resumes/manutej-reddy-resume.pdf",
         "careerPath": "Software Development",
         "skillLevel": "Intermediate",
-        "careerGoal": "Internship",
+        "careerGoal": "High-Impact AI Systems Internship",
         "knownSkills": [
           "Python",
           "JavaScript",
@@ -712,14 +725,14 @@
       "country": "India",
       "careerReadinessScore": 70,
       "onboardingCompleted": true,
-      "college": "Stanford University",
+      "college": "HITAM",
       "department": "CSE",
       "branch": "CSE",
       "degree": "B.Tech",
       "graduationYear": "2026",
       "careerPath": "Software Development",
       "skillLevel": "Intermediate",
-      "careerGoal": "Internship",
+      "careerGoal": "High-Impact AI Systems Internship",
       "knownSkills": [
         "Python",
         "JavaScript",
@@ -788,121 +801,96 @@
     },
     "pranitha12@gmail.com": {
       "id": "std-1789150084793-zyo8g",
-      "name": "Aarav Sharma",
+      "name": "Manutej Reddy",
       "email": "pranitha12@gmail.com",
       "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
-      "headline": "",
-      "targetRole": "Software Engineer",
+      "headline": "Data Science Candidate | hitam '26",
+      "targetRole": "Data Science",
       "academic": {
-        "college": "",
+        "college": "hitam",
         "department": "CSE",
         "year": "1st Year",
         "semester": "1st Semester",
-        "cgpa": 0,
-        "studentId": ""
+        "cgpa": 8.5,
+        "studentId": "STU-2026-3613",
+        "degree": "B.Tech",
+        "branch": "CSE",
+        "graduationYear": "2026",
+        "country": "India",
+        "state": "Telangana",
+        "city": "Hyderabad"
       },
       "professional": {
-        "githubUrl": "",
-        "linkedinUrl": "",
+        "githubUrl": "https://github.com/pranitha12",
+        "linkedinUrl": "https://linkedin.com/in/pranitha12",
         "portfolioUrl": "",
-        "bio": "",
-        "totalProjects": 0,
-        "hackathonWins": 0,
+        "bio": "Intermediate builder focused on Data Science with a target goal of Internship.",
+        "totalProjects": 2,
+        "hackathonWins": 1,
         "researchPapers": 0,
-        "openSourceContributions": 0
+        "openSourceContributions": 12,
+        "resumeUrl": "",
+        "careerPath": "Data Science",
+        "skillLevel": "Intermediate",
+        "careerGoal": "Internship",
+        "knownSkills": [
+          "Python",
+          "JavaScript",
+          "React"
+        ],
+        "projectCountRange": "1–2",
+        "hasHackathonExperience": true
       },
       "builderScores": {
-        "overall": 540,
-        "execution": 60,
-        "leadership": 0,
-        "innovation": 0,
-        "problemSolving": 0,
-        "consistency": 0
+        "overall": 580,
+        "execution": 58,
+        "leadership": 70,
+        "innovation": 85,
+        "problemSolving": 78,
+        "consistency": 75
       },
-      "employabilityScore": 66,
+      "employabilityScore": 70,
       "verifiedSkills": [
         {
-          "id": "vs-1789154324246",
-          "name": "Modern Frontend Architecture",
-          "category": "Programming",
-          "level": "Expert",
-          "score": 94,
+          "id": "vs-onboard-1789177856283-0",
+          "name": "Python",
+          "category": "AI & ML",
+          "level": "Intermediate",
+          "score": 80,
           "verificationSources": [
             "Assessment",
-            "Code Validation"
+            "Project"
           ],
           "verifiedDate": "Sep 12, 2026",
-          "verificationCode": "SB-MO-75962",
+          "verificationCode": "SB-PYT-38078",
           "evidenceCount": 1
         },
         {
-          "id": "vs-1789154324103",
-          "name": "Modern Frontend Architecture",
+          "id": "vs-onboard-1789177856285-1",
+          "name": "JavaScript",
           "category": "Programming",
-          "level": "Expert",
-          "score": 94,
+          "level": "Intermediate",
+          "score": 82,
           "verificationSources": [
             "Assessment",
-            "Code Validation"
+            "Project"
           ],
           "verifiedDate": "Sep 12, 2026",
-          "verificationCode": "SB-MO-77243",
+          "verificationCode": "SB-JAV-30591",
           "evidenceCount": 1
         },
         {
-          "id": "vs-1789154323481",
-          "name": "Modern Frontend Architecture",
+          "id": "vs-onboard-1789177856285-2",
+          "name": "React",
           "category": "Programming",
-          "level": "Expert",
-          "score": 94,
+          "level": "Intermediate",
+          "score": 84,
           "verificationSources": [
             "Assessment",
-            "Code Validation"
+            "Project"
           ],
           "verifiedDate": "Sep 12, 2026",
-          "verificationCode": "SB-MO-30232",
-          "evidenceCount": 1
-        },
-        {
-          "id": "vs-1789154321918",
-          "name": "Modern Frontend Architecture",
-          "category": "Programming",
-          "level": "Expert",
-          "score": 94,
-          "verificationSources": [
-            "Assessment",
-            "Code Validation"
-          ],
-          "verifiedDate": "Sep 12, 2026",
-          "verificationCode": "SB-MO-67838",
-          "evidenceCount": 1
-        },
-        {
-          "id": "vs-1789154320178",
-          "name": "Modern Frontend Architecture",
-          "category": "Programming",
-          "level": "Expert",
-          "score": 94,
-          "verificationSources": [
-            "Assessment",
-            "Code Validation"
-          ],
-          "verifiedDate": "Sep 12, 2026",
-          "verificationCode": "SB-MO-70543",
-          "evidenceCount": 1
-        },
-        {
-          "id": "vs-1789154317757",
-          "name": "Modern Frontend Architecture",
-          "category": "Programming",
-          "level": "Expert",
-          "score": 94,
-          "verificationSources": [
-            "Assessment",
-            "Code Validation"
-          ],
-          "verifiedDate": "Sep 12, 2026",
-          "verificationCode": "SB-MO-25910",
+          "verificationCode": "SB-REA-91751",
           "evidenceCount": 1
         }
       ],
@@ -1028,7 +1016,27 @@
           "date": "Sep 12, 2026"
         }
       ],
-      "googleName": "Aarav Sharma"
+      "googleName": "Manutej Reddy",
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "country": "India",
+      "careerReadinessScore": 70,
+      "onboardingCompleted": true,
+      "college": "hitam",
+      "department": "CSE",
+      "branch": "CSE",
+      "degree": "B.Tech",
+      "graduationYear": "2026",
+      "careerPath": "Data Science",
+      "skillLevel": "Intermediate",
+      "careerGoal": "Internship",
+      "knownSkills": [
+        "Python",
+        "JavaScript",
+        "React"
+      ],
+      "projectCount": "1–2",
+      "hackathonExperience": "Yes"
     },
     "manutejreddy@gmail.com": {
       "id": "std-1789152783595-4ngdu",
@@ -1259,6 +1267,139 @@
         "C",
         "JavaScript",
         "Node.js"
+      ],
+      "projectCount": "1–2",
+      "hackathonExperience": "Yes"
+    },
+    "pratik.badiger12@gmail.com": {
+      "id": "std-1789187738980-szubb",
+      "name": "praneet",
+      "email": "pratik.badiger12@gmail.com",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      "headline": "Data Science Candidate | hitam '29",
+      "targetRole": "Data Science",
+      "academic": {
+        "college": "hitam",
+        "department": "Data Science",
+        "year": "1st Year",
+        "semester": "3rd Semester",
+        "cgpa": 8.5,
+        "studentId": "STU-2029-5146",
+        "degree": "B.Tech",
+        "branch": "Data Science",
+        "graduationYear": "2029",
+        "country": "India",
+        "state": "Telangana",
+        "city": "Hyderabad"
+      },
+      "professional": {
+        "githubUrl": "https://github.com/praneet",
+        "linkedinUrl": "https://linkdin/in.com/praneet",
+        "portfolioUrl": "",
+        "bio": "Intermediate builder focused on Data Science with a target goal of Job Placement.",
+        "totalProjects": 2,
+        "hackathonWins": 1,
+        "researchPapers": 0,
+        "openSourceContributions": 12,
+        "resumeUrl": "",
+        "careerPath": "Data Science",
+        "skillLevel": "Intermediate",
+        "careerGoal": "Job Placement",
+        "knownSkills": [
+          "Python",
+          "JavaScript",
+          "React",
+          "C"
+        ],
+        "projectCountRange": "1–2",
+        "hasHackathonExperience": true
+      },
+      "builderScores": {
+        "overall": 600,
+        "execution": 60,
+        "leadership": 70,
+        "innovation": 85,
+        "problemSolving": 78,
+        "consistency": 75
+      },
+      "employabilityScore": 72,
+      "verifiedSkills": [
+        {
+          "id": "vs-onboard-1789187850200-0",
+          "name": "Python",
+          "category": "AI & ML",
+          "level": "Intermediate",
+          "score": 80,
+          "verificationSources": [
+            "Assessment",
+            "Project"
+          ],
+          "verifiedDate": "Sep 12, 2026",
+          "verificationCode": "SB-PYT-79811",
+          "evidenceCount": 1
+        },
+        {
+          "id": "vs-onboard-1789187850201-1",
+          "name": "JavaScript",
+          "category": "Programming",
+          "level": "Intermediate",
+          "score": 82,
+          "verificationSources": [
+            "Assessment",
+            "Project"
+          ],
+          "verifiedDate": "Sep 12, 2026",
+          "verificationCode": "SB-JAV-39385",
+          "evidenceCount": 1
+        },
+        {
+          "id": "vs-onboard-1789187850201-2",
+          "name": "React",
+          "category": "Programming",
+          "level": "Intermediate",
+          "score": 84,
+          "verificationSources": [
+            "Assessment",
+            "Project"
+          ],
+          "verifiedDate": "Sep 12, 2026",
+          "verificationCode": "SB-REA-85655",
+          "evidenceCount": 1
+        },
+        {
+          "id": "vs-onboard-1789187850202-3",
+          "name": "C",
+          "category": "Programming",
+          "level": "Intermediate",
+          "score": 86,
+          "verificationSources": [
+            "Assessment",
+            "Project"
+          ],
+          "verifiedDate": "Sep 12, 2026",
+          "verificationCode": "SB-C-88995",
+          "evidenceCount": 1
+        }
+      ],
+      "evidences": [],
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "country": "India",
+      "careerReadinessScore": 72,
+      "onboardingCompleted": true,
+      "college": "hitam",
+      "department": "Data Science",
+      "branch": "Data Science",
+      "degree": "B.Tech",
+      "graduationYear": "2029",
+      "careerPath": "Data Science",
+      "skillLevel": "Intermediate",
+      "careerGoal": "Job Placement",
+      "knownSkills": [
+        "Python",
+        "JavaScript",
+        "React",
+        "C"
       ],
       "projectCount": "1–2",
       "hackathonExperience": "Yes"
@@ -1510,6 +1651,382 @@
     ]
   },
   "auditLogs": [
+    {
+      "id": "log-1789191186090",
+      "timestamp": "2026-09-12T05:33:06.090Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789188342352",
+      "timestamp": "2026-09-12T04:45:42.352Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148645714_20tlt0r",
+      "role": "INSTITUTE",
+      "details": "Successful authenticated login for: manutejreddy@gmail.com"
+    },
+    {
+      "id": "log-1789188228056",
+      "timestamp": "2026-09-12T04:43:48.056Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148818117_r151md3",
+      "role": "INDUSTRY",
+      "details": "Successful authenticated login for: pranitha12@gmail.com"
+    },
+    {
+      "id": "log-1789187738980",
+      "timestamp": "2026-09-12T04:35:38.980Z",
+      "action": "USER_REGISTERED_BCRYPT",
+      "userId": "usr_1789187738979_0gqlewe",
+      "role": "STUDENT",
+      "details": "Registered new verified student identity: pratik.badiger12@gmail.com"
+    },
+    {
+      "id": "log-1789187672256",
+      "timestamp": "2026-09-12T04:34:32.256Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789187201090",
+      "timestamp": "2026-09-12T04:26:41.090Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789186803227",
+      "timestamp": "2026-09-12T04:20:03.227Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789185784975",
+      "timestamp": "2026-09-12T04:03:04.975Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148645714_20tlt0r",
+      "role": "INSTITUTE",
+      "details": "Successful authenticated login for: manutejreddy@gmail.com"
+    },
+    {
+      "id": "log-1789185745457",
+      "timestamp": "2026-09-12T04:02:25.458Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148818117_r151md3",
+      "role": "INDUSTRY",
+      "details": "Successful authenticated login for: pranitha12@gmail.com"
+    },
+    {
+      "id": "log-1789185653114",
+      "timestamp": "2026-09-12T04:00:53.114Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789184984872",
+      "timestamp": "2026-09-12T03:49:44.872Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789184727264",
+      "timestamp": "2026-09-12T03:45:27.264Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789184551296",
+      "timestamp": "2026-09-12T03:42:31.296Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789184538614",
+      "timestamp": "2026-09-12T03:42:18.614Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148645714_20tlt0r",
+      "role": "INSTITUTE",
+      "details": "Successful authenticated login for: manutejreddy@gmail.com"
+    },
+    {
+      "id": "log-1789184523505",
+      "timestamp": "2026-09-12T03:42:03.505Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148818117_r151md3",
+      "role": "INDUSTRY",
+      "details": "Successful authenticated login for: pranitha12@gmail.com"
+    },
+    {
+      "id": "log-1789184454348",
+      "timestamp": "2026-09-12T03:40:54.348Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789183769279",
+      "timestamp": "2026-09-12T03:29:29.279Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789183003995",
+      "timestamp": "2026-09-12T03:16:43.995Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789182946564",
+      "timestamp": "2026-09-12T03:15:46.564Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148645714_20tlt0r",
+      "role": "INSTITUTE",
+      "details": "Successful authenticated login for: manutejreddy@gmail.com"
+    },
+    {
+      "id": "log-1789182898521",
+      "timestamp": "2026-09-12T03:14:58.521Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148645714_20tlt0r",
+      "role": "INSTITUTE",
+      "details": "Successful authenticated login for: manutejreddy@gmail.com"
+    },
+    {
+      "id": "log-1789182857585",
+      "timestamp": "2026-09-12T03:14:17.585Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148645714_20tlt0r",
+      "role": "INSTITUTE",
+      "details": "Successful authenticated login for: manutejreddy@gmail.com"
+    },
+    {
+      "id": "log-1789182819036",
+      "timestamp": "2026-09-12T03:13:39.036Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789182763206",
+      "timestamp": "2026-09-12T03:12:43.206Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148818117_r151md3",
+      "role": "INDUSTRY",
+      "details": "Successful authenticated login for: pranitha12@gmail.com"
+    },
+    {
+      "id": "log-1789182731835",
+      "timestamp": "2026-09-12T03:12:11.835Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789182702015",
+      "timestamp": "2026-09-12T03:11:42.015Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148818117_r151md3",
+      "role": "INDUSTRY",
+      "details": "Successful authenticated login for: pranitha12@gmail.com"
+    },
+    {
+      "id": "log-1789182571021",
+      "timestamp": "2026-09-12T03:09:31.021Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789181985340",
+      "timestamp": "2026-09-12T02:59:45.340Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148818117_r151md3",
+      "role": "INDUSTRY",
+      "details": "Successful authenticated login for: pranitha12@gmail.com"
+    },
+    {
+      "id": "log-1789181896511",
+      "timestamp": "2026-09-12T02:58:16.511Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789181763675",
+      "timestamp": "2026-09-12T02:56:03.675Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789181743790",
+      "timestamp": "2026-09-12T02:55:43.790Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148818117_r151md3",
+      "role": "INDUSTRY",
+      "details": "Successful authenticated login for: pranitha12@gmail.com"
+    },
+    {
+      "id": "log-1789181731374",
+      "timestamp": "2026-09-12T02:55:31.374Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789181726013",
+      "timestamp": "2026-09-12T02:55:26.013Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789181722455",
+      "timestamp": "2026-09-12T02:55:22.455Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789178185345",
+      "timestamp": "2026-09-12T01:56:25.345Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789177979647",
+      "timestamp": "2026-09-12T01:52:59.647Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148645714_20tlt0r",
+      "role": "INSTITUTE",
+      "details": "Successful authenticated login for: manutejreddy@gmail.com"
+    },
+    {
+      "id": "log-1789177953142",
+      "timestamp": "2026-09-12T01:52:33.142Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148645714_20tlt0r",
+      "role": "INSTITUTE",
+      "details": "Successful authenticated login for: manutejreddy@gmail.com"
+    },
+    {
+      "id": "log-1789177576422",
+      "timestamp": "2026-09-12T01:46:16.422Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148818117_r151md3",
+      "role": "INDUSTRY",
+      "details": "Successful authenticated login for: pranitha12@gmail.com"
+    },
+    {
+      "id": "log-1789177552680",
+      "timestamp": "2026-09-12T01:45:52.680Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789177549123",
+      "timestamp": "2026-09-12T01:45:49.123Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789176958042",
+      "timestamp": "2026-09-12T01:35:58.042Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789176754817",
+      "timestamp": "2026-09-12T01:32:34.817Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr-1789123646558",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badiger@gmail.com"
+    },
+    {
+      "id": "log-1789176093364",
+      "timestamp": "2026-09-12T01:21:33.364Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148645714_20tlt0r",
+      "role": "INSTITUTE",
+      "details": "Successful authenticated login for: manutejreddy@gmail.com"
+    },
+    {
+      "id": "log-1789176047110",
+      "timestamp": "2026-09-12T01:20:47.110Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789148818117_r151md3",
+      "role": "INDUSTRY",
+      "details": "Successful authenticated login for: pranitha12@gmail.com"
+    },
+    {
+      "id": "log-1789175848838",
+      "timestamp": "2026-09-12T01:17:28.838Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789161544074_trgl0y0",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badige12r@gmail.com"
+    },
+    {
+      "id": "log-1789171415881",
+      "timestamp": "2026-09-12T00:03:35.881Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789161544074_trgl0y0",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badige12r@gmail.com"
+    },
+    {
+      "id": "log-1789166881731",
+      "timestamp": "2026-09-11T22:48:01.731Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789161544074_trgl0y0",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badige12r@gmail.com"
+    },
+    {
+      "id": "log-1789166878427",
+      "timestamp": "2026-09-11T22:47:58.427Z",
+      "action": "USER_LOGIN_SUCCESS",
+      "userId": "usr_1789161544074_trgl0y0",
+      "role": "STUDENT",
+      "details": "Successful authenticated login for: pratik.badige12r@gmail.com"
+    },
     {
       "id": "log-1789166393162",
       "timestamp": "2026-09-11T22:39:53.162Z",

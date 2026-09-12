@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     const { provider, testPrompt = 'Respond with "Connection Verified" and nothing else.' } = body;
     const rawApiKey = body.apiKey;
 
-    if (!provider || !['gemini', 'openai', 'claude'].includes(provider)) {
+    if (!provider || !['gemini', 'openai', 'claude', 'groq', 'openrouter', 'deepseek'].includes(provider)) {
       return NextResponse.json(
         { status: 'Invalid Request', error: 'Invalid or unsupported AI provider specified.' },
         { status: 400 }
@@ -38,10 +38,18 @@ export async function POST(req: NextRequest) {
     const key = cleanApiKey(rawApiKey);
 
     if (!key || key.length < 8) {
+      const providerNames: Record<string, string> = {
+        gemini: 'Google Gemini AI',
+        openai: 'OpenAI',
+        claude: 'Anthropic Claude',
+        groq: 'Groq Cloud',
+        openrouter: 'OpenRouter AI',
+        deepseek: 'DeepSeek AI',
+      };
       return NextResponse.json(
         {
           status: 'Invalid API Key',
-          provider: provider === 'gemini' ? 'Google Gemini AI' : provider === 'openai' ? 'OpenAI' : 'Anthropic Claude',
+          provider: providerNames[provider] || provider,
           model: 'default',
           latencyMs: 0,
           error: 'API key is too short or empty. Please copy a valid key from your developer console.',
@@ -249,6 +257,200 @@ export async function POST(req: NextRequest) {
             model: 'claude-3-5-sonnet-20241022',
             latencyMs,
             error: `Failed to connect to Anthropic API: ${err.message || 'Network unreachable'}`,
+          },
+          { status: 200 }
+        );
+      }
+    }
+
+    // 4. Groq Testing
+    if (provider === 'groq') {
+      const endpoint = 'https://api.groq.com/openai/v1/chat/completions';
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${key}`,
+          },
+          body: JSON.stringify({
+            model: 'llama-3.3-70b-versatile',
+            max_tokens: 25,
+            messages: [{ role: 'user', content: testPrompt }],
+          }),
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+
+        const latencyMs = Date.now() - startTime;
+
+        if (response.ok) {
+          const data = await response.json();
+          const echoText = data?.choices?.[0]?.message?.content?.trim() || 'Connection Verified';
+          return NextResponse.json({
+            status: 'Connected',
+            provider: 'Groq Cloud',
+            model: 'llama-3.3-70b-versatile',
+            latencyMs,
+            echoResponse: echoText,
+            message: `Successfully connected to Groq ultra-fast API in ${latencyMs}ms.`,
+          });
+        }
+
+        const errData = await response.json().catch(() => ({}));
+        return NextResponse.json(
+          {
+            status: 'Authentication Failed',
+            provider: 'Groq Cloud',
+            model: 'llama-3.3-70b-versatile',
+            latencyMs,
+            error: errData?.error?.message || 'Groq API key authentication failed.',
+          },
+          { status: 200 }
+        );
+      } catch (err: any) {
+        clearTimeout(timeoutId);
+        const latencyMs = Date.now() - startTime;
+        return NextResponse.json(
+          {
+            status: 'Provider Unavailable',
+            provider: 'Groq Cloud',
+            model: 'llama-3.3-70b-versatile',
+            latencyMs,
+            error: `Failed to connect to Groq: ${err.message || 'Network unreachable'}`,
+          },
+          { status: 200 }
+        );
+      }
+    }
+
+    // 5. OpenRouter Testing
+    if (provider === 'openrouter') {
+      const endpoint = 'https://openrouter.ai/api/v1/chat/completions';
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${key}`,
+            'HTTP-Referer': 'https://skillbridge.ai',
+            'X-Title': 'SkillBridge AI Builder OS',
+          },
+          body: JSON.stringify({
+            model: 'deepseek/deepseek-chat',
+            max_tokens: 25,
+            messages: [{ role: 'user', content: testPrompt }],
+          }),
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+
+        const latencyMs = Date.now() - startTime;
+
+        if (response.ok) {
+          const data = await response.json();
+          const echoText = data?.choices?.[0]?.message?.content?.trim() || 'Connection Verified';
+          return NextResponse.json({
+            status: 'Connected',
+            provider: 'OpenRouter AI',
+            model: 'deepseek/deepseek-chat',
+            latencyMs,
+            echoResponse: echoText,
+            message: `Successfully connected to OpenRouter API in ${latencyMs}ms.`,
+          });
+        }
+
+        const errData = await response.json().catch(() => ({}));
+        return NextResponse.json(
+          {
+            status: 'Authentication Failed',
+            provider: 'OpenRouter AI',
+            model: 'deepseek/deepseek-chat',
+            latencyMs,
+            error: errData?.error?.message || 'OpenRouter API key authentication failed.',
+          },
+          { status: 200 }
+        );
+      } catch (err: any) {
+        clearTimeout(timeoutId);
+        const latencyMs = Date.now() - startTime;
+        return NextResponse.json(
+          {
+            status: 'Provider Unavailable',
+            provider: 'OpenRouter AI',
+            model: 'deepseek/deepseek-chat',
+            latencyMs,
+            error: `Failed to connect to OpenRouter: ${err.message || 'Network unreachable'}`,
+          },
+          { status: 200 }
+        );
+      }
+    }
+
+    // 6. DeepSeek Testing
+    if (provider === 'deepseek') {
+      const endpoint = 'https://api.deepseek.com/chat/completions';
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${key}`,
+          },
+          body: JSON.stringify({
+            model: 'deepseek-chat',
+            max_tokens: 25,
+            messages: [{ role: 'user', content: testPrompt }],
+          }),
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+
+        const latencyMs = Date.now() - startTime;
+
+        if (response.ok) {
+          const data = await response.json();
+          const echoText = data?.choices?.[0]?.message?.content?.trim() || 'Connection Verified';
+          return NextResponse.json({
+            status: 'Connected',
+            provider: 'DeepSeek AI',
+            model: 'deepseek-chat',
+            latencyMs,
+            echoResponse: echoText,
+            message: `Successfully connected to DeepSeek API in ${latencyMs}ms.`,
+          });
+        }
+
+        const errData = await response.json().catch(() => ({}));
+        return NextResponse.json(
+          {
+            status: 'Authentication Failed',
+            provider: 'DeepSeek AI',
+            model: 'deepseek-chat',
+            latencyMs,
+            error: errData?.error?.message || 'DeepSeek API key authentication failed.',
+          },
+          { status: 200 }
+        );
+      } catch (err: any) {
+        clearTimeout(timeoutId);
+        const latencyMs = Date.now() - startTime;
+        return NextResponse.json(
+          {
+            status: 'Provider Unavailable',
+            provider: 'DeepSeek AI',
+            model: 'deepseek-chat',
+            latencyMs,
+            error: `Failed to connect to DeepSeek: ${err.message || 'Network unreachable'}`,
           },
           { status: 200 }
         );

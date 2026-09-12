@@ -120,7 +120,7 @@ export function AIProviderModal({ isOpen, onClose }: AIProviderModalProps) {
       case 'gemini':
         return {
           title: 'Google Gemini AI',
-          description: 'Gemini 1.5 Flash & Pro for low-latency reasoning and multimodel analysis.',
+          description: 'Gemini 1.5 Flash & Pro for low-latency reasoning and multimodal analysis.',
           linkText: 'Get Gemini Key from Google AI Studio',
           link: 'https://aistudio.google.com/app/apikey',
           placeholder: 'AIzaSy...',
@@ -141,6 +141,30 @@ export function AIProviderModal({ isOpen, onClose }: AIProviderModalProps) {
           link: 'https://console.anthropic.com/settings/keys',
           placeholder: 'sk-ant-...',
         };
+      case 'groq':
+        return {
+          title: 'Groq Cloud',
+          description: 'Ultra-fast LPU inference running LLaMA 3.3 70B & Mixtral 8x7B.',
+          linkText: 'Get Groq Key from Groq Console',
+          link: 'https://console.groq.com/keys',
+          placeholder: 'gsk_...',
+        };
+      case 'openrouter':
+        return {
+          title: 'OpenRouter AI',
+          description: 'Unified multi-provider access to DeepSeek, Claude, LLaMA, and Gemini.',
+          linkText: 'Get OpenRouter Key',
+          link: 'https://openrouter.ai/keys',
+          placeholder: 'sk-or-v1-...',
+        };
+      case 'deepseek':
+        return {
+          title: 'DeepSeek AI',
+          description: 'DeepSeek-V3 & DeepSeek-R1 for advanced reasoning and algorithmic coding.',
+          linkText: 'Get DeepSeek Key',
+          link: 'https://platform.deepseek.com/api_keys',
+          placeholder: 'sk-...',
+        };
     }
   };
 
@@ -159,22 +183,22 @@ export function AIProviderModal({ isOpen, onClose }: AIProviderModalProps) {
       case 'Provider Unavailable':
         return 'bg-orange-50 border-orange-200 text-orange-900';
       default:
-        return 'bg-slate-50 border-slate-200 text-slate-900';
+        return 'bg-slate-50 border-slate-200 text-slate-800';
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-      <div className="w-full max-w-xl bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-xl w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+        <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div className="flex items-center gap-2.5">
             <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-semibold text-slate-900 text-base">Connect AI Provider (BYOK)</h3>
-              <p className="text-xs text-slate-500">Live API diagnostics, latency probe &amp; key management</p>
+              <h3 className="text-base font-bold text-slate-900">AI Provider & BYOK Hub</h3>
+              <p className="text-xs text-slate-500">Configure your personal AI mentor credentials</p>
             </div>
           </div>
           <button
@@ -199,7 +223,7 @@ export function AIProviderModal({ isOpen, onClose }: AIProviderModalProps) {
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-2">Select Provider</label>
             <div className="grid grid-cols-3 gap-2">
-              {(['gemini', 'openai', 'claude'] as AIProvider[]).map((p) => {
+              {(['gemini', 'openai', 'claude', 'groq', 'openrouter', 'deepseek'] as AIProvider[]).map((p) => {
                 const isSelected = selectedProvider === p;
                 const isConfigured = Boolean(aiKeys[p] && aiKeys[p].length > 8);
                 return (
@@ -207,7 +231,7 @@ export function AIProviderModal({ isOpen, onClose }: AIProviderModalProps) {
                     key={p}
                     type="button"
                     onClick={() => handleProviderSelect(p)}
-                    className={`p-3 rounded-lg border text-left flex flex-col justify-between transition-all ${
+                    className={`p-2.5 rounded-lg border text-left flex flex-col justify-between transition-all ${
                       isSelected
                         ? 'border-blue-600 bg-blue-50/40 ring-1 ring-blue-600'
                         : 'border-slate-200 hover:border-slate-300 bg-white'
@@ -217,7 +241,7 @@ export function AIProviderModal({ isOpen, onClose }: AIProviderModalProps) {
                       <span className="text-xs font-bold capitalize text-slate-900">{p}</span>
                       {isConfigured && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />}
                     </div>
-                    <span className="text-[10px] text-slate-500">
+                    <span className="text-[10px] text-slate-500 truncate">
                       {isConfigured ? maskApiKey(aiKeys[p]) : 'Not configured'}
                     </span>
                   </button>

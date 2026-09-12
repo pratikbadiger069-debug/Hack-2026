@@ -23,8 +23,8 @@ export async function POST(req: NextRequest) {
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
       linkedinUrl: linkedinUrl || `https://linkedin.com/in/${cleanName.toLowerCase().replace(/\s+/g, '-')}`,
       education: {
-        college: 'Stanford University',
-        degree: 'Bachelor of Science in Computer Science',
+        college: 'HITAM',
+        degree: 'Bachelor of Technology in Computer Science',
         department: 'CSE',
         graduationYear: '2026',
       },

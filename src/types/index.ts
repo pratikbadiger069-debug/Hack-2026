@@ -11,12 +11,66 @@ export interface AuthUser {
   emailVerified?: boolean;
 }
 
-export type AIProvider = 'gemini' | 'openai' | 'claude';
+export type AIProvider = 'gemini' | 'openai' | 'claude' | 'groq' | 'openrouter' | 'deepseek';
 
 export interface AIKeys {
   gemini: string;
   openai: string;
   claude: string;
+  groq?: string;
+  openrouter?: string;
+  deepseek?: string;
+}
+
+export interface AIProviderConfig {
+  id: AIProvider;
+  name: string;
+  model: string;
+  models: string[];
+  apiKey: string;
+  enabled: boolean;
+  isDefault: boolean;
+  latencyMs?: number;
+  status: 'connected' | 'untested' | 'error' | 'disconnected';
+  lastTested?: string;
+  errorMessage?: string;
+  docsUrl: string;
+}
+
+export type CopilotMentorMode =
+  | 'career'
+  | 'project'
+  | 'interview'
+  | 'learning'
+  | 'opportunity'
+  | 'general';
+
+export interface CopilotChatMessage {
+  id: string;
+  sender: 'user' | 'assistant' | 'system';
+  content: string;
+  text?: string;
+  timestamp: string;
+  mode?: CopilotMentorMode;
+  provider?: AIProvider;
+  model?: string;
+  isStreaming?: boolean;
+  suggestedActions?: string[];
+  codeSnippets?: { language: string; code: string; title?: string }[];
+  evidencePills?: { label: string; type: 'github' | 'assessment' | 'project' | 'skill' }[];
+  scoreImpact?: { builderScore?: number; xp?: number };
+  structuredType?: 'roadmap' | 'gps' | 'missions' | 'projects' | 'gaps' | 'opportunities' | 'readiness' | 'memory' | 'profile_analysis';
+  structuredPayload?: any;
+}
+
+export interface CopilotChatSession {
+  id: string;
+  title: string;
+  mode: CopilotMentorMode;
+  pinned: boolean;
+  createdAt: string;
+  updatedAt: string;
+  messages: CopilotChatMessage[];
 }
 
 export type ThemeColor = 'blue' | 'orange' | 'green' | 'gray' | 'ocean-blue' | 'sunset-orange' | 'forest-green' | 'purple-haze' | 'monochrome' | 'cyber-teal';
@@ -99,6 +153,7 @@ export interface ProfessionalDetails {
   knownSkills?: string[];
   projectCountRange?: string;
   hasHackathonExperience?: boolean;
+  githubScore?: number;
 }
 
 export interface GitHubPinnedRepo {
@@ -403,16 +458,6 @@ export interface LearningVelocity {
   githubGrowthRate: string; // e.g. "+34% Commits MoM"
 }
 
-export interface CopilotChatMessage {
-  id: string;
-  sender: 'user' | 'copilot';
-  text: string;
-  timestamp: string;
-  mode?: 'career' | 'learning' | 'projects' | 'interview' | 'productivity';
-  structuredType?: 'roadmap' | 'gps' | 'missions' | 'projects' | 'gaps' | 'opportunities' | 'readiness' | 'memory' | 'profile_analysis';
-  structuredPayload?: any;
-}
-
 export type CopilotAssistantMode = 'career' | 'learning' | 'projects' | 'interview' | 'productivity';
 
 export interface CopilotMemoryItem {
@@ -420,7 +465,7 @@ export interface CopilotMemoryItem {
   category: 'goal' | 'tech_stack' | 'learning_plan' | 'project_idea' | 'weakness' | 'strength' | 'custom';
   content: string;
   timestamp: string;
-  relevance: number;
+  relevance?: number;
 }
 
 export interface CopilotMemory {
@@ -527,16 +572,52 @@ export interface CandidateApplication {
   name: string;
   avatar: string;
   college: string;
+  institution?: string;
   department: string;
+  branch?: string;
+  degree?: string;
+  graduationYear?: string;
+  location?: string;
   targetRole: string;
   jobId: string;
   builderScore: number;
   employabilityScore: number;
+  careerReadinessScore?: number;
+  githubScore?: number;
   matchScore: number;
   stage: 'Matched' | 'Shortlisted' | 'Assessment' | 'Interview' | 'Selected';
   appliedDate: string;
   topSkills: string[];
   githubUrl: string;
+  linkedinUrl?: string;
+  portfolioUrl?: string;
+  resumeUrl?: string;
+  verifiedSkills?: {
+    name: string;
+    category?: string;
+    level?: string;
+    score?: number;
+    sources?: string[];
+  }[];
+  projects?: {
+    title: string;
+    techStack: string[];
+    githubUrl?: string;
+    projectScore?: number;
+    description?: string;
+  }[];
+  certifications?: {
+    title: string;
+    issuer: string;
+    date?: string;
+    score?: number;
+  }[];
+  assessments?: {
+    title: string;
+    score: number;
+    passed: boolean;
+    date?: string;
+  }[];
 }
 
 export interface Assignment {

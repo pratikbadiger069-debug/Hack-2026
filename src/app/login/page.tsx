@@ -91,8 +91,8 @@ export default function LoginPage() {
     setOauthLoading('google');
     setErrorMessage(null);
     try {
-      const googleEmail = email.trim() || 'aarav.sharma@gmail.com';
-      await loginWithGoogle(googleEmail, 'Aarav Sharma');
+      const googleEmail = email.trim() || 'manutej.reddy@hitam.org';
+      await loginWithGoogle(googleEmail, 'Manutej Reddy');
       setOauthLoading(null);
       const state = useAppStore.getState();
       if (!state.studentProfile?.onboardingCompleted) {
@@ -110,7 +110,7 @@ export default function LoginPage() {
     setOauthLoading('github');
     setErrorMessage(null);
     try {
-      await loginWithGitHub('aarav-builder');
+      await loginWithGitHub('manutejreddy');
       setOauthLoading(null);
       const state = useAppStore.getState();
       if (!state.studentProfile?.onboardingCompleted) {

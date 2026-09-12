@@ -17,9 +17,9 @@ export interface AuthUser {
 
 export const DEMO_USERS: Record<UserRole, AuthUser> = {
   student: {
-    id: 'demo-student-1',
-    email: 'aarav.sharma@stanford.edu',
-    name: 'Aarav Sharma (Demo)',
+    id: 'student-primary',
+    email: 'manutej.reddy@skillbridge.edu',
+    name: 'Manutej Reddy',
     role: 'student',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     isDemoMode: true,

@@ -62,7 +62,7 @@ export function GitHubStreakCard() {
   };
 
   const handleConnect = () => {
-    connectGitHub('aarav-builder');
+    connectGitHub('manutejreddy');
   };
 
   return (
