@@ -1385,9 +1385,8 @@ export function generatePersonalizedAssessment(
  * Dynamic Resource Engine
  * Generates verified learning references per topic / concept.
  */
-export function getTopicLearningResources(topicName: string, subtopic?: string): QuestionLearningReferences {
+export function getTopicLearningResources(topicName: string, _subtopic?: string): QuestionLearningReferences {
   const t = (topicName || '').toLowerCase();
-  const sub = (subtopic || '').toLowerCase();
 
   if (t.includes('java')) {
     return {

@@ -10,12 +10,12 @@ interface ParticleFieldProps {
  * Decorative CSS-animated particle overlay for hero sections.
  * Each particle gets randomized position, size, drift direction, and delay.
  */
-export default function ParticleField({ count = 18 }: ParticleFieldProps) {
-  const [mounted, setMounted] = React.useState(false);
+const emptySubscribe = () => () => {};
+const getSnapshot = () => true;
+const getServerSnapshot = () => false;
 
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
+export default function ParticleField({ count = 18 }: ParticleFieldProps) {
+  const mounted = React.useSyncExternalStore(emptySubscribe, getSnapshot, getServerSnapshot);
 
   const particles = React.useMemo(() => {
     return Array.from({ length: count }, (_, i) => {

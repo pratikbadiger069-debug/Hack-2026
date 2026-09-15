@@ -163,7 +163,7 @@ function saveDb(data: DBData) {
       fs.mkdirSync(dir, { recursive: true });
     }
     fs.writeFileSync(DB_FILE_PATH, JSON.stringify(data, null, 2), 'utf-8');
-  } catch (err) {
+  } catch {
     console.warn('Warning: Serverless persistent write skipped, updated in-memory state.');
   }
 }

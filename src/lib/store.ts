@@ -713,7 +713,7 @@ export const useAppStore = create<AppState>()(
           const completedCount = updatedQuests.filter((q) => q.completed).length;
 
           // Add verified skill if challenge is advanced/expert/boss
-          let updatedSkills = [...state.studentProfile.verifiedSkills];
+          const updatedSkills = [...state.studentProfile.verifiedSkills];
           if (targetQuest && targetQuest.skillsGained.length > 0) {
             const primarySkill = targetQuest.skillsGained[0];
             const alreadyExists = updatedSkills.some((s) => s.name.toLowerCase().includes(primarySkill.toLowerCase()));
@@ -1722,7 +1722,7 @@ export const useAppStore = create<AppState>()(
           const levelInfo = getLevelInfo(newXP);
 
           // Update verified skills if passed
-          let updatedSkills = [...state.studentProfile.verifiedSkills];
+          const updatedSkills = [...state.studentProfile.verifiedSkills];
           if (record.passed) {
             const existingIdx = updatedSkills.findIndex((s) => s.name.toLowerCase() === record.topic.toLowerCase());
             if (existingIdx >= 0) {

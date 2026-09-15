@@ -49,7 +49,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    refreshSession();
+    queueMicrotask(() => {
+      refreshSession();
+    });
   }, []);
 
   return (
